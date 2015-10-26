@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="theme-next  ">
+<html class="theme-next  theme-next-mist">
 <head>
   
 
@@ -46,23 +46,23 @@
 
 
 <meta name="description" content="The first version of this article was written on 2015-01-15. It was updated when I moved my blog to github pages.
-The Problem and the first solutionI have been revisiting Python recently and walked th">
+The Problem and the simple timing scriptI have been revisiting Python recently and wal">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Simple Python performance timing by checkpoints">
 <meta property="og:url" content="http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/index.html">
 <meta property="og:site_name" content="Artificial Learning and Evolution inspired by Nature">
 <meta property="og:description" content="The first version of this article was written on 2015-01-15. It was updated when I moved my blog to github pages.
-The Problem and the first solutionI have been revisiting Python recently and walked th">
-<meta property="og:updated_time" content="2015-10-22T01:53:35.008Z">
+The Problem and the simple timing scriptI have been revisiting Python recently and wal">
+<meta property="og:updated_time" content="2015-10-25T03:22:38.878Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Simple Python performance timing by checkpoints">
 <meta name="twitter:description" content="The first version of this article was written on 2015-01-15. It was updated when I moved my blog to github pages.
-The Problem and the first solutionI have been revisiting Python recently and walked th">
+The Problem and the simple timing scriptI have been revisiting Python recently and wal">
 
 
 <script type="text/javascript" id="hexo.configuration">
   var CONFIG = {
-    scheme: '',
+    scheme: 'Mist',
     sidebar: 'post'
   };
 </script>
@@ -203,7 +203,7 @@ The Problem and the first solutionI have been revisiting Python recently and wal
 
       
         <span itemprop="articleBody"><p><em><a href="https://dracodoc.wordpress.com/2015/01/15/a-python-script-inline-timer/" target="_blank" rel="external">The first version of this article</a> was written on 2015-01-15. It was updated when I moved my blog to github pages.</em></p>
-<h2 id="The_Problem_and_the_first_solution">The Problem and the first solution</h2><p>I have been revisiting Python recently and walked through <a href="https://developers.google.com/edu/python/" target="_blank" rel="external">Google’s tutorial</a>. Interestingly my first solution to one of the exercise <strong><em>word count</em></strong> took a lot of time to analysis a 600K text.</p>
+<h1 id="The_Problem_and_the_simple_timing_script">The Problem and the simple timing script</h1><p>I have been revisiting Python recently and walked through <a href="https://developers.google.com/edu/python/" target="_blank" rel="external">Google’s tutorial</a>. Interestingly my first solution to one of the exercise <strong><em>word count</em></strong> took a lot of time to analysis a 600K text.</p>
 <p>I wanted some profile tool to locate the bottle neck. There are lots of profiler tools but they seemed to be too “heavy weighted” for my simple purpose. <a href="http://www.huyng.com/posts/python-performance-analysis/" target="_blank" rel="external">This great Python profiler guide</a> introduced a simple <em>timing context manager</em> script to measure script execution. You will need to</p>
 <blockquote>
 <p>wrap blocks of code that you want to time with Python’s <em>with</em> keyword and this <em>Timer</em> context manager. It will take care of starting the timer when your code block begins execution and stopping the timer when your code block ends.</p>
@@ -228,7 +228,7 @@ rdb = Redis()
 </code></pre><p>However, this is a linear look up in a list which didn’t utilize the constant time access of HashMap. The right way is to use dict directly without keys().</p>
 <pre><code><span class="keyword">if</span> <span class="keyword">key</span> <span class="keyword">in</span> dict
 </code></pre><p>So the problem was solved but I still found the timing context manager not simple and intuitive enough. Adding timer means lots of edits and indents of original code, and moving checkpoints involves more editing and indenting.</p>
-<h2 id="My_simple_script_that_timing_code_by_checkpoints">My simple script that timing code by checkpoints</h2><p>I wrote a simple script that have similar function of timing code blocks by checkpoints, tried to keep the effort of using it minimal. Just first import the module, then place some checkpoints in the location you want.</p>
+<h1 id="My_version_of_even_simpler_timing_script">My version of even simpler timing script</h1><p>I wrote a simple script that have similar function of timing code blocks by checkpoints, tried to keep the effort of using it minimal. Just first import the module, then place some checkpoints in the location you want.</p>
 <ul>
 <li>Place <code>times.start(digit)</code> in the place that you want the timer start. <code>digit</code> control the digits after the decimal point, default at 7.</li>
 <li>Use <code>times.seg_start(&quot;msg&quot;)</code> and <code>times.seg_stop(&quot;msg&quot;)</code> enclose a code block and print the time of start and stop. <code>msg</code> can be used to identify the code block in the output. </li>
@@ -255,6 +255,20 @@ rdb = Redis()
         </div>
       
 
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/10/23/house-price/" rel="prev" title="Exploring House Price Estimation and Imagining a better Real Estate website">
+                Exploring House Price Estimation and Imagining a better Real Estate website <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
       
 
       
@@ -320,21 +334,21 @@ rdb = Redis()
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/">
-              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-count">2</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
 
           <div class="site-state-item site-state-categories">
             
-              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-count">2</span>
               <span class="site-state-item-name">categories</span>
               
           </div>
 
           <div class="site-state-item site-state-tags">
             
-              <span class="site-state-item-count">1</span>
+              <span class="site-state-item-count">8</span>
               <span class="site-state-item-name">tags</span>
               
           </div>
@@ -362,7 +376,7 @@ rdb = Redis()
           <div class="post-toc">
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#The_Problem_and_the_first_solution"><span class="nav-number">1.</span> <span class="nav-text">The Problem and the first solution</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#My_simple_script_that_timing_code_by_checkpoints"><span class="nav-number">2.</span> <span class="nav-text">My simple script that timing code by checkpoints</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#The_Problem_and_the_simple_timing_script"><span class="nav-number">1.</span> <span class="nav-text">The Problem and the simple timing script</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#My_version_of_even_simpler_timing_script"><span class="nav-number">2.</span> <span class="nav-text">My version of even simpler timing script</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator"></div>
@@ -394,7 +408,7 @@ rdb = Redis()
 <div class="theme-info">
   Theme -
   <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
-    NexT
+    NexT.Mist
   </a>
 </div>
 
