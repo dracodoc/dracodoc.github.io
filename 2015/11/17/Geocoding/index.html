@@ -1,0 +1,725 @@
+<!doctype html>
+<html class="theme-next  theme-next-mist">
+<head>
+  
+
+<meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
+
+
+
+  
+    <link href='//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+  
+
+
+<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
+
+<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
+
+
+    <meta name="description" content="Artificial learning and Evolution inspired by nature" />
+
+
+
+  <meta name="keywords" content="DataKind,NFIRS,PostGIS,Tiger Geocoder," />
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+<meta name="description" content="BackgroundI found I want to geocode lots of addresses in my Red Cross Smoke Alarm Project. The NFIRS data have 18 million addresses in 9 years data, and I would like to 
+
+verify all the addresses beca">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Geocoding 18 million addresses with PostGIS Tiger Geocoder">
+<meta property="og:url" content="http://dracodoc.github.io/2015/11/17/Geocoding/index.html">
+<meta property="og:site_name" content="Artificial Learning and Evolution inspired by Nature">
+<meta property="og:description" content="BackgroundI found I want to geocode lots of addresses in my Red Cross Smoke Alarm Project. The NFIRS data have 18 million addresses in 9 years data, and I would like to 
+
+verify all the addresses beca">
+<meta property="og:updated_time" content="2015-11-19T19:53:42.325Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Geocoding 18 million addresses with PostGIS Tiger Geocoder">
+<meta name="twitter:description" content="BackgroundI found I want to geocode lots of addresses in my Red Cross Smoke Alarm Project. The NFIRS data have 18 million addresses in 9 years data, and I would like to 
+
+verify all the addresses beca">
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'hide'
+  };
+</script>
+
+
+
+  <title> Geocoding 18 million addresses with PostGIS Tiger Geocoder | Artificial Learning and Evolution inspired by Nature </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Artificial Learning and Evolution inspired by Nature</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content"> 
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Geocoding 18 million addresses with PostGIS Tiger Geocoder
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            Posted on
+            <time itemprop="dateCreated" datetime="2015-11-17T11:36:10-05:00" content="2015-11-17">
+              2015-11-17
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; In
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Data-Science/" itemprop="url" rel="index">
+                    <span itemprop="name">Data Science</span>
+                  </a>
+                </span>
+
+                
+                
+                  , 
+                
+
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Data-Science/Geocoding/" itemprop="url" rel="index">
+                    <span itemprop="name">Geocoding</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2015/11/17/Geocoding/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/11/17/Geocoding/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h3 id="Background">Background</h3><p>I found I want to geocode lots of addresses in my <a href="http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/">Red Cross Smoke Alarm Project</a>. The <a href="https://github.com/brooksandrew/arc_smoke_alarm/wiki/References-and-Data-Sources#public-data-sources" target="_blank" rel="external">NFIRS data</a> have 18 million addresses in 9 years data, and I would like to </p>
+<ul>
+<li>verify all the addresses because many inputs have quality problems.</li>
+<li>map street address to coordinates, so we can map and do more geospatial analysis.</li>
+<li>map street address to census block, then we can link NFIRS data to other public data like census data of <a href="https://www.census.gov/programs-surveys/acs/" target="_blank" rel="external">American Community Survey(ACS)</a> and <a href="http://www.census.gov/programs-surveys/ahs.html" target="_blank" rel="external">American Housing Survey(AHS)</a>).<a id="more"></a>
+</li>
+</ul>
+<h3 id="Possible_Approaches">Possible Approaches</h3><p>I did some research on the possible options:</p>
+<ul>
+<li>Online service. Most free online API have limit, and paid service would be too expensive for my task. Surprisingly FCC have <a href="https://www.fcc.gov/developers/census-block-conversions-api" target="_blank" rel="external">an API</a> to map coordinates to census block which didn’t mention limit, but it cannot geocode street address to coordinates.</li>
+<li>Setup your own geocoder. <a href="http://postgis.net/docs/Extras.html#Tiger_Geocoder" target="_blank" rel="external">Tiger geocoder</a> is a PostGIS extension which use Census Tiger data to geocode addresses.</li>
+</ul>
+<p>PostGIS can work in both windows and linux, and Enigma.io has shared their <a href="https://github.com/enigma-io/ansible-tiger-geocoder-playbook" target="_blank" rel="external">automated Tiger Geocoder setup tool</a> for linux. However the Tiger database itself need 105G space and I don’t have a linux box for that(Amazon AWS free tier service only allow for 30G storage), so I decided to install PostGIS in windows and experiment with everything first.</p>
+<h3 id="Windows_Setup">Windows Setup</h3><p>I need to install postgresql server, PostGIS extension and Tiger geocoder extension. <a href="http://www.bostongis.com/?content_name=postgis_tut01" target="_blank" rel="external">This</a> is a very detailed installation guide for PostGIS in windows. I’ll just add some notes from my experience:</p>
+<ul>
+<li>It’s best if you could install the database in SSD drive. My first setup was in SSD and only have two states data, the geocoding performance was pretty good. Then I need to download all the states so I have to move the database to regular hard drive according to <a href="https://wiki.postgresql.org/wiki/Change_the_default_PGDATA_directory_on_Windows" target="_blank" rel="external">this guide</a> (<em>note the data folder path value cannot have the trialling escape, otherwise the PostgreSQL Service will just fail</em>). After that the geocoding performance dropped considerably.</li>
+<li>The pgAdmin is easy to use. I used SQL Query, View Data (or view top 100 rows if the table is huge) a lot. The explain analyze function in the SQL Query tool is also very intuitive.</li>
+</ul>
+<p>With server and extension installed, I need to load Tiger data. The Tiger geocoder provided scripts generating functions for you to download Tiger data from Census ftp then set up the database. <a href="http://postgis.net/docs/Loader_Generate_Nation_Script.html" target="_blank" rel="external">The official documentation</a> didn’t provide enough information for me, so I have to search and tweak a lot. At first I tried the commands from SQL query tool but it didn’t show any result. Later I solved this problem with hints from <a href="http://gis.stackexchange.com/questions/81907/install-postgis-and-tiger-data-in-ubuntu-12-04" target="_blank" rel="external">this guide</a>, although it was written for Ubuntu.</p>
+<ul>
+<li>You need to install 7z.exe and wget windows version and record their path.</li>
+<li>Create a directory for download. Postgresql need to have permission for that folder. I just created the folder in same level with the postgresql database folder, and both of them have user group <code>Authenticated users</code> in full control. If you write a sql copy command to read csv file in some other folder that don’t have this user permission, there could be a permission denied error.</li>
+<li><p>Start pgAdmin, connect to the GIS database you created in installation, run psql tool from pgAdmin, input <code>\a</code> <code>\t</code> to set up format first, and set output file by</p>
+<pre><code>\<span class="tag">o</span> <span class="tag">nation_generator</span><span class="class">.bat</span>
+</code></pre><p>then run </p>
+<pre><code><span class="operator"><span class="keyword">SELECT</span> loader_generate_nation_script(<span class="string">'windows'</span>);</span> 
+</code></pre><p>to generate the script to load national tables. It will be a file with the name specified with <code>\o nation_generator.bat</code> before located in the same folder of <code>psql.exe</code>, which should be the postgresql bin folder.</p>
+</li>
+<li><p>Technically you can input the parameters specific to your system settings in the table <code>loader_variables</code> and <code>loader_platform</code> which are under <code>tiger</code> schema. However after I inputed the parameters, only the stage folder(i.e. where to download data to) was taken into generated script. My guess is the file path with spaces need be proper escaped and quoted. The script generating function is reading from database then write to file, hat means the file path will go through several different internal representations, which make the escaping and quoting more complicated. I just replaced the default parameters with mine in the generated script later.</p>
+</li>
+<li>All the parameters are listed in the first section of generated script, and <code>cd your_stage_folder</code> will be used several times through the script. You need to edit the parameters in first section and make sure the stage folder is correct in all places.</li>
+<li><p>After the national data is loaded by running with the script, you can specify the states that you want to load. Actually the tiger database support 56 states/regions. You can find them by </p>
+<pre><code>select stusps, name <span class="keyword">from</span> tiger.<span class="keyword">state</span> order by stusps;
+</code></pre></li>
+<li><p>Start psql again, go through similar steps and run</p>
+<pre><code><span class="operator"><span class="keyword">SELECT</span> loader_generate_script(<span class="built_in">ARRAY</span>[<span class="string">'VA'</span>,<span class="string">'MD'</span>], <span class="string">'windows'</span>);</span>
+</code></pre><p>  Put the states abbreviations that you want in the array. Note if you copy the query results it will be quoted with double quote by default, but you need single quote in SQL. You can change the pgAdmin output setting in <code>Options - Query tool - Results grid</code>.</p>
+</li>
+<li><p>The generated script will have one section for each state, each section have parameters set in beginning. You need to replace the parameters and the <code>cd your_stage_folder</code> to correct values. Using an editor that support multi line search replace will make this much easier.</p>
+</li>
+<li>I don’t want to load 56 states in one script. If anything went wrong it will be bothersome to start again from last point. I wanted to split the big script into 56 ones, one state each. I searched for a while and didn’t find a software to do this, then I just wrote a python script.</li>
+<li><p>First add a marker in the script to separate states. I replaced all occurrences of</p>
+<pre><code>set TMPDIR=e:<span class="command">\data</span><span class="command">\gisdata</span><span class="command">\temp</span><span class="command">\\</span>
+</code></pre><p>to </p>
+<pre><code>:: ---- end <span class="keyword">state</span> ----
+<span class="built_in">set</span> TMPDIR=e:\data\gisdata\temp\\
+</code></pre><p>then deleted the <code>:: ---- end state ----</code> marker in the first line. This make the marker appear in the end of each state section. Note the <code>::</code> is commenting symbol in dos bat so it will not interfere with the script.</p>
+<p>  Then I run this python script to split it by states.</p>
+</li>
+</ul>
+<figure class="highlight python"><figcaption><span>splitStates.py</span><a href="https://gist.github.com/dracodoc/f0eeeac91eb0d68c712c#file-splitstates-py" target="_blank" rel="external">Open in Github</a></figcaption><table><tr><td class="code"><pre><span class="line">__author__ = <span class="string">'draco'</span></span><br><span class="line"><span class="comment"># split all states loader script into separate scripts by states.</span></span><br><span class="line"><span class="comment"># replace all the "set TMPDIR=..." line with ":: ---- end state ----\nset TMPDIR=..."</span></span><br><span class="line"><span class="comment"># then delete the first line of ":: ---- end state ----\n"</span></span><br><span class="line"><span class="comment"># modify the base file path and output file folder by your case.</span></span><br><span class="line"></span><br><span class="line">text_file = open(<span class="string">"e:\\Data\\all_states.bat"</span>,<span class="string">"r"</span>)</span><br><span class="line">lines = text_file.readlines()</span><br><span class="line">text_file.close()</span><br><span class="line"><span class="keyword">print</span> len(lines)</span><br><span class="line">sep = <span class="string">":: ---- end state ----\n"</span></span><br><span class="line">file_no = <span class="number">1</span></span><br><span class="line">temp = <span class="string">""</span></span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> lines[<span class="number">0</span>:]:</span><br><span class="line">    <span class="keyword">if</span> line != sep:</span><br><span class="line">        temp += line</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        state_file = open(<span class="string">"e:\\Data\\"</span> + str(file_no).zfill(<span class="number">2</span>) + <span class="string">".bat"</span>, <span class="string">'w'</span>)</span><br><span class="line">        state_file.write(temp)</span><br><span class="line">        state_file.close()</span><br><span class="line">        temp = line</span><br><span class="line">        file_no += <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<h3 id="Linux_Setup">Linux Setup</h3><p>After I moved the postgresql database to regular hard drive because of storage limit, the geocoding performance was very low. Fortunately I got the generous support of DataKind on their AWS resources, so I can run the geocoding task in Amazon EC2 server. I want to test everything as comprehensive as possible before deploying an expensive EC2 instance, thus I decided to do everything with the Amazon EC2 free tier service first. The free tier only allow 30G storage, 1G RAM but I can test with 2 states first.</p>
+<p>I used the <a href="https://github.com/enigma-io/ansible-tiger-geocoder-playbook" target="_blank" rel="external">ansible playbook</a> from Enigma to setup the AWS EC2 instance. Here are some notes:</p>
+<ul>
+<li>Be careful when using AWS free tier service, anything not explicitly marked as <code>free tier</code> could cost money.</li>
+<li>For a test server with national tables and 2 states data, the free tier t2.micro instance actually is enough. You can normalizing addresses, mapping census block for all states and geocoding for those 2 states addresses. Actually my 2 states free server with 1G RAM is much faster than the t2.large 8G server with all states data loaded. I’ll discuss this in more details in another post about the geocoding script.</li>
+<li>I used <a href="https://www.bitvise.com/ssh-client" target="_blank" rel="external">bitvise</a> as my ssh and sftp tool since it seemed to be an enhanced putty.</li>
+<li>I either use nano as the editor in AWS instance, or just download the file to be edited with sftp, edit then upload. It’s much easier to edit multiple places with sublime.</li>
+</ul>
+<p>After lots of experimentation I have my batch geocoding workflow ready, then I started to setup the full scale server with DataKind resources.</p>
+<ul>
+<li><p>Interestingly, <code>sudo</code> doesn’t work in the t2.large instance. I searched and found it’s because <a href="https://forums.aws.amazon.com/thread.jspa?threadID=104765" target="_blank" rel="external">the private ip is not in hosts</a>. The problem can be solved by adding the machine name into hosts file, however how can you edit hots file without <code>sudo</code>? Finally I <a href="http://askubuntu.com/questions/91598/how-do-i-login-as-root" target="_blank" rel="external">used this</a> to solve this problem.</p>
+<pre><code>sudo passwd root
+<span class="keyword">su</span> root
+nano /etc/hosts
+<span class="keyword">su</span> ubuntu
+</code></pre></li>
+<li><p>The command of running ansible playbook from the Enigma repo have <code>\</code> to extend one line into multiple lines. My first try didn’t copy the new line after each <code>\</code> correctly (because I was using a firefox extension to automatically copy on select) and the command cannot run, but the error message was very misleading so I didn’t realize it’s because of this. </p>
+</li>
+<li>Although the Tiger database will take 105G at last, the downloading and provisioning need more spaces for temporary files. My first attempt with 120G storage was filled up in the provisioning, so I have to start again with 180G. </li>
+<li><code>Gnu Screen</code> let you use same terminal window to switch between tasks or even split windows, so that you can leave the process running but detached from the screen. It’s essential to run and control the time consuming tasks. Here is a <a href="http://www.pixelbeat.org/lkdb/screen.html" target="_blank" rel="external">cheat sheet</a> and <a href="http://aperiodic.net/screen/quick_reference" target="_blank" rel="external">quick list</a>.</li>
+<li>I enabled the color prompt of bash by removing comment of <code>#force_color_prompt=yes</code> in <code>~/.bashrc</code>. When you need to scroll through long history of command line or reading many lines of output, a colored prompt could separate the command and the output well.</li>
+<li><p>You may need to use psql a lot, so I placed a <a href="http://www.postgresql.org/docs/9.4/static/libpq-pgpass.html" target="_blank" rel="external">.pgpass</a> file in my user folder. I also set several other options in <code>.psqlrc</code> file in user folder, including color prompt, timing on, vertical output etc.</p>
+<pre><code>\timing
+\x auto
+\<span class="keyword">set</span> COMP_KEYWORD_CASE upper
+\<span class="keyword">set</span> PROMPT1 '<span class="envvar">%[%</span><span class="number">033</span>[<span class="number">1</span>;<span class="number">33</span>;<span class="number">40</span>m<span class="envvar">%]%</span>n@<span class="envvar">%/%</span>R<span class="envvar">%[%</span><span class="number">033</span>[<span class="number">0</span>m<span class="envvar">%]%</span># '
+</code></pre></li>
+<li><p>I was not satisfied with the geocoding performance so I experimented with tuning postgresql configurations. <a href="http://www.linux.com/learn/tutorials/394523-configuring-postgresql-for-pretty-good-performance" target="_blank" rel="external">This post</a> and <a href="http://workshops.boundlessgeo.com/postgis-intro/tuning.html#section-21-tuning-postgresql-for-spatial" target="_blank" rel="external">this guide</a> helped me most. The average time needed for geocoding one address in a 200 records sample dropped from 320 ms to 100 ms.</p>
+</li>
+</ul>
+<h3 id="Geocoding_Script_And_Work_Flow_Setup">Geocoding Script And Work Flow Setup</h3><p>I’ll discuss the geocoding script and my work flow for batch geocoding in next post.</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/DataKind/" rel="tag">#DataKind</a>
+          
+            <a href="/tags/NFIRS/" rel="tag">#NFIRS</a>
+          
+            <a href="/tags/PostGIS/" rel="tag">#PostGIS</a>
+          
+            <a href="/tags/Tiger-Geocoder/" rel="tag">#Tiger Geocoder</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/11/11/Red-Cross-Smoke-Alarm-Project/" rel="next" title="Red Cross Smoke Alarm Project">
+                <i class="fa fa-chevron-left"></i> Red Cross Smoke Alarm Project
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+ </div>
+
+        
+
+        
+          <div class="comments" id="comments">
+            
+              <div id="disqus_thread">
+                <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+              </div>
+            
+          </div>
+        
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table Of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="dracodoc" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">dracodoc</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Artificial learning and Evolution inspired by nature</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/">
+              <span class="site-state-item-count">4</span>
+              <span class="site-state-item-name">posts</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            
+              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-name">categories</span>
+              
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            
+              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-name">tags</span>
+              
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc">
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Background"><span class="nav-number">1.</span> <span class="nav-text">Background</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Possible_Approaches"><span class="nav-number">2.</span> <span class="nav-text">Possible Approaches</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Windows_Setup"><span class="nav-number">3.</span> <span class="nav-text">Windows Setup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux_Setup"><span class="nav-number">4.</span> <span class="nav-text">Linux Setup</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Geocoding_Script_And_Work_Flow_Setup"><span class="nav-number">5.</span> <span class="nav-text">Geocoding Script And Work Flow Setup</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner"> <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2015</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dracodoc</span>
+</div>
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+ </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+  
+    
+    
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'dracodocgithub';
+      var disqus_identifier = '2015/11/17/Geocoding/';
+      var disqus_title = 'Geocoding 18 million addresses with PostGIS Tiger Geocoder';
+      var disqus_url = 'http://dracodoc.github.io/2015/11/17/Geocoding/';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+  
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  
+
+  <script type="text/javascript" src="/js/motion_fallback.js?v=0.4.5.2" id="motion.fallback"></script>
+
+
+
+
+  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 0.4 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    var $tocContent = $('.post-toc-content');
+    if (isDesktop() && CONFIG.sidebar === 'post') {
+      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+        displaySidebar();
+      }
+    }
+  });
+</script>
+
+
+
+  <script type="text/javascript">
+    $(document).ready(function () {
+      if (CONFIG.sidebar === 'always') {
+        displaySidebar();
+      }
+      if (isMobile()) {
+        FastClick.attach(document.body);
+      }
+
+      motionIntegrator.bootstrap();
+    });
+  </script>
+
+  
+  
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/lazyload.js"></script>
+  <script type="text/javascript">
+    $(function () {
+      $("#posts").find('img').lazyload({
+        placeholder: "/images/loading.gif",
+        effect: "fadeIn"
+      });
+    });
+  </script>
+</body>
+</html>
