@@ -1,11 +1,10 @@
 <!doctype html>
-<html class="theme-next  theme-next-mist">
+<html class="theme-next ">
 <head>
-  
-
-<meta charset="UTF-8"/>
+  <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
 
 
 <meta http-equiv="Cache-Control" content="no-transform" />
@@ -18,22 +17,22 @@
 
 
 
-  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
 
 
 
-  
-    <link href='//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-  
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
 
 
-<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
-
-<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
 
 
-    <meta name="description" content="Artificial learning and Evolution inspired by nature" />
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
 
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
 
 
   <meta name="keywords" content="Python," />
@@ -42,7 +41,14 @@
 
 
 
+
+
+
   <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
 
 
 <meta name="description" content="The first version of this article was written on 2015-01-15. It was updated when I moved my blog to github pages.
@@ -60,14 +66,14 @@ The Problem and the simple timing scriptI have been revisiting Python recently a
 The Problem and the simple timing scriptI have been revisiting Python recently and wal">
 
 
+
 <script type="text/javascript" id="hexo.configuration">
   var CONFIG = {
     scheme: 'Mist',
-    sidebar: 'hide'
+    sidebar: 'hide',
+    motion: false
   };
 </script>
-
-
 
   <title> Simple Python performance timing by checkpoints | Artificial Learning and Evolution inspired by Nature </title>
 </head>
@@ -119,6 +125,23 @@ The Problem and the simple timing scriptI have been revisiting Python recently a
   
 
   
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
 
   
 </nav>
@@ -128,11 +151,16 @@ The Problem and the simple timing scriptI have been revisiting Python recently a
 
     <main id="main" class="main">
       <div class="main-inner">
-        <div id="content" class="content"> 
+        <div id="content" class="content">
+          
 
   <div id="posts" class="posts-expand">
     
 
+  
+  
+
+  
   
   
 
@@ -203,10 +231,10 @@ The Problem and the simple timing scriptI have been revisiting Python recently a
 
       
         <span itemprop="articleBody"><p><em><a href="https://dracodoc.wordpress.com/2015/01/15/a-python-script-inline-timer/" target="_blank" rel="external">The first version of this article</a> was written on 2015-01-15. It was updated when I moved my blog to github pages.</em></p>
-<h1 id="The_Problem_and_the_simple_timing_script">The Problem and the simple timing script</h1><p>I have been revisiting Python recently and walked through <a href="https://developers.google.com/edu/python/" target="_blank" rel="external">Google’s tutorial</a>. Interestingly my first solution to one of the exercise <strong><em>word count</em></strong> took a lot of time to analysis a 600K text.</p>
-<p>I wanted some profile tool to locate the bottle neck. There are lots of profiler tools but they seemed to be too “heavy weighted” for my simple purpose. <a href="http://www.huyng.com/posts/python-performance-analysis/" target="_blank" rel="external">This great Python profiler guide</a> introduced a simple <em>timing context manager</em> script to measure script execution. You will need to</p>
+<h1 id="the-problem-and-the-simple-timing-script">The Problem and the simple timing script</h1><p>I have been revisiting Python recently and walked through <a href="https://developers.google.com/edu/python/" target="_blank" rel="external">Google&#x2019;s tutorial</a>. Interestingly my first solution to one of the exercise <strong><em>word count</em></strong> took a lot of time to analysis a 600K text.</p>
+<p>I wanted some profile tool to locate the bottle neck. There are lots of profiler tools but they seemed to be too &#x201C;heavy weighted&#x201D; for my simple purpose. <a href="http://www.huyng.com/posts/python-performance-analysis/" target="_blank" rel="external">This great Python profiler guide</a> introduced a simple <em>timing context manager</em> script to measure script execution. You will need to</p>
 <blockquote>
-<p>wrap blocks of code that you want to time with Python’s <em>with</em> keyword and this <em>Timer</em> context manager. It will take care of starting the timer when your code block begins execution and stopping the timer when your code block ends.</p>
+<p>wrap blocks of code that you want to time with Python&#x2019;s <em>with</em> keyword and this <em>Timer</em> context manager. It will take care of starting the timer when your code block begins execution and stopping the timer when your code block ends.</p>
 </blockquote>
 <a id="more"></a>
 <p>Like this</p>
@@ -215,31 +243,41 @@ The Problem and the simple timing scriptI have been revisiting Python recently a
 rdb = Redis()
 
 <span class="keyword">with</span> Timer() <span class="keyword">as</span> t:
-    rdb.lpush(<span class="string">"foo"</span>, <span class="string">"bar"</span>)
-<span class="keyword">print</span> <span class="string">"=&gt; elasped lpush: %s s"</span> % t.secs
+    rdb.lpush(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;bar&quot;</span>)
+<span class="keyword">print</span> <span class="string">&quot;=&gt; elasped lpush: %s s&quot;</span> % t.secs
 
 <span class="keyword">with</span> Timer() <span class="keyword">as</span> t:
-    rdb.lpop(<span class="string">"foo"</span>)
-<span class="keyword">print</span> <span class="string">"=&gt; elasped lpop: %s s"</span> % t.secs
+    rdb.lpop(<span class="string">&quot;foo&quot;</span>)
+<span class="keyword">print</span> <span class="string">&quot;=&gt; elasped lpop: %s s&quot;</span> % t.secs
 </code></pre><p>I used this method and found out the problem in my script is that I used</p>
 <pre><code><span class="keyword">if</span> key <span class="keyword">in</span> dict.<span class="function"><span class="title">keys</span><span class="params">()</span></span> 
 </code></pre><p>which seems natural since I saw this before:</p>
 <pre><code><span class="keyword">for</span> key <span class="keyword">in</span> <span class="function"><span class="title">sorted</span><span class="params">(dict.keys()</span></span>):
-</code></pre><p>However, this is a linear look up in a list which didn’t utilize the constant time access of HashMap. The right way is to use dict directly without keys().</p>
+</code></pre><p>However, this is a linear look up in a list which didn&#x2019;t utilize the constant time access of HashMap. The right way is to use dict directly without keys().</p>
 <pre><code><span class="keyword">if</span> <span class="keyword">key</span> <span class="keyword">in</span> dict
 </code></pre><p>So the problem was solved but I still found the timing context manager not simple and intuitive enough. Adding timer means lots of edits and indents of original code, and moving checkpoints involves more editing and indenting.</p>
-<h1 id="My_version_of_even_simpler_timing_script">My version of even simpler timing script</h1><p>I wrote a simple script that have similar function of timing code blocks by checkpoints, tried to keep the effort of using it minimal. Just first import the module, then place some checkpoints in the location you want.</p>
+<h1 id="my-version-of-even-simpler-timing-script">My version of even simpler timing script</h1><p>I wrote a simple script that have similar function of timing code blocks by checkpoints, tried to keep the effort of using it minimal. Just first import the module, then place some checkpoints in the location you want.</p>
 <ul>
 <li>Place <code>times.start(digit)</code> in the place that you want the timer start. <code>digit</code> control the digits after the decimal point, default at 7.</li>
 <li>Use <code>times.seg_start(&quot;msg&quot;)</code> and <code>times.seg_stop(&quot;msg&quot;)</code> enclose a code block and print the time of start and stop. <code>msg</code> can be used to identify the code block in the output. </li>
 <li>You can also add single checkpoint <code>times.last_seg</code> anywhere, it will print the time elapsed since last checkpoint which could be of any type.</li>
 </ul>
 <p>Here is an example of using timing script in <strong><em>Wordcount</em></strong>. You can search and highlight <code>times</code> to see all the edits needed in script.</p>
-<figure class="highlight py"><figcaption><span>wordcount.py</span><a href="/downloads/code/wordcount.py">view raw</a></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python -tt</span></span><br><span class="line"><span class="comment"># Copyright 2010 Google Inc.</span></span><br><span class="line"><span class="comment"># Licensed under the Apache License, Version 2.0</span></span><br><span class="line"><span class="comment"># http://www.apache.org/licenses/LICENSE-2.0</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Google's Python Class</span></span><br><span class="line"><span class="comment"># http://code.google.com/edu/languages/google-python-class/</span></span><br><span class="line"></span><br><span class="line"><span class="string">"""Wordcount exercise</span><br><span class="line">Google's Python class</span><br><span class="line">"""</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> basic.util <span class="keyword">import</span> times</span><br><span class="line"></span><br><span class="line"><span class="comment">###</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># This basic command line argument parsing code is provided and</span></span><br><span class="line"><span class="comment"># calls the print_words() and print_top() functions which you must define.</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">count_words</span><span class="params">(filename)</span>:</span></span><br><span class="line">    <span class="string">"""helper method for the other 2, return dict"""</span></span><br><span class="line">    <span class="comment"># read file into words</span></span><br><span class="line">    times.seg_start(<span class="string">'count words start'</span>)</span><br><span class="line">    f = open(filename, <span class="string">'rU'</span>)</span><br><span class="line">    word_count = {}</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> f:</span><br><span class="line">        words = line.split()</span><br><span class="line">        <span class="keyword">for</span> word <span class="keyword">in</span> words:</span><br><span class="line">            word = word.lower()</span><br><span class="line">            <span class="keyword">if</span> word <span class="keyword">in</span> word_count:    <span class="comment"># 0.069 for 640k</span></span><br><span class="line">            <span class="comment">#if word_count.get(word): # 0.03s for 250k text, 0.084 for 640k</span></span><br><span class="line">                word_count[word] += <span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                word_count[word] = <span class="number">1</span></span><br><span class="line">    times.seg_stop(<span class="string">'count words stop'</span>)</span><br><span class="line">    <span class="keyword">return</span> word_count</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_words</span><span class="params">(filename)</span>:</span></span><br><span class="line">    <span class="string">"count words"</span></span><br><span class="line">    <span class="comment">#sort dict and print</span></span><br><span class="line">    word_count = count_words(filename)</span><br><span class="line">    <span class="keyword">for</span> word <span class="keyword">in</span> sorted(word_count.keys()):</span><br><span class="line">        <span class="keyword">print</span> word, word_count[word]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_top</span><span class="params">(filename)</span>:</span></span><br><span class="line">    word_count = count_words(filename)</span><br><span class="line">    word_count_pairs = word_count.items()</span><br><span class="line">    times.seg_start(<span class="string">'sorting start'</span>)</span><br><span class="line">    word_count_pairs = sorted(word_count_pairs, key = <span class="keyword">lambda</span> pair: pair[-<span class="number">1</span>], reverse=<span class="keyword">True</span>)</span><br><span class="line">    times.seg_stop(<span class="string">'sorting stop'</span>)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        <span class="keyword">print</span> word_count_pairs[i][<span class="number">0</span>], word_count_pairs[i][<span class="number">1</span>]</span><br><span class="line">    times.last_seg()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">if</span> len(sys.argv) != <span class="number">3</span>:</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'usage: ./wordcount.py {--count | --topcount} file'</span></span><br><span class="line">    sys.exit(<span class="number">1</span>)</span><br><span class="line">  times.start(<span class="number">5</span>)</span><br><span class="line">  option = sys.argv[<span class="number">1</span>]</span><br><span class="line">  filename = sys.argv[<span class="number">2</span>]</span><br><span class="line">  <span class="keyword">if</span> option == <span class="string">'--count'</span>:</span><br><span class="line">    print_words(filename)</span><br><span class="line">  <span class="keyword">elif</span> option == <span class="string">'--topcount'</span>:</span><br><span class="line">    print_top(filename)</span><br><span class="line">  <span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'unknown option: '</span> + option</span><br><span class="line">    sys.exit(<span class="number">1</span>)</span><br><span class="line">  times.end()</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">  main()</span><br></pre></td></tr></table></figure>
+<figure class="highlight py"><figcaption><span>wordcount.py</span><a href="/downloads/code/wordcount.py">view raw</a></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python -tt</span></span><br><span class="line"><span class="comment"># Copyright 2010 Google Inc.</span></span><br><span class="line"><span class="comment"># Licensed under the Apache License, Version 2.0</span></span><br><span class="line"><span class="comment"># http://www.apache.org/licenses/LICENSE-2.0</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Google&apos;s Python Class</span></span><br><span class="line"><span class="comment"># http://code.google.com/edu/languages/google-python-class/</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;Wordcount exercise</span><br><span class="line">Google&apos;s Python class</span><br><span class="line">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> basic.util <span class="keyword">import</span> times</span><br><span class="line"></span><br><span class="line"><span class="comment">###</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># This basic command line argument parsing code is provided and</span></span><br><span class="line"><span class="comment"># calls the print_words() and print_top() functions which you must define.</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">count_words</span><span class="params">(filename)</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;helper method for the other 2, return dict&quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># read file into words</span></span><br><span class="line">    times.seg_start(<span class="string">&apos;count words start&apos;</span>)</span><br><span class="line">    f = open(filename, <span class="string">&apos;rU&apos;</span>)</span><br><span class="line">    word_count = {}</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> f:</span><br><span class="line">        words = line.split()</span><br><span class="line">        <span class="keyword">for</span> word <span class="keyword">in</span> words:</span><br><span class="line">            word = word.lower()</span><br><span class="line">            <span class="keyword">if</span> word <span class="keyword">in</span> word_count:    <span class="comment"># 0.069 for 640k</span></span><br><span class="line">            <span class="comment">#if word_count.get(word): # 0.03s for 250k text, 0.084 for 640k</span></span><br><span class="line">                word_count[word] += <span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                word_count[word] = <span class="number">1</span></span><br><span class="line">    times.seg_stop(<span class="string">&apos;count words stop&apos;</span>)</span><br><span class="line">    <span class="keyword">return</span> word_count</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_words</span><span class="params">(filename)</span>:</span></span><br><span class="line">    <span class="string">&quot;count words&quot;</span></span><br><span class="line">    <span class="comment">#sort dict and print</span></span><br><span class="line">    word_count = count_words(filename)</span><br><span class="line">    <span class="keyword">for</span> word <span class="keyword">in</span> sorted(word_count.keys()):</span><br><span class="line">        <span class="keyword">print</span> word, word_count[word]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_top</span><span class="params">(filename)</span>:</span></span><br><span class="line">    word_count = count_words(filename)</span><br><span class="line">    word_count_pairs = word_count.items()</span><br><span class="line">    times.seg_start(<span class="string">&apos;sorting start&apos;</span>)</span><br><span class="line">    word_count_pairs = sorted(word_count_pairs, key = <span class="keyword">lambda</span> pair: pair[-<span class="number">1</span>], reverse=<span class="keyword">True</span>)</span><br><span class="line">    times.seg_stop(<span class="string">&apos;sorting stop&apos;</span>)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        <span class="keyword">print</span> word_count_pairs[i][<span class="number">0</span>], word_count_pairs[i][<span class="number">1</span>]</span><br><span class="line">    times.last_seg()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">if</span> len(sys.argv) != <span class="number">3</span>:</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&apos;usage: ./wordcount.py {--count | --topcount} file&apos;</span></span><br><span class="line">    sys.exit(<span class="number">1</span>)</span><br><span class="line">  times.start(<span class="number">5</span>)</span><br><span class="line">  option = sys.argv[<span class="number">1</span>]</span><br><span class="line">  filename = sys.argv[<span class="number">2</span>]</span><br><span class="line">  <span class="keyword">if</span> option == <span class="string">&apos;--count&apos;</span>:</span><br><span class="line">    print_words(filename)</span><br><span class="line">  <span class="keyword">elif</span> option == <span class="string">&apos;--topcount&apos;</span>:</span><br><span class="line">    print_top(filename)</span><br><span class="line">  <span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&apos;unknown option: &apos;</span> + option</span><br><span class="line">    sys.exit(<span class="number">1</span>)</span><br><span class="line">  times.end()</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&apos;__main__&apos;</span>:</span><br><span class="line">  main()</span><br></pre></td></tr></table></figure>
 <p>I put some efforts in the print indenting to make the output aligned:</p>
-<figure class="highlight plain"><figcaption><span>output</span></figcaption><table><tr><td class="code"><pre><span class="line">==&#62;| Timer start | set to 5 digits after decimal point&#10;=&#62; &#60;&#60; | 0          count words start&#10;      | 0.06900 s  count words stop  &#62;&#62;&#10;=&#62; &#60;&#60; | 0          sorting start&#10;      | 0.00800 s  sorting stop  &#62;&#62;&#10;the 5027&#10;to 3353&#10;and 2831&#10;=&#62; | 0.00100 s since last point&#10;=&#62; | 0.00300 s since last point. Timer end.&#10;| 0.08600 s Total time elapsed |</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><figcaption><span>output</span></figcaption><table><tr><td class="code"><pre><span class="line">==&gt;| Timer start | set to 5 digits after decimal point
+=&gt; &lt;&lt; | 0          count words start
+      | 0.06900 s  count words stop  &gt;&gt;
+=&gt; &lt;&lt; | 0          sorting start
+      | 0.00800 s  sorting stop  &gt;&gt;
+the 5027
+to 3353
+and 2831
+=&gt; | 0.00100 s since last point
+=&gt; | 0.00300 s since last point. Timer end.
+| 0.08600 s Total time elapsed |</span><br></pre></td></tr></table></figure>
 <p>Here is the script. You can also download it from the link in right top corner of code block.</p>
-<figure class="highlight python"><figcaption><span>times.py</span><a href="https://github.com/dracodoc/misc_utils/blob/master/times.py" target="_blank" rel="external">Open in Github</a></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">__author__ = <span class="string">'dracodoc'</span></span><br><span class="line"><span class="comment"># measure script time duration in segments. http://dracodoc.github.io/</span></span><br><span class="line"><span class="comment"># the clock value list: start, segments, end</span></span><br><span class="line"><span class="comment"># usage: import times, put times.start, seg_start, end etc in line.</span></span><br><span class="line">T = []</span><br><span class="line">Digit = [<span class="number">7</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(digit=<span class="number">7</span>)</span>:</span></span><br><span class="line">    <span class="string">"""Timer start. digit control the number width to align"""</span></span><br><span class="line">    <span class="keyword">del</span> T[:]  <span class="comment"># clean up first</span></span><br><span class="line">    Digit[<span class="number">0</span>] = digit</span><br><span class="line">    T.append(time.time())</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'==&gt;| Timer start | set to'</span>, Digit[<span class="number">0</span>], <span class="string">'digits after decimal point'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">last_seg</span><span class="params">(s=<span class="string">'since last point'</span>)</span>:</span></span><br><span class="line">    <span class="string">"""calculate the duration between last point till this one"""</span></span><br><span class="line">    T.append(time.time())</span><br><span class="line">    duration = T[-<span class="number">1</span>] - T[-<span class="number">2</span>]</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"=&gt; | %.*f s"</span> % (Digit[<span class="number">0</span>], duration), s</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">seg_start</span><span class="params">(s=<span class="string">'start...'</span>)</span>:</span></span><br><span class="line">    <span class="string">"""set a segment start, always used with seg_stop in pairs"""</span></span><br><span class="line">    T.append(time.time())</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"=&gt; &lt;&lt; | 0"</span>, <span class="string">' '</span> * (Digit[<span class="number">0</span>] + <span class="number">3</span>), s</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">seg_stop</span><span class="params">(s=<span class="string">'...stop'</span>)</span>:</span></span><br><span class="line">    <span class="string">"""set a segment end, always used with seg_start in pairs"""</span></span><br><span class="line">    T.append(time.time())</span><br><span class="line">    duration = T[-<span class="number">1</span>] - T[-<span class="number">2</span>]</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"      | %.*f s "</span> % (Digit[<span class="number">0</span>], duration), s, <span class="string">' &gt;&gt;'</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">end</span><span class="params">(s=<span class="string">'since last point. Timer end.'</span>)</span>:</span></span><br><span class="line">    T.append(time.time())</span><br><span class="line">    duration = T[-<span class="number">1</span>] - T[-<span class="number">2</span>]</span><br><span class="line">    total = T[-<span class="number">1</span>] - T[<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"=&gt; | %.*f s"</span> % (Digit[<span class="number">0</span>], duration), s</span><br><span class="line">    <span class="keyword">print</span> <span class="string">"==&gt;| %.*f s"</span> % (Digit[<span class="number">0</span>], total), <span class="string">'Total time elapsed'</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><figcaption><span>times.py</span><a href="https://github.com/dracodoc/misc_utils/blob/master/times.py" target="_blank" rel="external">Open in Github</a></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">__author__ = <span class="string">&apos;dracodoc&apos;</span></span><br><span class="line"><span class="comment"># measure script time duration in segments. http://dracodoc.github.io/</span></span><br><span class="line"><span class="comment"># the clock value list: start, segments, end</span></span><br><span class="line"><span class="comment"># usage: import times, put times.start, seg_start, end etc in line.</span></span><br><span class="line">T = []</span><br><span class="line">Digit = [<span class="number">7</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(digit=<span class="number">7</span>)</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;Timer start. digit control the number width to align&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">del</span> T[:]  <span class="comment"># clean up first</span></span><br><span class="line">    Digit[<span class="number">0</span>] = digit</span><br><span class="line">    T.append(time.time())</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&apos;==&gt;| Timer start | set to&apos;</span>, Digit[<span class="number">0</span>], <span class="string">&apos;digits after decimal point&apos;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">last_seg</span><span class="params">(s=<span class="string">&apos;since last point&apos;</span>)</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;calculate the duration between last point till this one&quot;&quot;&quot;</span></span><br><span class="line">    T.append(time.time())</span><br><span class="line">    duration = T[-<span class="number">1</span>] - T[-<span class="number">2</span>]</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&quot;=&gt; | %.*f s&quot;</span> % (Digit[<span class="number">0</span>], duration), s</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">seg_start</span><span class="params">(s=<span class="string">&apos;start...&apos;</span>)</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;set a segment start, always used with seg_stop in pairs&quot;&quot;&quot;</span></span><br><span class="line">    T.append(time.time())</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&quot;=&gt; &lt;&lt; | 0&quot;</span>, <span class="string">&apos; &apos;</span> * (Digit[<span class="number">0</span>] + <span class="number">3</span>), s</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">seg_stop</span><span class="params">(s=<span class="string">&apos;...stop&apos;</span>)</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;set a segment end, always used with seg_start in pairs&quot;&quot;&quot;</span></span><br><span class="line">    T.append(time.time())</span><br><span class="line">    duration = T[-<span class="number">1</span>] - T[-<span class="number">2</span>]</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&quot;      | %.*f s &quot;</span> % (Digit[<span class="number">0</span>], duration), s, <span class="string">&apos; &gt;&gt;&apos;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">end</span><span class="params">(s=<span class="string">&apos;since last point. Timer end.&apos;</span>)</span>:</span></span><br><span class="line">    T.append(time.time())</span><br><span class="line">    duration = T[-<span class="number">1</span>] - T[-<span class="number">2</span>]</span><br><span class="line">    total = T[-<span class="number">1</span>] - T[<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&quot;=&gt; | %.*f s&quot;</span> % (Digit[<span class="number">0</span>], duration), s</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&quot;==&gt;| %.*f s&quot;</span> % (Digit[<span class="number">0</span>], total), <span class="string">&apos;Total time elapsed&apos;</span></span><br></pre></td></tr></table></figure>
 <p>Of course sometimes you want more features like execution frequency and memory analysis, then you can always use more powerful profiler like <a href="https://github.com/rkern/line_profiler" target="_blank" rel="external">line_profiler</a> and <a href="https://github.com/fabianp/memory_profiler" target="_blank" rel="external">memory profiler</a>. The profiler guide I mentioned earlier have detailed introductions on them. </p>
 <p>That being said, I still found my simple timing script is often useful enough and easy to use with minimal overhead.</p>
 </span>
@@ -263,8 +301,8 @@ rdb = Redis()
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2015/10/23/house-price/" rel="prev" title="Exploring House Price Estimation and Imagining a better Real Estate website">
-                Exploring House Price Estimation and Imagining a better Real Estate website <i class="fa fa-chevron-right"></i>
+              <a href="/2015/10/23/house-price/" rel="prev" title="Exploring House Price Estimation And Imagining A Better Real Estate Website">
+                Exploring House Price Estimation And Imagining A Better Real Estate Website <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -283,19 +321,22 @@ rdb = Redis()
     </div>
   </div>
 
- </div>
+
+        </div>
 
         
 
+
         
-          <div class="comments" id="comments">
-            
-              <div id="disqus_thread">
-                <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-              </div>
-            
-          </div>
-        
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      </div>
+    
+  </div>
+
+
       </div>
 
       
@@ -333,8 +374,8 @@ rdb = Redis()
         <p class="site-description motion-element" itemprop="description">Artificial learning and Evolution inspired by nature</p>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
-            <a href="/">
-              <span class="site-state-item-count">4</span>
+            <a href="/archives">
+              <span class="site-state-item-count">5</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
@@ -372,14 +413,20 @@ rdb = Redis()
 
       
         <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
           <div class="post-toc">
             
+              
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#The_Problem_and_the_simple_timing_script"><span class="nav-number">1.</span> <span class="nav-text">The Problem and the simple timing script</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#My_version_of_even_simpler_timing_script"><span class="nav-number">2.</span> <span class="nav-text">My version of even simpler timing script</span></a></li></ol></div>
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#the-problem-and-the-simple-timing-script"><span class="nav-number">1.</span> <span class="nav-text">The Problem and the simple timing script</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#my-version-of-even-simpler-timing-script"><span class="nav-number">2.</span> <span class="nav-text">My version of even simpler timing script</span></a></li></ol></div>
             
           </div>
-          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
         </section>
       
 
@@ -391,7 +438,8 @@ rdb = Redis()
     </main>
 
     <footer id="footer" class="footer">
-      <div class="footer-inner"> <div class="copyright" >
+      <div class="footer-inner">
+        <div class="copyright" >
   
   &copy; 
   <span itemprop="copyrightYear">2015</span>
@@ -413,7 +461,8 @@ rdb = Redis()
 </div>
 
 
- </div>
+
+      </div>
     </footer>
 
     <div class="back-to-top"></div>
@@ -423,6 +472,7 @@ rdb = Redis()
 
   
   
+
   
     
     
@@ -452,21 +502,21 @@ rdb = Redis()
 
 
   
+
   
   <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
   <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
 
 
   <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
-  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
 
-  <script type="text/javascript" src="/js/motion_fallback.js?v=0.4.5.2" id="motion.fallback"></script>
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
 
 
-
-
-  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
   <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
 
   
   
@@ -551,7 +601,7 @@ rdb = Redis()
 
     function tocOverflowIndicator (indicator, action) {
       var $indicator = $(indicator);
-      var opacity = action === 'show' ? 0.4 : 0;
+      var opacity = action === 'show' ? 1 : 0;
       $indicator.velocity ?
         $indicator.velocity('stop').velocity({
           opacity: opacity
@@ -618,29 +668,20 @@ rdb = Redis()
     });
 
     // Expand sidebar on post detail page by default, when post has a toc.
-    var $tocContent = $('.post-toc-content');
-    if (isDesktop() && CONFIG.sidebar === 'post') {
-      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
-        displaySidebar();
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
       }
-    }
+    };
   });
 </script>
 
 
 
-  <script type="text/javascript">
-    $(document).ready(function () {
-      if (CONFIG.sidebar === 'always') {
-        displaySidebar();
-      }
-      if (isMobile()) {
-        FastClick.attach(document.body);
-      }
-
-      motionIntegrator.bootstrap();
-    });
-  </script>
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
 
   
   
@@ -648,15 +689,5 @@ rdb = Redis()
   
   
 
-  
-  <script type="text/javascript" src="/js/lazyload.js"></script>
-  <script type="text/javascript">
-    $(function () {
-      $("#posts").find('img').lazyload({
-        placeholder: "/images/loading.gif",
-        effect: "fadeIn"
-      });
-    });
-  </script>
 </body>
 </html>

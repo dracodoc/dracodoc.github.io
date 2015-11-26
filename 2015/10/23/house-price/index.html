@@ -1,11 +1,10 @@
 <!doctype html>
-<html class="theme-next  theme-next-mist">
+<html class="theme-next ">
 <head>
-  
-
-<meta charset="UTF-8"/>
+  <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
 
 
 <meta http-equiv="Cache-Control" content="no-transform" />
@@ -18,22 +17,22 @@
 
 
 
-  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
 
 
 
-  
-    <link href='//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-  
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
 
 
-<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
-
-<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
 
 
-    <meta name="description" content="Artificial learning and Evolution inspired by nature" />
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
 
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
 
 
   <meta name="keywords" content="Data Science,House Price,R," />
@@ -42,13 +41,20 @@
 
 
 
+
+
+
   <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
 
 
 <meta name="description" content="This is one of my side projects of learning on Data Science.
 IntroductionI was looking at local housing market some time ago and found it was difficult to judge how much a house worth or how much it w">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Exploring House Price Estimation and Imagining a better Real Estate website">
+<meta property="og:title" content="Exploring House Price Estimation And Imagining A Better Real Estate Website">
 <meta property="og:url" content="http://dracodoc.github.io/2015/10/23/house-price/index.html">
 <meta property="og:site_name" content="Artificial Learning and Evolution inspired by Nature">
 <meta property="og:description" content="This is one of my side projects of learning on Data Science.
@@ -57,23 +63,23 @@ IntroductionI was looking at local housing market some time ago and found it was
 <meta property="og:image" content="http://dracodoc.github.io/zestimate_AL_DE.png">
 <meta property="og:image" content="http://dracodoc.github.io/zestimate_metro.png">
 <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/1/18/Spider_Chart2.jpg">
-<meta property="og:updated_time" content="2015-10-27T21:29:35.938Z">
+<meta property="og:updated_time" content="2015-11-21T22:53:41.258Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Exploring House Price Estimation and Imagining a better Real Estate website">
+<meta name="twitter:title" content="Exploring House Price Estimation And Imagining A Better Real Estate Website">
 <meta name="twitter:description" content="This is one of my side projects of learning on Data Science.
 IntroductionI was looking at local housing market some time ago and found it was difficult to judge how much a house worth or how much it w">
+
 
 
 <script type="text/javascript" id="hexo.configuration">
   var CONFIG = {
     scheme: 'Mist',
-    sidebar: 'hide'
+    sidebar: 'hide',
+    motion: false
   };
 </script>
 
-
-
-  <title> Exploring House Price Estimation and Imagining a better Real Estate website | Artificial Learning and Evolution inspired by Nature </title>
+  <title> Exploring House Price Estimation And Imagining A Better Real Estate Website | Artificial Learning and Evolution inspired by Nature </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="en">
@@ -123,6 +129,23 @@ IntroductionI was looking at local housing market some time ago and found it was
   
 
   
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
 
   
 </nav>
@@ -132,11 +155,16 @@ IntroductionI was looking at local housing market some time ago and found it was
 
     <main id="main" class="main">
       <div class="main-inner">
-        <div id="content" class="content"> 
+        <div id="content" class="content">
+          
 
   <div id="posts" class="posts-expand">
     
 
+  
+  
+
+  
   
   
 
@@ -151,7 +179,7 @@ IntroductionI was looking at local housing market some time ago and found it was
             
             
               
-                Exploring House Price Estimation and Imagining a better Real Estate website
+                Exploring House Price Estimation And Imagining A Better Real Estate Website
               
             
           </h1>
@@ -207,30 +235,30 @@ IntroductionI was looking at local housing market some time ago and found it was
 
       
         <span itemprop="articleBody"><p><em>This is one of my side projects of learning on Data Science.</em></p>
-<h2 id="Introduction">Introduction</h2><p>I was looking at local housing market some time ago and found it was difficult to judge how much a house worth or how much it will be sold at. Real State agents could have a very good estimate based on their experience, but it is really an overwhelming problem for first time home buyer or seller.</p>
+<h2 id="introduction">Introduction</h2><p>I was looking at local housing market some time ago and found it was difficult to judge how much a house worth or how much it will be sold at. Real State agents could have a very good estimate based on their experience, but it is really an overwhelming problem for first time home buyer or seller.</p>
 <ol>
 <li>There are many aspects about a house that could affect how much it worth to buyer. And every buyer has different preference and priorities about these aspects. </li>
 <li>Only a subset of all possible buyers will see the house listing and consider it seriously. The actual candidate buyer pool is small and very susceptible to random factors like timing and other details.</li>
 <li>The negotiations involve more random events and human decisions.</li>
 </ol>
-<p>Naturally I searched for house price estimation tool on line. The best and most complete one is Zillow.com’s <a href="http://www.zillow.com/zestimate/" target="_blank" rel="external">Zestimate®</a>. Using huge amount of data for more than 100 million homes and sophisticated algorithms to estimate house sale price.  <a href="http://www.zillow.com/zestimate/#acc" target="_blank" rel="external">Their performance</a>? Estimation within 20% of sale price in 81.4% of times. Take a $500,000 house as example, that means $100,000 error.</p>
+<p>Naturally I searched for house price estimation tool on line. The best and most complete one is Zillow.com&#x2019;s <a href="http://www.zillow.com/zestimate/" target="_blank" rel="external">Zestimate&#xAE;</a>. Using huge amount of data for more than 100 million homes and sophisticated algorithms to estimate house sale price.  <a href="http://www.zillow.com/zestimate/#acc" target="_blank" rel="external">Their performance</a>? Estimation within 20% of sale price in 81.4% of times. Take a $500,000 house as example, that means $100,000 error.</p>
 <a id="more"></a>
 <p><img src="zestimate_national.png" alt="Zestimate National Performance"></p>
-<h2 id="The_formal_house_price_assessment_procedures">The formal house price assessment procedures</h2><p>Not satisfied with this kind of accuracy, I did some research on house price evaluation principles. I found two formal house price assessment procedures provided some insight:</p>
+<h2 id="the-formal-house-price-assessment-procedures">The formal house price assessment procedures</h2><p>Not satisfied with this kind of accuracy, I did some research on house price evaluation principles. I found two formal house price assessment procedures provided some insight:</p>
 <ol>
-<li>Home owner insurance companies have a complex model to estimate cost of rebuilding the same house. The model require customer to report lots of detailed information about the house features and conditions. Sometimes insurance company will also send a professional inspector. The home owner insurance estimate doesn’t include the cost of land.</li>
+<li>Home owner insurance companies have a complex model to estimate cost of rebuilding the same house. The model require customer to report lots of detailed information about the house features and conditions. Sometimes insurance company will also send a professional inspector. The home owner insurance estimate doesn&#x2019;t include the cost of land.</li>
 <li>To establish base for property tax, county government assess the value of house from time to time. <a href="http://www.dat.state.md.us/sdatweb/hog.html" target="_blank" rel="external">Maryland</a> utilized a combination of two methods to assess the fair market value of a house.<br> <em>Cost approach</em> is similar to insurance company that calculated the rebuild cost but added the land cost. <em>Sales approach</em> use the sale price of comparable properties.<br> It was said that they use <em>Cost approach</em> for house cost and <em>Sales approach</em> for land cost, maybe because the county have the information of land cost for real estate developers. Though I have seen lots of houses in same area have same land cost even their area vary a lot.</li>
 </ol>
-<p>I can’t really use <em>Cost approach</em> since I don’t have the insurance company model, and the public available information for individual house are very limited and often have many errors, far less and worse than the data that insurance company can get. </p>
+<p>I can&#x2019;t really use <em>Cost approach</em> since I don&#x2019;t have the insurance company model, and the public available information for individual house are very limited and often have many errors, far less and worse than the data that insurance company can get. </p>
 <p><em>Sales approach</em> looks more promising since fair market price actually included all the information of house build cost and market trends. It may sound good, but where are comparable sales? There are no identical properties, all the reference sales must have some difference in features, time, location etc. To calculate these differences into price, we are back facing the original assessment problem again.</p>
-<h2 id="My_analysis_of_house_price">My analysis of house price</h2><p>After some research, exploring data with programs, and my own experience in negotiations, my understandings and assumptions of house price are as follows:</p>
+<h2 id="my-analysis-of-house-price">My analysis of house price</h2><p>After some research, exploring data with programs, and my own experience in negotiations, my understandings and assumptions of house price are as follows:</p>
 <p><em>House sale price is the result of negotiations between seller and buyer</em>. They make the decision based on their estimates on several things:</p>
 <ol>
 <li>His/her own perspective. How much does it worth in his/her view? This include both objective features and subjective preferences.</li>
-<li>His/her estimate of the opponent in negotiation. People will only make offer/counter offer at a level that they believe it’s possible to be accepted, at least in final round of negotiation. Knowing more about the house condition and the opponent’s situation can help a lot.</li>
+<li>His/her estimate of the opponent in negotiation. People will only make offer/counter offer at a level that they believe it&#x2019;s possible to be accepted, at least in final round of negotiation. Knowing more about the house condition and the opponent&#x2019;s situation can help a lot.</li>
 </ol>
 <p>There are many other factors contribute to the above two, including national and local market trends, other opinion sources like agent, the timing of everything etc. </p>
-<p>This may seem very subjective and impossible to predict. I don’t expect public data or any model can predict each individual’s personal preference, emotional factors, all the other random events. Even if a perfect prediction on sale price exists, once it was known it will immediately push the negotiations away from the prediction. </p>
+<p>This may seem very subjective and impossible to predict. I don&#x2019;t expect public data or any model can predict each individual&#x2019;s personal preference, emotional factors, all the other random events. Even if a perfect prediction on sale price exists, once it was known it will immediately push the negotiations away from the prediction. </p>
 <p>The individual buyer/seller perspective may keep unknown, however the overall result of sales in general are more predictable because <strong>the comparable sales in market are very strong references that both side will use to establish their perspective</strong>. If there are some very comparable recent sales and they expect to have similar sales in near future(the time and location distribution are both important, sales happened long time ago are not really comparable anymore), they knew they must align their expectations with these reference points. </p>
 <ul>
 <li>If the reference price is higher, seller can always expect similar high price and continue to wait for other buyer. </li>
@@ -238,15 +266,15 @@ IntroductionI was looking at local housing market some time ago and found it was
 </ul>
 <p>The other side of negotiations also knew this and have to accept the market situations. </p>
 <p>Thus I can try to establish an estimate on <em>fair market value</em> based on comparable sales, which can be very helpful to home buyer and seller as a good base point, not exactly prediction of final sale price. </p>
-<h2 id="How_to_measure_prediction_accuracy">How to measure prediction accuracy</h2><p>Now it’s easier to understand why Zestimate accuracy is not that impressive, because there are too many random events of each sale cannot be predicted with publicly available data. Actually I think it will be better to just predict a <em>fair market value</em> and give a estimate of <code>variation range</code>. A specific value may look like more accurate, but the buyer/seller will not really trust it because of the big margin of error. A core value plus a range will provide more information and give buyer/seller better understanding about the house price. </p>
-<p>Zestimate did give a value range, and the range could be narrower when there are more information available for the house, for example house in metro area could have a 10% value range instead of national average of 20%. This is understandable since more comparable sales provided more “anchors” and the variation will be small according to our analysis above. </p>
+<h2 id="how-to-measure-prediction-accuracy">How to measure prediction accuracy</h2><p>Now it&#x2019;s easier to understand why Zestimate accuracy is not that impressive, because there are too many random events of each sale cannot be predicted with publicly available data. Actually I think it will be better to just predict a <em>fair market value</em> and give a estimate of <code>variation range</code>. A specific value may look like more accurate, but the buyer/seller will not really trust it because of the big margin of error. A core value plus a range will provide more information and give buyer/seller better understanding about the house price. </p>
+<p>Zestimate did give a value range, and the range could be narrower when there are more information available for the house, for example house in metro area could have a 10% value range instead of national average of 20%. This is understandable since more comparable sales provided more &#x201C;anchors&#x201D; and the variation will be small according to our analysis above. </p>
 <p>The Zestimate accuracy for different regions also showed this effect, where Delaware is much easier to predict than Alaska. Although their houses in market are in same level, but Delaware houses must be much more dense so there will be more comparable sales for each house. </p>
 <p><img src="zestimate_AL_DE.png" alt="Zestimate accuracy in Alaska and Delaware"></p>
 <p>I also observed that there are very big accuracy differences among metro areas, even they all suppose to have sufficient information.</p>
 <p><img src="zestimate_metro.png" alt="Zestimate accruacy in Metro areas"></p>
 <p>My guess is that areas that are in fast changing phase or with more diversity will be more difficult to predict than areas in stable phase. Because of the diversity and fast changes, the actual comparable sales amount is not really big. If you divide that area into smaller sections to reduce diversity and variation, the scale of data points also dropped. Thus the 4.9 millions homes in NY may not provide more comparable sales information than the 681,000 homes in Las Vegas. </p>
-<p>Based on above findings, I adjusted my project goal from <em>estimate house sale price</em> to <em>estimate fair market value and variation range</em>. Note the <code>fair market value</code> in my definition is not really an objective intrinsic value. It reflected the information we can decode from the market, and the variation range cover all the factors we cannot account for. With more information — mainly comparable sales — we can have less unknown and reduce the variation range. Ideally if there are many comparable sales happened nearby and recently, these sales and the next house sale are more likely to fall in a pretty narrow range.</p>
-<h2 id="Comparable_sales_in_details">Comparable sales in details</h2><p><strong>Comparison implies distance</strong>. If we look at the <code>comparable sales</code> in depth, there are at least 3 dimensions to define distance and similarity:</p>
+<p>Based on above findings, I adjusted my project goal from <em>estimate house sale price</em> to <em>estimate fair market value and variation range</em>. Note the <code>fair market value</code> in my definition is not really an objective intrinsic value. It reflected the information we can decode from the market, and the variation range cover all the factors we cannot account for. With more information &#x2014; mainly comparable sales &#x2014; we can have less unknown and reduce the variation range. Ideally if there are many comparable sales happened nearby and recently, these sales and the next house sale are more likely to fall in a pretty narrow range.</p>
+<h2 id="comparable-sales-in-details">Comparable sales in details</h2><p><strong>Comparison implies distance</strong>. If we look at the <code>comparable sales</code> in depth, there are at least 3 dimensions to define distance and similarity:</p>
 <ol>
 <li>House feature. This is obvious but not easy. Everybody have his/her own preference, and the importance of house feature needed to considered under context. If there are many acceptable options, buyer could be more picky about house. However if there is not much option available, even non-perfect house features may have to be ignored.</li>
 <li>Location. This is another obvious dimension but it also mean different for different people:<ol>
@@ -256,28 +284,28 @@ IntroductionI was looking at local housing market some time ago and found it was
 <li>Some people also will consider the more detailed level of location like the specific location and environment in community.</li>
 </ol>
 </li>
-<li>Time. More recent sales are more relevant. Depend on seller/buyer’s acceptable time span for house transaction, the length of relevant period could vary from days to months.</li>
+<li>Time. More recent sales are more relevant. Depend on seller/buyer&#x2019;s acceptable time span for house transaction, the length of relevant period could vary from days to months.</li>
 </ol>
-<p>All the sales should be measured in these 3 dimensions to compare their similarity. These dimensions are based on objective data but have different meanings to different people. We cannot calculate each individual’s preference but we can segment people into some major groups in each dimension. For example</p>
+<p>All the sales should be measured in these 3 dimensions to compare their similarity. These dimensions are based on objective data but have different meanings to different people. We cannot calculate each individual&#x2019;s preference but we can segment people into some major groups in each dimension. For example</p>
 <ul>
 <li>School district may be top priority for some families, while young family without kids may consider transportation first.</li>
 <li>Investment property buyer will look at regional development and market condition.</li>
 </ul>
-<h2 id="Imagine_a_better_real_estate_website:_recommend_houses_for_home_buyer,_list_comparable_sales_for_home_buyer/seller">Imagine a better real estate website: recommend houses for home buyer, list comparable sales for home buyer/seller</h2><p>In the analysis of <code>comparable sales</code> I found there are lots of information can be useful to home buyer/seller and cannot be consolidated into a single number. My project goal of <code>fair market value</code> and <code>variation range</code> also need more context to be really meaningful.</p>
-<p>I no longer focused on trying to produce a house price number with high accuracy any more. I think it’s a impossible and meaningless mission. The data analysis and modeling in my imagination could provide great help to home buyer/seller by giving a full list and match scores instead of a single number:</p>
+<h2 id="imagine-a-better-real-estate-website-recommend-houses-for-home-buyer-list-comparable-sales-for-home-buyerseller">Imagine a better real estate website: recommend houses for home buyer, list comparable sales for home buyer/seller</h2><p>In the analysis of <code>comparable sales</code> I found there are lots of information can be useful to home buyer/seller and cannot be consolidated into a single number. My project goal of <code>fair market value</code> and <code>variation range</code> also need more context to be really meaningful.</p>
+<p>I no longer focused on trying to produce a house price number with high accuracy any more. I think it&#x2019;s a impossible and meaningless mission. The data analysis and modeling in my imagination could provide great help to home buyer/seller by giving a full list and match scores instead of a single number:</p>
 <ol>
 <li>Collect data from home seller/buyer for their preference and groups.</li>
-<li><p>Based on available public data, filter houses for home buyer. I didn’t say “ideal house” because it either non-exist or too expensive and out of budget, which equal to non-exist. I also don’t think a single match score will represent all the dimensions of house. This could be <a href="https://en.wikipedia.org/wiki/Radar_chart" target="_blank" rel="external">a better visual tool</a> to show the buyer’s expectation and the house’s actual score in each dimension:</p>
+<li><p>Based on available public data, filter houses for home buyer. I didn&#x2019;t say &#x201C;ideal house&#x201D; because it either non-exist or too expensive and out of budget, which equal to non-exist. I also don&#x2019;t think a single match score will represent all the dimensions of house. This could be <a href="https://en.wikipedia.org/wiki/Radar_chart" target="_blank" rel="external">a better visual tool</a> to show the buyer&#x2019;s expectation and the house&#x2019;s actual score in each dimension:</p>
 <p> <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/Spider_Chart2.jpg" alt="spider chart showing "></p>
-<p> The reason to make it more complicate than a single number is that people’s preference can change in different context. They may adjust the weights of dimensions according to the limit of available options or any new information. Thus a multi dimensional comparison will be more adaptive and useful.</p>
-<p> I used some real estate websites a lot in my own experience as a customer and in my research. They sure can recommend “similar houses” for the property you have interest, but the recommendation quality often cannot meet my expectation. These websites also provide lots of filter conditions in house search, however the specific sqft value range or bedroom numbers are just the easiest data point to measure, not the best guides of how people compare houses.</p>
+<p> The reason to make it more complicate than a single number is that people&#x2019;s preference can change in different context. They may adjust the weights of dimensions according to the limit of available options or any new information. Thus a multi dimensional comparison will be more adaptive and useful.</p>
+<p> I used some real estate websites a lot in my own experience as a customer and in my research. They sure can recommend &#x201C;similar houses&#x201D; for the property you have interest, but the recommendation quality often cannot meet my expectation. These websites also provide lots of filter conditions in house search, however the specific sqft value range or bedroom numbers are just the easiest data point to measure, not the best guides of how people compare houses.</p>
 </li>
-<li><p>List comparable sales for home buyer/seller. They will work as reference points for them to build a more accurate perspective and understanding of market. Because house sale involve multiple parties, they need to know not only the comparable sales in their own view, but also the comparable sales in the other party’s view. Of course if the preference is not public, they can only either guess the group the other party belong to or use the most general big group to estimate. These expectations are the corner stones of negotiation, thus very important in shaping the final sale price.</p>
+<li><p>List comparable sales for home buyer/seller. They will work as reference points for them to build a more accurate perspective and understanding of market. Because house sale involve multiple parties, they need to know not only the comparable sales in their own view, but also the comparable sales in the other party&#x2019;s view. Of course if the preference is not public, they can only either guess the group the other party belong to or use the most general big group to estimate. These expectations are the corner stones of negotiation, thus very important in shaping the final sale price.</p>
 </li>
 </ol>
 <p>I believe the negotiations and the house sale could be more efficient with more information and shared reference points, and this could lead to a better market.</p>
-<h2 id="Back_to_data_and_analysis">Back to data and analysis</h2><p>I haven’t talk about much data yet in this post about <code>Data Science</code>. Actually I started to collect data in the very beginning in my research, but I want to have a better understanding about the problem, so I did more research, explored the data with R program, with just checking individual records by hand, try to understand the logic behind the results, built models and tested the prediction performance, then back to do more research about the problem. The theory above is the final product of a long series of research, exploring, thinking and experiments.</p>
-<p>I have much more ideas than my time for implementation, actually my current data analysis program didn’t use any model yet. It’s just a moving average which is very familiar to people have some experience with stock chart (moving average still implied a model that assuming changes are continuous and smooth). The performance of this simple “model” is not bad at all:</p>
+<h2 id="back-to-data-and-analysis">Back to data and analysis</h2><p>I haven&#x2019;t talk about much data yet in this post about <code>Data Science</code>. Actually I started to collect data in the very beginning in my research, but I want to have a better understanding about the problem, so I did more research, explored the data with R program, with just checking individual records by hand, try to understand the logic behind the results, built models and tested the prediction performance, then back to do more research about the problem. The theory above is the final product of a long series of research, exploring, thinking and experiments.</p>
+<p>I have much more ideas than my time for implementation, actually my current data analysis program didn&#x2019;t use any model yet. It&#x2019;s just a moving average which is very familiar to people have some experience with stock chart (moving average still implied a model that assuming changes are continuous and smooth). The performance of this simple &#x201C;model&#x201D; is not bad at all:</p>
 <table>
 <thead>
 <tr>
@@ -311,7 +339,7 @@ IntroductionI was looking at local housing market some time ago and found it was
 </table>
 <p><em>The performance of my simple model and Zillow Zestimate on same dataset of 3000 homes. The estimation errors are divided by the sale price, this is the metric used by Zillow to measure Zestimate accuracy.</em></p>
 <p><em>The National and Maryland Zestimate accuracy number was taken on July, 2015. The specific Zestimate values on the dataset were downloaded from April to July. The most current Zestimate values and performance statistics may have been updated.</em></p>
-<p>I’ll talk about the technical details of data and analysis of this project in next post.</p>
+<p>I&#x2019;ll talk about the technical details of data and analysis of this project in next post.</p>
 </span>
       
     </div>
@@ -361,19 +389,22 @@ IntroductionI was looking at local housing market some time ago and found it was
     </div>
   </div>
 
- </div>
+
+        </div>
 
         
 
+
         
-          <div class="comments" id="comments">
-            
-              <div id="disqus_thread">
-                <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-              </div>
-            
-          </div>
-        
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      </div>
+    
+  </div>
+
+
       </div>
 
       
@@ -411,8 +442,8 @@ IntroductionI was looking at local housing market some time ago and found it was
         <p class="site-description motion-element" itemprop="description">Artificial learning and Evolution inspired by nature</p>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
-            <a href="/">
-              <span class="site-state-item-count">4</span>
+            <a href="/archives">
+              <span class="site-state-item-count">5</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
@@ -450,14 +481,20 @@ IntroductionI was looking at local housing market some time ago and found it was
 
       
         <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc-indicator-top post-toc-indicator"></div>
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
           <div class="post-toc">
             
+              
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#The_formal_house_price_assessment_procedures"><span class="nav-number">2.</span> <span class="nav-text">The formal house price assessment procedures</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#My_analysis_of_house_price"><span class="nav-number">3.</span> <span class="nav-text">My analysis of house price</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#How_to_measure_prediction_accuracy"><span class="nav-number">4.</span> <span class="nav-text">How to measure prediction accuracy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Comparable_sales_in_details"><span class="nav-number">5.</span> <span class="nav-text">Comparable sales in details</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Imagine_a_better_real_estate_website:_recommend_houses_for_home_buyer,_list_comparable_sales_for_home_buyer/seller"><span class="nav-number">6.</span> <span class="nav-text">Imagine a better real estate website: recommend houses for home buyer, list comparable sales for home buyer/seller</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Back_to_data_and_analysis"><span class="nav-number">7.</span> <span class="nav-text">Back to data and analysis</span></a></li></ol></div>
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#the-formal-house-price-assessment-procedures"><span class="nav-number">2.</span> <span class="nav-text">The formal house price assessment procedures</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#my-analysis-of-house-price"><span class="nav-number">3.</span> <span class="nav-text">My analysis of house price</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#how-to-measure-prediction-accuracy"><span class="nav-number">4.</span> <span class="nav-text">How to measure prediction accuracy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#comparable-sales-in-details"><span class="nav-number">5.</span> <span class="nav-text">Comparable sales in details</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#imagine-a-better-real-estate-website-recommend-houses-for-home-buyer-list-comparable-sales-for-home-buyerseller"><span class="nav-number">6.</span> <span class="nav-text">Imagine a better real estate website: recommend houses for home buyer, list comparable sales for home buyer/seller</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#back-to-data-and-analysis"><span class="nav-number">7.</span> <span class="nav-text">Back to data and analysis</span></a></li></ol></div>
             
           </div>
-          <div class="post-toc-indicator-bottom post-toc-indicator"></div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
         </section>
       
 
@@ -469,7 +506,8 @@ IntroductionI was looking at local housing market some time ago and found it was
     </main>
 
     <footer id="footer" class="footer">
-      <div class="footer-inner"> <div class="copyright" >
+      <div class="footer-inner">
+        <div class="copyright" >
   
   &copy; 
   <span itemprop="copyrightYear">2015</span>
@@ -491,7 +529,8 @@ IntroductionI was looking at local housing market some time ago and found it was
 </div>
 
 
- </div>
+
+      </div>
     </footer>
 
     <div class="back-to-top"></div>
@@ -501,6 +540,7 @@ IntroductionI was looking at local housing market some time ago and found it was
 
   
   
+
   
     
     
@@ -510,7 +550,7 @@ IntroductionI was looking at local housing market some time ago and found it was
     <script type="text/javascript">
       var disqus_shortname = 'dracodocgithub';
       var disqus_identifier = '2015/10/23/house-price/';
-      var disqus_title = 'Exploring House Price Estimation and Imagining a better Real Estate website';
+      var disqus_title = 'Exploring House Price Estimation And Imagining A Better Real Estate Website';
       var disqus_url = 'http://dracodoc.github.io/2015/10/23/house-price/';
 
       function run_disqus_script(disqus_script){
@@ -530,21 +570,21 @@ IntroductionI was looking at local housing market some time ago and found it was
 
 
   
+
   
   <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
   <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
 
 
   <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
-  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
 
-  <script type="text/javascript" src="/js/motion_fallback.js?v=0.4.5.2" id="motion.fallback"></script>
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
 
 
-
-
-  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
   <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
 
   
   
@@ -629,7 +669,7 @@ IntroductionI was looking at local housing market some time ago and found it was
 
     function tocOverflowIndicator (indicator, action) {
       var $indicator = $(indicator);
-      var opacity = action === 'show' ? 0.4 : 0;
+      var opacity = action === 'show' ? 1 : 0;
       $indicator.velocity ?
         $indicator.velocity('stop').velocity({
           opacity: opacity
@@ -696,29 +736,20 @@ IntroductionI was looking at local housing market some time ago and found it was
     });
 
     // Expand sidebar on post detail page by default, when post has a toc.
-    var $tocContent = $('.post-toc-content');
-    if (isDesktop() && CONFIG.sidebar === 'post') {
-      if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
-        displaySidebar();
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
       }
-    }
+    };
   });
 </script>
 
 
 
-  <script type="text/javascript">
-    $(document).ready(function () {
-      if (CONFIG.sidebar === 'always') {
-        displaySidebar();
-      }
-      if (isMobile()) {
-        FastClick.attach(document.body);
-      }
-
-      motionIntegrator.bootstrap();
-    });
-  </script>
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
 
   
   
@@ -726,15 +757,5 @@ IntroductionI was looking at local housing market some time ago and found it was
   
   
 
-  
-  <script type="text/javascript" src="/js/lazyload.js"></script>
-  <script type="text/javascript">
-    $(function () {
-      $("#posts").find('img').lazyload({
-        placeholder: "/images/loading.gif",
-        effect: "fadeIn"
-      });
-    });
-  </script>
 </body>
 </html>

@@ -1,11 +1,10 @@
 <!doctype html>
-<html class="theme-next  theme-next-mist">
+<html class="theme-next ">
 <head>
-  
-
-<meta charset="UTF-8"/>
+  <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
 
 
 <meta http-equiv="Cache-Control" content="no-transform" />
@@ -18,31 +17,38 @@
 
 
 
-  <link rel="stylesheet" type="text/css" href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5"/>
 
 
 
-  
-    <link href='//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-  
 
-
-<link rel="stylesheet" type="text/css" href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" />
-
-<link rel="stylesheet" type="text/css" href="/css/main.css?v=0.4.5.2"/>
-
-
-    <meta name="description" content="Artificial learning and Evolution inspired by nature" />
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
 
 
 
-  <meta name="keywords" content="Hexo,next" />
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
 
 
 
 
 
   <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
 
 
 <meta name="description" content="&amp;lt;!DOCTYPE html&amp;gt;
@@ -158,14 +164,14 @@ code{white-space: pre;}
 if (window.hljs &amp;&amp; document.readyState &amp;&amp; document.readyState === &quot;complete">
 
 
+
 <script type="text/javascript" id="hexo.configuration">
   var CONFIG = {
     scheme: 'Mist',
-    sidebar: 'hide'
+    sidebar: 'hide',
+    motion: false
   };
 </script>
-
-
 
   <title>
   
@@ -223,6 +229,23 @@ if (window.hljs &amp;&amp; document.readyState &amp;&amp; document.readyState ==
   
 
   
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
 
   
 </nav>
@@ -232,7 +255,8 @@ if (window.hljs &amp;&amp; document.readyState &amp;&amp; document.readyState ==
 
     <main id="main" class="main">
       <div class="main-inner">
-        <div id="content" class="content"> 
+        <div id="content" class="content">
+          
 
   <div id="posts" class="posts-expand">
     
@@ -299,7 +323,7 @@ img {
 
 
 <div id="header">
-<h1 class="title">webMap</h1>
+<h1 class="title" id="webmap">webMap</h1>
 </div>
 
 
@@ -312,9 +336,9 @@ require(ggplot2)
 require(data.table)
 require(bit64)</code></pre>
 <div id="zcta-to-county-info-lookup-table" class="section level3">
-<h3>ZCTA to county info lookup table</h3>
+<h3 id="zcta-to-county-info-lookup-table">ZCTA to county info lookup table</h3>
 <div id="r-package-noncensus" class="section level4">
-<h4>r package <code>noncensus</code></h4>
+<h4 id="r-package-noncensus">r package <code>noncensus</code></h4>
 <p>Seemed to be easy to use, but only mapped one ZCTA to one county. <em>Not used now</em>.</p>
 <pre class="r"><code># get county name and county code for each row.
 library(noncensus)
@@ -335,17 +359,17 @@ setnames(zip_counties, &quot;zip&quot;, &quot;Zip&quot;)
 setkey(zip_counties, Zip)</code></pre>
 </div>
 <div id="the-official-2010-zcta-relationship-file." class="section level4">
-<h4>The official <a href="https://www.census.gov/geo/maps-data/data/zcta_rel_layout.html" target="_blank" rel="external">2010 ZCTA relationship file</a>.</h4>
+<h4 id="the-official-2010-zcta-relationship-file">The official <a href="https://www.census.gov/geo/maps-data/data/zcta_rel_layout.html" target="_blank" rel="external">2010 ZCTA relationship file</a>.</h4>
 <ul>
 <li>POPPT ~ Calculated 2010 Population for the relationship record</li>
 <li>ZPOP ~ 2010 Population of the 2010 ZCTA</li>
 <li>ZPOPPCT ~ The Percentage of Total Population of the 2010 ZCTA represented by the record. Some area have 0 or 1 population and 0 or 100 ratio.</li>
 </ul>
 <p>There are 33120 unique ZCTAs in 44410 rows, 9036 ZCTAs in them covered more than 1 county, in which 76% have a population distribution higher than 80/20. So we just select the county of most share of population for each ZCTA to work as a simple <code>temporary workaround</code>. The better method will be geocoding each specific address to county.</p>
-<pre class="r"><code>county_fips = fread(&quot;data/Geo/2010 FIPS.txt&quot;, sep=',', header = TRUE, 
+<pre class="r"><code>county_fips = fread(&quot;data/Geo/2010 FIPS.txt&quot;, sep=&apos;,&apos;, header = TRUE, 
                     stringsAsFactors=FALSE, 
                     colClasses=list(character=c(&quot;StateFP&quot;,&quot;CountyFP&quot;))) # keep leading 0s
-zip_county_fips = fread(&quot;data/Geo/zcta_county_rel_10.txt&quot;, sep=',', header = TRUE,
+zip_county_fips = fread(&quot;data/Geo/zcta_county_rel_10.txt&quot;, sep=&apos;,&apos;, header = TRUE,
                    stringsAsFactors=FALSE,
                    colClasses=list(character=c(&quot;ZCTA5&quot;,&quot;STATE&quot;,&quot;COUNTY&quot;,&quot;GEOID&quot;)))
 # we will call State fips + county fips as countyGEOID in all related data
@@ -432,9 +456,9 @@ multi_county_zip[multi_county_zip[ZPOPPCT == 50][, ZCTA5]]</code></pre>
 zip_county_single = zip_county[zip_county[, ZPOPPCT == max(ZPOPPCT), by = ZCTA5][, V1]]</code></pre>
 </div>
 <div id="missouri-census-data-center-file" class="section level4">
-<h4><a href="http://mcdc.missouri.edu/cgi-bin/uexplore?/pub/data/corrlst/zip2_xxx" target="_blank" rel="external">Missouri Census Data Center file</a></h4>
-<p>There are 882 rows of ZCTA “99999” which are not valid ZCTA. They also didn’t include places like Puerto Rico etc.</p>
-<pre class="r"><code>zip_county_midata = fread(&quot;data/Geo/zip2County.csv&quot;, sep=',', header = TRUE,
+<h4 id="missouri-census-data-center-file"><a href="http://mcdc.missouri.edu/cgi-bin/uexplore?/pub/data/corrlst/zip2_xxx" target="_blank" rel="external">Missouri Census Data Center file</a></h4>
+<p>There are 882 rows of ZCTA &#x201C;99999&#x201D; which are not valid ZCTA. They also didn&#x2019;t include places like Puerto Rico etc.</p>
+<pre class="r"><code>zip_county_midata = fread(&quot;data/Geo/zip2County.csv&quot;, sep=&apos;,&apos;, header = TRUE,
                           stringsAsFactors=FALSE,
                           colClasses=list(character=c(&quot;zcta5&quot;,&quot;county&quot;)))
 zip_county_midata[zcta5 == &quot;99999&quot;,]</code></pre>
@@ -453,7 +477,7 @@ zip_county_midata[zcta5 == &quot;99999&quot;,]</code></pre>
 </div>
 </div>
 <div id="data-coverage-by-zcta-county-state" class="section level3">
-<h3>Data coverage by ZCTA, county, state</h3>
+<h3 id="data-coverage-by-zcta-county-state">Data coverage by ZCTA, county, state</h3>
 <ul>
 <li>fire incident coverage, chart and map</li>
 <li>NFIRS reporting dept coverage, chart and map</li>
@@ -518,7 +542,7 @@ zip_regions[, ZCTA5 := region]</code></pre>
 ## 51664:         NA                                         NA 84732
 ## 51665:         NA                                         NA 99720
 ## 51666:         NA                                         NA 68324</code></pre>
-<pre class="r"><code>zip_coverage_RC_home[, region := ZCTA5] # seemed a little bit redundant, but we don't want change the column name in original data into 'region', especially when we want to aggregate on different level from same original data</code></pre>
+<pre class="r"><code>zip_coverage_RC_home[, region := ZCTA5] # seemed a little bit redundant, but we don&apos;t want change the column name in original data into &apos;region&apos;, especially when we want to aggregate on different level from same original data</code></pre>
 <pre><code>##       ZCTA5 value region
 ##    1: 00602     1  00602
 ##    2: 00612     8  00612
@@ -541,7 +565,7 @@ zip_choropleth(zip_coverage_RC_home,
 <pre class="r"><code># ---- RC responses to fire --------------------------------------------------------------
 # esri_zip have many missing rows, sort it and saw characters, less than 5 digits, 999s
 summary(as.numeric(RC_fire_response$esri_zip)) # 50139 NA include empty and characters.</code></pre>
-<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA&apos;s 
 ##       0   24460   39570   45000   68850  100000   50139</code></pre>
 <pre class="r"><code>summary(as.numeric(RC_fire_response$pre_zip_5_digit)) # 208 NAs, but have many non 5 digits</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
@@ -550,7 +574,7 @@ summary(as.numeric(RC_fire_response$esri_zip)) # 50139 NA include empty and char
 <pre><code>## &lt; table of extent 0 &gt;</code></pre>
 <pre class="r"><code># we can ignore all invalid zip by merging with standard ZCTA table
 setnames(RC_fire_response, &quot;pre_zip_5_digit&quot;, &quot;ZCTA5&quot;)</code></pre>
-<pre><code>## Error in setnames(RC_fire_response, &quot;pre_zip_5_digit&quot;, &quot;ZCTA5&quot;): Items of 'old' not found in column names: pre_zip_5_digit</code></pre>
+<pre><code>## Error in setnames(RC_fire_response, &quot;pre_zip_5_digit&quot;, &quot;ZCTA5&quot;): Items of &apos;old&apos; not found in column names: pre_zip_5_digit</code></pre>
 <pre class="r"><code>coverage_RC_response = merge(RC_fire_response, zip_county_single, by = &quot;ZCTA5&quot;)
 zip_coverage_RC_response = coverage_RC_response[, .(value = .N), by = ZCTA5]
 county_coverage_RC_response = coverage_RC_response[, .(value = .N), by = countyGEOID]
@@ -586,10 +610,10 @@ state_choropleth(merge(state_regions, state_coverage_RC_response, by = &quot;Sta
 <p><img src="data:image/png;base64,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" alt="plot of chunk data coverage by ZCTA and counties"></p>
 <pre class="r"><code># ---- NFIRS data fire incident location coverage -----------------------------------------
 # home fire incident
-data_all$`2010basicincident`[grep('111', INC_TYPE), .N]</code></pre>
+data_all$`2010basicincident`[grep(&apos;111&apos;, INC_TYPE), .N]</code></pre>
 <pre><code>## [1] 290196</code></pre>
 <pre class="r"><code># need address information, merge with home fire events
-coverage_NFIRS_home_fire_2010 = merge(data_all$`2010basicincident`[grep('111', INC_TYPE), ],
+coverage_NFIRS_home_fire_2010 = merge(data_all$`2010basicincident`[grep(&apos;111&apos;, INC_TYPE), ],
                                       data_all$`2010incidentaddress`)
 # no county info, need to start from zip. 
 setnames(coverage_NFIRS_home_fire_2010, &quot;ZIP5&quot;, &quot;ZCTA5&quot;) # is ZIP4 the 4 digits extension zipcode?
@@ -635,7 +659,7 @@ state_choropleth(merge(state_regions, state_coverage_NFIRS_home_fire_2010, by = 
 # smoke alarm presence
 # match home fire events id with fireincident data
 # 2007, 21377 in 125277 home fire, 2008, 37891 in 134718
-home_fire_2010 = merge(data_all$`2010basicincident`[grep('111', INC_TYPE), ],
+home_fire_2010 = merge(data_all$`2010basicincident`[grep(&apos;111&apos;, INC_TYPE), ],
                                       data_all$`2010fireincident`)
 
 
@@ -650,18 +674,18 @@ home_fire_2010 = merge(data_all$`2010basicincident`[grep('111', INC_TYPE), ],
 # all areas with above average coverage, count &gt; mean. merge together, rename column first.</code></pre>
 </div>
 <div id="state-fire-incident-count-state-fire-dept-coverage-map-zipcode-map-in-one-state-leaflet-zoom-in" class="section level3">
-<h3>state fire incident count, state fire dept coverage map, zipcode map in one state, leaflet zoom in</h3>
+<h3 id="state-fire-incident-count-state-fire-dept-coverage-map-zipcode-map-in-one-state-leaflet-zoom-in">state fire incident count, state fire dept coverage map, zipcode map in one state, leaflet zoom in</h3>
 <pre class="r"><code># county visits on RC home visit: county_coverage_RC_home</code></pre>
 </div>
 <div id="possible-methods" class="section level2">
-<h2>Possible methods</h2>
+<h2 id="possible-methods">Possible methods</h2>
 <ul>
 <li>leaflet, self hosted?</li>
 <li>google map with a layer</li>
 </ul>
 </div>
 <div id="leaflet" class="section level1">
-<h1>—-leaflet—–</h1>
+<h1 id="-leaflet">&#x2014;-leaflet&#x2014;&#x2013;</h1>
 <p>1.street level map showing fire incidents from NFIRS and RC response data. * prepare a sample data, estimate the scale of records</p>
 <p>2.calculate score on census tract level, or at least zipcode level first(easy and quick, for prototyping), show it as heatmap</p>
 <p>3.shiny app to accept user model input.</p>
@@ -691,23 +715,25 @@ $(document).ready(function () {
 
 </body>
 </html>
-
     
   </div>
 
- </div>
+
+        </div>
 
         
 
+
         
-          <div class="comments" id="comments">
-            
-              <div id="disqus_thread">
-                <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-              </div>
-            
-          </div>
-        
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      </div>
+    
+  </div>
+
+
       </div>
 
       
@@ -736,8 +762,8 @@ $(document).ready(function () {
         <p class="site-description motion-element" itemprop="description">Artificial learning and Evolution inspired by nature</p>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
-            <a href="/">
-              <span class="site-state-item-count">4</span>
+            <a href="/archives">
+              <span class="site-state-item-count">5</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>
@@ -783,7 +809,8 @@ $(document).ready(function () {
     </main>
 
     <footer id="footer" class="footer">
-      <div class="footer-inner"> <div class="copyright" >
+      <div class="footer-inner">
+        <div class="copyright" >
   
   &copy; 
   <span itemprop="copyrightYear">2015</span>
@@ -805,7 +832,8 @@ $(document).ready(function () {
 </div>
 
 
- </div>
+
+      </div>
     </footer>
 
     <div class="back-to-top"></div>
@@ -815,6 +843,7 @@ $(document).ready(function () {
 
   
   
+
   
     
     
@@ -844,36 +873,25 @@ $(document).ready(function () {
 
 
   
+
   
   <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
   <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
 
 
   <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
-  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
 
-  <script type="text/javascript" src="/js/motion_fallback.js?v=0.4.5.2" id="motion.fallback"></script>
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
 
 
-
-
-  <script type="text/javascript" src="/js/nav-toggle.js?v=0.4.5.2"></script>
   <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
 
   
 
-  <script type="text/javascript">
-    $(document).ready(function () {
-      if (CONFIG.sidebar === 'always') {
-        displaySidebar();
-      }
-      if (isMobile()) {
-        FastClick.attach(document.body);
-      }
-
-      motionIntegrator.bootstrap();
-    });
-  </script>
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
 
   
   
@@ -881,15 +899,5 @@ $(document).ready(function () {
   
   
 
-  
-  <script type="text/javascript" src="/js/lazyload.js"></script>
-  <script type="text/javascript">
-    $(function () {
-      $("#posts").find('img').lazyload({
-        placeholder: "/images/loading.gif",
-        effect: "fadeIn"
-      });
-    });
-  </script>
 </body>
 </html>
