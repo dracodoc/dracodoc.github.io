@@ -74,7 +74,7 @@ IntroductionI was looking at local housing market some time ago and found it was
 <script type="text/javascript" id="hexo.configuration">
   var CONFIG = {
     scheme: 'Mist',
-    sidebar: 'post',
+    sidebar: 'always',
     motion: false
   };
 </script>
@@ -758,7 +758,7 @@ IntroductionI was looking at local housing market some time ago and found it was
     // Expand sidebar on post detail page by default, when post has a toc.
     motionMiddleWares.sidebar = function () {
       var $tocContent = $('.post-toc-content');
-      if (CONFIG.sidebar === 'post') {
+      if (CONFIG.sidebar === 'post' || CONFIG.sidebar === 'always') {
         if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
           displaySidebar();
         }

@@ -70,7 +70,7 @@ The Problem and the simple timing scriptI have been revisiting Python recently a
 <script type="text/javascript" id="hexo.configuration">
   var CONFIG = {
     scheme: 'Mist',
-    sidebar: 'post',
+    sidebar: 'always',
     motion: false
   };
 </script>
@@ -690,7 +690,7 @@ and 2831
     // Expand sidebar on post detail page by default, when post has a toc.
     motionMiddleWares.sidebar = function () {
       var $tocContent = $('.post-toc-content');
-      if (CONFIG.sidebar === 'post') {
+      if (CONFIG.sidebar === 'post' || CONFIG.sidebar === 'always') {
         if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
           displaySidebar();
         }
