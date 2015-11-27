@@ -51,12 +51,12 @@
 
 
 
-<meta name="description" content="IntroductionThis is the detailed discussion of my script and work flow for geocoding NFIRS data. See background of project and the system setup in my previous posts.">
+<meta name="description" content="IntroductionThis is the detailed discussion of my script and workflow for geocoding NFIRS data. See background of project and the system setup in my previous posts.">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Script And Work Flow For Batch Geocoding Millions Of Address With Postgis Tiger Geocoder">
+<meta property="og:title" content="Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder">
 <meta property="og:url" content="http://dracodoc.github.io/2015/11/19/Script-workflow/index.html">
 <meta property="og:site_name" content="Artificial Learning and Evolution inspired by Nature">
-<meta property="og:description" content="IntroductionThis is the detailed discussion of my script and work flow for geocoding NFIRS data. See background of project and the system setup in my previous posts.">
+<meta property="og:description" content="IntroductionThis is the detailed discussion of my script and workflow for geocoding NFIRS data. See background of project and the system setup in my previous posts.">
 <meta property="og:image" content="http://dracodoc.github.io/NFIRS_data_sample.png">
 <meta property="og:image" content="http://dracodoc.github.io/table1.png">
 <meta property="og:image" content="http://dracodoc.github.io/table2.png">
@@ -67,10 +67,10 @@
 <meta property="og:image" content="http://dracodoc.github.io/2_explain_limit_v1.png">
 <meta property="og:image" content="http://dracodoc.github.io/3_explain_scan_v2.png">
 <meta property="og:image" content="http://dracodoc.github.io/4_explain_scan_v1_2nd_run.png">
-<meta property="og:updated_time" content="2015-11-27T03:28:35.600Z">
+<meta property="og:updated_time" content="2015-11-27T20:16:05.767Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Script And Work Flow For Batch Geocoding Millions Of Address With Postgis Tiger Geocoder">
-<meta name="twitter:description" content="IntroductionThis is the detailed discussion of my script and work flow for geocoding NFIRS data. See background of project and the system setup in my previous posts.">
+<meta name="twitter:title" content="Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder">
+<meta name="twitter:description" content="IntroductionThis is the detailed discussion of my script and workflow for geocoding NFIRS data. See background of project and the system setup in my previous posts.">
 
 
 
@@ -82,7 +82,7 @@
   };
 </script>
 
-  <title> Script And Work Flow For Batch Geocoding Millions Of Address With Postgis Tiger Geocoder | Artificial Learning and Evolution inspired by Nature </title>
+  <title> Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder | Artificial Learning and Evolution inspired by Nature </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="en">
@@ -202,7 +202,7 @@
             
             
               
-                Script And Work Flow For Batch Geocoding Millions Of Address With Postgis Tiger Geocoder
+                Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder
               
             
           </h1>
@@ -269,14 +269,14 @@
       
 
       
-        <span itemprop="articleBody"><h3 id="introduction">Introduction</h3><p>This is the detailed discussion of my script and work flow for geocoding NFIRS data. See <a href="http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/">background of project</a> and <a href="http://dracodoc.github.io/2015/11/17/Geocoding/">the system setup</a> in my previous posts.<br><a id="more"></a></p>
+        <span itemprop="articleBody"><h3 id="introduction">Introduction</h3><p>This is the detailed discussion of my script and workflow for geocoding NFIRS data. See <a href="http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/">background of project</a> and <a href="http://dracodoc.github.io/2015/11/17/Geocoding/">the system setup</a> in my previous posts.<br><a id="more"></a></p>
 <p>So I have 18 million addresses like this, how can I geocode them into valid address, coordinates and map to census block?<br><img src="NFIRS_data_sample.png" alt="NFIRS data sample"></p>
 <h3 id="tiger-geocoder-geocode-function">Tiger Geocoder Geocode Function</h3><p>Tiger Geocoder extension have this <a href="http://postgis.net/docs/Geocode.html" target="_blank" rel="external"><code>geocode</code> function</a> to take in address string then output a set of possible locations and coordinates. A perfect formated accurate address could have an exact match in 61ms, but if there are misspelling or other non-perfect input, it could take much longer time.</p>
-<p>Since geocoding performance varys a lot depending on the case and I have 18 millions address to geocode, I need to take every possible measure to improve the performance and finish the task with less hours. I searched numerous discussions about improving performance and tried most of them.</p>
+<p>Since geocoding performance varies a lot depending on the case and I have 18 millions address to geocode, I need to take every possible measure to improve the performance and finish the task with less hours. I searched numerous discussions about improving performance and tried most of them.</p>
 <h3 id="preparing-addresses">Preparing Addresses</h3><p>First I need to prepare my address input. Technically NFIRS data have a column of <code>Location Type</code> to separate street addresses, intersections and other type of input. I filtered the addresses with the street address type then further removed many rows that obviously are still intersections.</p>
 <p>NFIRS designed many columns for different part of an address, like street prefix, suffix, apt number etc. I concatenate them into a string formated to meet the <code>geocode</code> function expectation. <strong>A good format with proper comma separation could make the geocode function&#x2019;s work much easier</strong>. One bonus of concatenating the address segments is that some misplaced input columns will be corrected, for example some rows have the street number in street name column.</p>
 <p>There are still numerous input errors, but I didn&#x2019;t plan to clean up too much first. Because I don&#x2019;t know what will cause problems before actually running the geocoding process . It will be probably easier to run one pass for one year&#x2019;s data first, then collect all the formatting errors, clean them up and feed them for second pass. After this round I can use the clean up procedures to process other years&#x2019; data before geocoding.</p>
-<p>Another tip I found about improving geocoding performance is to <strong>process one state at a time, maybe sort the address by zipcode</strong>. Because I want the postgresql server to cache everything needed for geocoding in RAM and avoid disk access as much as possible. With limited RAM it&#x2019;s better to only process similar address at a time. Split huge data file into smaller tasks also make it easier to find problem or deal with exceptions, of course you will need a good batch processing work flow to process more input files.</p>
+<p>Another tip I found about improving geocoding performance is to <strong>process one state at a time, maybe sort the address by zipcode</strong>. Because I want the postgresql server to cache everything needed for geocoding in RAM and avoid disk access as much as possible. With limited RAM it&#x2019;s better to only process similar address at a time. Split huge data file into smaller tasks also make it easier to find problem or deal with exceptions, of course you will need a good batch processing workflow to process more input files.</p>
 <p>Someone also mentioned that to <strong>standardize the address first, remove the invalid addresses</strong> since they take the most time to geocode. However I&#x2019;m not sure how can I verify the valid address without actual geocoding. Some addresses are obviously missing street numbers and cannot have an exact location, but I may still need the ballpark location for my analysis. They may not be able to be mapped to census block, but a census tract mapping could still be helpful. After the first pass on one year&#x2019;s data I will design a much more complete cleaning process, which could make the geocoding function&#x2019;s job a little bit easier.</p>
 <p><a href="http://postgis.net/docs/postgis_installation.html#tiger_pagc_address_standardizing" target="_blank" rel="external">The PostGIS documentation</a> did mention that the built-in address normalizer is not optimal and they have a better pagc address standardizer can be used. I tried to enable it in the linux setup but failed. It seemed that I need to reinstall postgresql since it is not included in the postgresql setup process of the ansible playbook. This is a direction I&#x2019;ll explore later.</p>
 <h3 id="test-geocoding-function">Test Geocoding Function</h3><p>Based on the example given in <code>geocode</code> function documentation, I wrote my version of SQL command to geocode address like this:</p>
@@ -391,7 +391,7 @@
             <span class="keyword">ORDER</span> <span class="keyword">BY</span> addid <span class="keyword">LIMIT</span> sample_size
          ) <span class="keyword">AS</span> <span class="keyword">sample</span></span>
 </code></pre><p>Later I found this problem only occurs when the first row of table have invalid address for which the geocode function have no return value. These are the <code>explain analysis</code> results from pgAdmin SQL query tool:</p>
-<p>The example code runs on 100 row table on first time, with first row address invalid. The first step of <code>Seq Scan</code> take 284 s (this was on my home pc server running on regulard hard drive with all states data, so the performance was bad) to return 99 rows of geocoding result(one row has no match).</p>
+<p>The example code runs on 100 row table on first time, with first row address invalid. The first step of <code>Seq Scan</code> take 284 s (this was on my home pc server running on regular hard drive with all states data, so the performance was bad) to return 99 rows of geocoding result(one row has no match).</p>
 <p><img src="1_explain_scan_v1.png" alt="1. example code returned 99 rows in seq scan "></p>
 <p><img src="2_explain_limit_v1.png" alt="2. example code limited results to 3 rows later"></p>
 <p>While my modified version only processed 3 rows in first step.<br><img src="3_explain_scan_v2.png" alt="3. modified version geocoded 3 rows only"></p>
@@ -575,7 +575,7 @@ output_address <span class="string">| 2198 Florida Ave NW, Washington, DC 20008<
 <li>The slight difference may result in different census block output, probably because these locations are on street intersections which are more than likely to be boundary of census blocks.</li>
 <li>Using the geometry or the coordinates output (6 digits after dot) from <code>geocode_intersection</code> for <code>ST_Contains</code> could have empty result, i.e. no census block have contain relationship of these points. I&#x2019;m not sure the reason of this, only observed that using coordinates with 5 digits after dot will find a match in most time. This is an open question need to consulting with the experts on this.</li>
 </ul>
-<h3 id="work-in-batch">Work In Batch</h3><p>I was planning to geocode addresses by states to improve the performance, so I&#x2019;ll need to process lots of files. After some experimentations, I developed a batch work flow:</p>
+<h3 id="work-in-batch">Work In Batch</h3><p>I was planning to geocode addresses by states to improve the performance, so I&#x2019;ll need to process lots of files. After some experimentations, I developed a batch workflow:</p>
 <ol>
 <li><p>The script discussed above can take a csv input, geocode addresses, map census block, update the table. I used this psql command line to execute the script. Note I have a .pgpass file in my user folder so I don&#x2019;t need to write database password in the command line, and I saved a copy of the console messages to log file. </p>
 <pre><code>psql -<span class="keyword">d</span> census -<span class="keyword">U</span> postgres -<span class="keyword">h</span> localhost -w -v input_file=<span class="string">&quot;&apos;/home/ubuntu/geocode/address_input/address_sample.csv&apos;&quot;</span> -f geocode_batch.sql 2&gt;&amp;1 | tee address.<span class="literal">log</span>
@@ -590,7 +590,7 @@ sh ./batch<span class="class">.sh</span>
 </code></pre></li>
 </ol>
 <h3 id="exception-handling-and-progress-report">Exception Handling And Progress Report</h3><p>The NFIRS data have many ill formated addresses that could cause problem for <code>geocode</code> function. I decided that it&#x2019;s better to process one year&#x2019;s data first, then collect all the problem cases and design a cleaning procedure before processing other years&#x2019; data. </p>
-<p>This means the work flow should be able to skip on errors and mark the problems. The script above can handle the cases when there is no match returned from the <code>geocode</code> function, but any exception occurred in runtime will interrupt the script. Since the <code>geocode_sample</code> is called in a loop inside the main control function, the whole script is one single transaction. Once the transaction is interrupted, it will be rolled back and all the previous geocoding results are lost. See <a href="http://www.postgresql.org/docs/current/static/plpgsql-structure.html" target="_blank" rel="external">more about this</a>. </p>
+<p>This means the workflow should be able to skip on errors and mark the problems. The script above can handle the cases when there is no match returned from the <code>geocode</code> function, but any exception occurred in runtime will interrupt the script. Since the <code>geocode_sample</code> is called in a loop inside the main control function, the whole script is one single transaction. Once the transaction is interrupted, it will be rolled back and all the previous geocoding results are lost. See <a href="http://www.postgresql.org/docs/current/static/plpgsql-structure.html" target="_blank" rel="external">more about this</a>. </p>
 <p>However, <a href="http://www.postgresql.org/docs/current/static/plpgsql-control-structures.html#PLPGSQL-ERROR-TRAPPING" target="_blank" rel="external">adding an EXCEPTION clause</a> effectively forms a subtransaction that can be rolled back without affecting the outer transaction.</p>
 <p>Therefore I added this exception handling part in the <code>geocode_sample</code> function:</p>
 <pre><code><span class="keyword">CREATE</span> <span class="keyword">OR</span> REPLACE <span class="function"><span class="keyword">FUNCTION</span> <span class="title">geocode_sample</span><span class="params">(sample_size integer)</span> 
@@ -635,7 +635,7 @@ psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  <span class="pr
 psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  <span class="preprocessor"># <span class="number">00</span>:<span class="number">00</span>:<span class="number">03.4</span>  |    <span class="number">2000</span>    &lt;&lt;&lt;&lt;    <span class="number">8845</span></span>
 </code></pre><h3 id="summary-and-open-questions">Summary And Open Questions</h3><p>I put everything in <a href="https://github.com/dracodoc/Geocode" target="_blank" rel="external">this Github repository</a>. </p>
 <p>My script has processed almost one year&#x2019;s data, but I&#x2019;m not really satisfied with the performance yet. When I tested the 44185 MD, DC addresses in the AWS free tier server with MD, DC database, the average time per row is about 60 ms, while the full server with all states have the average time of 342 ms. Some other states with more ill formated addresses have worse performance. </p>
-<p>I have updated the Tiger database index and tuned the postgresql configurations. I can try parallel but the cpu should not be the bottle neck here, and <a href="http://geeohspatial.blogspot.com/2013/12/a-simple-function-for-parallel-queries_18.html" target="_blank" rel="external">the hack I found to enable postgresql run parallel</a> is not easily managable. Somebody also mentioned partitioning database, but I&#x2019;m not sure if this will help.</p>
+<p>I have updated the Tiger database index and tuned the postgresql configurations. I can try parallel but the cpu should not be the bottle neck here, and <a href="http://geeohspatial.blogspot.com/2013/12/a-simple-function-for-parallel-queries_18.html" target="_blank" rel="external">the hack I found to enable postgresql run parallel</a> is not easily manageable. Somebody also mentioned partitioning database, but I&#x2019;m not sure if this will help.</p>
 <p>And here are some open questions I will ask in PostGIS community, some of them may have the potential to further improve performance:</p>
 <ol>
 <li><p>Why is a server with 2 states data much faster than the server with all states data? I assume it&#x2019;s because the bad address that don&#x2019;t have a exact hit at first will cost much more time when the geocoder checked all states. With only 2 states this search is limited and stopped much early. This can be further verified by comparing the performance of two test cases in each server, one with exact match perfect address, another one with lots of invalid addresses.</p>
@@ -860,7 +860,7 @@ psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  <span class="pr
     <script type="text/javascript">
       var disqus_shortname = 'dracodocgithub';
       var disqus_identifier = '2015/11/19/Script-workflow/';
-      var disqus_title = 'Script And Work Flow For Batch Geocoding Millions Of Address With Postgis Tiger Geocoder';
+      var disqus_title = 'Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder';
       var disqus_url = 'http://dracodoc.github.io/2015/11/19/Script-workflow/';
 
       function run_disqus_script(disqus_script){

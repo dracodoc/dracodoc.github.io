@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://dracodoc.github.io/2015/11/19/Script-workflow/</loc>
+    <lastmod>2015-11-27T20:16:05.767Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://dracodoc.github.io/categories/index.html</loc>
     <lastmod>2015-11-27T03:34:19.970Z</lastmod>
   </url>
@@ -9,11 +14,6 @@
   <url>
     <loc>http://dracodoc.github.io/tags/index.html</loc>
     <lastmod>2015-11-27T03:34:01.167Z</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://dracodoc.github.io/2015/11/19/Script-workflow/</loc>
-    <lastmod>2015-11-27T03:28:35.600Z</lastmod>
   </url>
   
   <url>
