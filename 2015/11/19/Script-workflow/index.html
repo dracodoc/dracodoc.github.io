@@ -51,12 +51,12 @@
 
 
 
-<meta name="description" content="IntroductionThis is the detailed discussion of my script and work flow for geocoding 18 million address from NFIRS data. See background of project and the system setup in my previous posts.">
+<meta name="description" content="IntroductionThis is the detailed discussion of my script and work flow for geocoding NFIRS data. See background of project and the system setup in my previous posts.">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Script And Work Flow For Batch Geocoding Millions Of Address With Postgis Tiger Geocoder">
 <meta property="og:url" content="http://dracodoc.github.io/2015/11/19/Script-workflow/index.html">
 <meta property="og:site_name" content="Artificial Learning and Evolution inspired by Nature">
-<meta property="og:description" content="IntroductionThis is the detailed discussion of my script and work flow for geocoding 18 million address from NFIRS data. See background of project and the system setup in my previous posts.">
+<meta property="og:description" content="IntroductionThis is the detailed discussion of my script and work flow for geocoding NFIRS data. See background of project and the system setup in my previous posts.">
 <meta property="og:image" content="http://dracodoc.github.io/NFIRS_data_sample.png">
 <meta property="og:image" content="http://dracodoc.github.io/table1.png">
 <meta property="og:image" content="http://dracodoc.github.io/table2.png">
@@ -67,17 +67,17 @@
 <meta property="og:image" content="http://dracodoc.github.io/2_explain_limit_v1.png">
 <meta property="og:image" content="http://dracodoc.github.io/3_explain_scan_v2.png">
 <meta property="og:image" content="http://dracodoc.github.io/4_explain_scan_v1_2nd_run.png">
-<meta property="og:updated_time" content="2015-11-26T03:50:46.834Z">
+<meta property="og:updated_time" content="2015-11-27T03:28:35.600Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Script And Work Flow For Batch Geocoding Millions Of Address With Postgis Tiger Geocoder">
-<meta name="twitter:description" content="IntroductionThis is the detailed discussion of my script and work flow for geocoding 18 million address from NFIRS data. See background of project and the system setup in my previous posts.">
+<meta name="twitter:description" content="IntroductionThis is the detailed discussion of my script and work flow for geocoding NFIRS data. See background of project and the system setup in my previous posts.">
 
 
 
 <script type="text/javascript" id="hexo.configuration">
   var CONFIG = {
     scheme: 'Mist',
-    sidebar: 'hide',
+    sidebar: 'post',
     motion: false
   };
 </script>
@@ -135,12 +135,32 @@
     <ul id="menu" class="menu ">
       
         
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
             
               <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
             
             Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            Tags
           </a>
         </li>
       
@@ -249,17 +269,17 @@
       
 
       
-        <span itemprop="articleBody"><h3 id="introduction">Introduction</h3><p>This is the detailed discussion of my script and work flow for geocoding 18 million address from NFIRS data. See <a href="http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/">background of project</a> and <a href="http://dracodoc.github.io/2015/11/17/Geocoding/">the system setup</a> in my previous posts.<br><a id="more"></a></p>
+        <span itemprop="articleBody"><h3 id="introduction">Introduction</h3><p>This is the detailed discussion of my script and work flow for geocoding NFIRS data. See <a href="http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/">background of project</a> and <a href="http://dracodoc.github.io/2015/11/17/Geocoding/">the system setup</a> in my previous posts.<br><a id="more"></a></p>
 <p>So I have 18 million addresses like this, how can I geocode them into valid address, coordinates and map to census block?<br><img src="NFIRS_data_sample.png" alt="NFIRS data sample"></p>
-<h3 id="tiger-geocoder-geocode-function">Tiger Geocoder Geocode function</h3><p>Tiger Geocoder extension have this <a href="http://postgis.net/docs/Geocode.html" target="_blank" rel="external"><code>geocode</code> function</a> to take in address string then output a set of possible locations and coordinates. A perfect formated accurate address could have an exact match in 61ms, but if there are misspelling or other non-perfect input, it could take much longer time.</p>
+<h3 id="tiger-geocoder-geocode-function">Tiger Geocoder Geocode Function</h3><p>Tiger Geocoder extension have this <a href="http://postgis.net/docs/Geocode.html" target="_blank" rel="external"><code>geocode</code> function</a> to take in address string then output a set of possible locations and coordinates. A perfect formated accurate address could have an exact match in 61ms, but if there are misspelling or other non-perfect input, it could take much longer time.</p>
 <p>Since geocoding performance varys a lot depending on the case and I have 18 millions address to geocode, I need to take every possible measure to improve the performance and finish the task with less hours. I searched numerous discussions about improving performance and tried most of them.</p>
-<h3 id="preparing-addresses">Preparing Addresses</h3><p>First I need to prepare my addresses input. Technically NFIRS data have a column of <code>Location Type</code> to separate street addresses, intersections and other type of input. I took the street address type first then filtered out many rows that obviously are still intersections although with a street address type code.</p>
-<p>The NFIRS table designed many columns for different part of an address, like street prefix, suffix, apt number etc. I concatenate them into a string that meet the <code>geocode</code> function expectation. <strong>A good format with proper comma separation could make the geocode function&#x2019;s work much easier</strong>. One bonus of concatenate the address segments is that some misplaced input like putting street number in street name column will be corrected.</p>
-<p>There are still numerous input errors, but I didn&#x2019;t plan to clean every type of error before hand. It will be probably easier to run one pass for one year&#x2019;s data first, then collect all the formatting errors to design the complete cleaning process for next batch.</p>
-<p>Another tip I found about improving geocoding performance is to <strong>process one state at a time, maybe sort the address by zipcode</strong>. Because I want the postgresql server to cache everything needed for geocoding in RAM and avoid disk access as much as possible, with limited RAM it&#x2019;s better to only process similar address at a time. Making each task smaller also means it&#x2019;s easier to find problem or deal with exceptions, of course you will need a good batch processing work flow to process more input files.</p>
-<p>Someone also mentioned that to <strong>standardize the address first, remove the invalid addresses</strong> since they take the most time to geocode. However I&#x2019;m not sure how can I verify the valid address without actual geocoding. Some addresses are obviously missing street numbers and cannot have an exact location, but I may still need the ballpark location for my analysis. They may not be able to map to census block, but a census tract mapping could also be helpful. After the first pass on one year&#x2019;s data I will design a much more complete cleaning process, which could make the geocoding function&#x2019;s job a little bit easier.</p>
+<h3 id="preparing-addresses">Preparing Addresses</h3><p>First I need to prepare my address input. Technically NFIRS data have a column of <code>Location Type</code> to separate street addresses, intersections and other type of input. I filtered the addresses with the street address type then further removed many rows that obviously are still intersections.</p>
+<p>NFIRS designed many columns for different part of an address, like street prefix, suffix, apt number etc. I concatenate them into a string formated to meet the <code>geocode</code> function expectation. <strong>A good format with proper comma separation could make the geocode function&#x2019;s work much easier</strong>. One bonus of concatenating the address segments is that some misplaced input columns will be corrected, for example some rows have the street number in street name column.</p>
+<p>There are still numerous input errors, but I didn&#x2019;t plan to clean up too much first. Because I don&#x2019;t know what will cause problems before actually running the geocoding process . It will be probably easier to run one pass for one year&#x2019;s data first, then collect all the formatting errors, clean them up and feed them for second pass. After this round I can use the clean up procedures to process other years&#x2019; data before geocoding.</p>
+<p>Another tip I found about improving geocoding performance is to <strong>process one state at a time, maybe sort the address by zipcode</strong>. Because I want the postgresql server to cache everything needed for geocoding in RAM and avoid disk access as much as possible. With limited RAM it&#x2019;s better to only process similar address at a time. Split huge data file into smaller tasks also make it easier to find problem or deal with exceptions, of course you will need a good batch processing work flow to process more input files.</p>
+<p>Someone also mentioned that to <strong>standardize the address first, remove the invalid addresses</strong> since they take the most time to geocode. However I&#x2019;m not sure how can I verify the valid address without actual geocoding. Some addresses are obviously missing street numbers and cannot have an exact location, but I may still need the ballpark location for my analysis. They may not be able to be mapped to census block, but a census tract mapping could still be helpful. After the first pass on one year&#x2019;s data I will design a much more complete cleaning process, which could make the geocoding function&#x2019;s job a little bit easier.</p>
 <p><a href="http://postgis.net/docs/postgis_installation.html#tiger_pagc_address_standardizing" target="_blank" rel="external">The PostGIS documentation</a> did mention that the built-in address normalizer is not optimal and they have a better pagc address standardizer can be used. I tried to enable it in the linux setup but failed. It seemed that I need to reinstall postgresql since it is not included in the postgresql setup process of the ansible playbook. This is a direction I&#x2019;ll explore later.</p>
-<h3 id="test-geocoding-function">Test Geocoding function</h3><p>Based on the example given in <code>geocode</code> function documentation, I wrote my version of sql command to geocode address like this:</p>
+<h3 id="test-geocoding-function">Test Geocoding Function</h3><p>Based on the example given in <code>geocode</code> function documentation, I wrote my version of SQL command to geocode address like this:</p>
 <pre><code><span class="operator"><span class="keyword">SELECT</span> <span class="keyword">g</span>.rating,
         pprint_addy(<span class="keyword">g</span>.addy),
         ST_X(<span class="keyword">g</span>.geomout)::<span class="built_in">numeric</span>(<span class="number">8</span>,<span class="number">5</span>) <span class="keyword">AS</span> lon,
@@ -271,9 +291,9 @@
 <li>rating is needed because I need to know the match score for result. 0 is for perfect match, and 100 is for very rough match which I probably will not use.</li>
 <li><code>pprint_addy</code> give a pretty print of address in format that people familiar.</li>
 <li><code>geomout</code> is the point geometry of the match. I want to save this because it is a more precise representation and I may need it for census block mapping.</li>
-<li><code>lon</code> and <code>lat</code> are the coordinates round up to 5 digits. The 6th digit will be in range of 1 m. Since most street address locations are interpolated and can be off a lot, there is no point to keep more digits than the 5th.</li>
+<li><code>lon</code> and <code>lat</code> are the coordinates round up to 5 digits after dot. The 6th digit will be in range of 1 m. Since most street address locations are interpolated and can be off a lot, there is no point to keep more digits.</li>
 </ul>
-<p>The next step is to make it work in many rows instead of just single input. I formated the addresses in R and wrote to csv file with this format:</p>
+<p>The next step is to make it work for many rows instead of just single input. I formated the addresses in R and wrote to csv file with this format:</p>
 <table>
 <thead>
 <tr>
@@ -310,8 +330,8 @@
 </tr>
 </tbody>
 </table>
-<p>The <code>row_seq</code> is the unique id I assigned to every row so I can link the output back to the original table. <code>zip</code> is needed because I want to sort the addresses by zipcode. Another bonus is that addresses with obvious wrong zipcode will be shown together in beginning or ending of the file. I used the pipe symbol <code>|</code> as the separator of csv because there could be quotes and commas in column and I don&#x2019;t want the separator to be confused with part of input.</p>
-<p>Then I can read the csv into a table in sql. The <code>geocode</code> function documentation provided an example to geocode addresses in batch mode, and most discussions in web seemed to be based on this example.</p>
+<p>The <code>row_seq</code> is the unique id I assigned to every row so I can link the output back to the original table. <code>zip</code> is needed because I want to sort the addresses by zipcode. Another bonus is that addresses with obvious wrong zipcode will be shown together in beginning or ending of the file. I used the pipe symbol <code>|</code> as the separator of csv because there could be quotes and commas in columns.</p>
+<p>Then I can read the csv into a table in postgresql database. The <code>geocode</code> function documentation provided an example to geocode addresses in batch mode, and most discussions in web seemed to be based on this example.</p>
 <pre><code><span class="comment">-- only update the first 3 addresses (323-704 ms</span>
 <span class="comment">-- there are caching and shared memory effects so first geocode you do is always slower)</span>
 <span class="comment">-- for large numbers of addresses you don&apos;t want to update all at once</span>
@@ -330,46 +350,55 @@
                 <span class="keyword">FROM</span> addresses_to_geocode <span class="keyword">AS</span> ag
                 <span class="keyword">WHERE</span> ag.rating <span class="keyword">IS</span> <span class="literal">NULL</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> addid <span class="keyword">LIMIT</span> <span class="number">3</span>) <span class="keyword">AS</span> <span class="keyword">g</span> <span class="keyword">ON</span> a.addid = <span class="keyword">g</span>.addid
 <span class="keyword">WHERE</span> a.addid = addresses_to_geocode.addid;</span>
-</code></pre><p>Since the geocoding process can be slow, it&#x2019;s suggested to process a small portion at a time. The address table was assigned an addid for each row as index then sorted. The code always process the first 3 rows not yet processed (rating column is null) as the sample to be processed &#x2013; <code>a</code>.</p>
+</code></pre><p>Since the geocoding process can be slow, it&#x2019;s suggested to process a small portion at a time. The address table was assigned an <code>addid</code> for each row as a index. The code always take <em>the first 3 rows not yet processed (rating column is null)</em> as the <em>sample</em> <code>a</code> to be geocoded.</p>
 <pre><code><span class="operator"><span class="keyword">SELECT</span> addid
     <span class="keyword">FROM</span> addresses_to_geocode
     <span class="keyword">WHERE</span> rating <span class="keyword">IS</span> <span class="literal">NULL</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> addid <span class="keyword">LIMIT</span> <span class="number">3</span>) <span class="keyword">AS</span> a</span>
-</code></pre><p><img src="table1.png" alt="table 1"><br>The result of geocoding &#x2013; <code>ag</code> is joined with the addid of the sample <code>a</code>.</p>
+</code></pre><p><img src="table1.png" alt="table 1"><br>The <em>result of geocoding</em> <code>g</code> is joined with the <code>addid</code> of the <em>sample</em> <code>a</code>.</p>
 <pre><code>LEFT JOIN (<span class="operator"><span class="keyword">SELECT</span> addid, (geocode(address,<span class="number">1</span>)) <span class="keyword">AS</span> geo
             <span class="keyword">FROM</span> addresses_to_geocode <span class="keyword">AS</span> ag
             <span class="keyword">WHERE</span> ag.rating <span class="keyword">IS</span> <span class="literal">NULL</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> addid <span class="keyword">LIMIT</span> <span class="number">3</span>
           ) <span class="keyword">AS</span> <span class="keyword">g</span> <span class="keyword">ON</span> a.addid = <span class="keyword">g</span>.addid</span>
-</code></pre><p><img src="table2.png" alt="table 2"><br>Then the address table was updated by joining the addid from joined <code>ag</code> and <code>a</code> with addid of address table. The initial value of rating column is null. valid match have a rating number range from 0 to around 100. Empty match have null rating value but was replaced to <code>-1</code> by the <code>COALESCE</code> function. This marked the empty match rows and the next run will skip these rows because the rating column is not null anymore even there is no match. Otherwise the code will select the empty match rows again in next geocoding.</p>
-<p>The join of <code>a</code> and <code>ag</code> may looks redundant at first since it didn&#x2019;t add new information, and <code>g</code> already included the addid column. However if some rows has no match and no value is returned by <code>geocode</code> function, <code>g</code> will only have rows with return values.<br><img src="table3.png" alt="table 3"><br>Joining <code>g</code> with address table will only update these rows. <code>COALESCE</code> function will not take any effect since the empty rows were not even included. And next run will select them again because they still satisfied the sample selection condition, which will mess up the control logic.</p>
-<p>Instead joining <code>a</code> and <code>ag</code> will have this,<br><img src="table4.png" alt="table 4"><br>The afterwards joining with address table will have the rating column updated correctly by <code>COALESCE</code> function.<br><img src="table5.png" alt="table 5"><br>I feel that I have to use this kind of method to control the execution logic because sql don&#x2019;t have many of the controls of the regular procedure languages.</p>
-<h3 id="problem-with-ill-formated-address">Problem With Ill Formated Address</h3><p>Because I sorted the addresses by zipcode, the ill formated addresses that with invalid zipcode always appear in the beginning of the file. I found the example code above had serious performance problems in some test cases. Because I have observed a similar problem before in experimenting I knew what caused the problem:</p>
-<p>I run this line on different sizes of test data, it is supposed to only process the first 3 rows so the table size should not matter:</p>
+</code></pre><p><img src="table2.png" alt="table 2"></p>
+<p>Then the <code>address table</code> was joined with <em>that joined table a-g</em> by <code>addid</code> and corresponding columns were updated. </p>
+<pre><code><span class="operator"><span class="keyword">UPDATE</span> addresses_to_geocode
+  <span class="keyword">SET</span> ( rating, new_address, lon, lat)
+    = ( <span class="keyword">COALESCE</span>((<span class="keyword">g</span>.geo).rating,-<span class="number">1</span>), pprint_addy((<span class="keyword">g</span>.geo).addy),
+       ST_X((<span class="keyword">g</span>.geo).geomout)::<span class="built_in">numeric</span>(<span class="number">8</span>,<span class="number">5</span>), ST_Y((<span class="keyword">g</span>.geo).geomout)::<span class="built_in">numeric</span>(<span class="number">8</span>,<span class="number">5</span>) )
+<span class="keyword">FROM</span> 
+...
+<span class="keyword">WHERE</span> a.addid = addresses_to_geocode.addid;</span>
+</code></pre><p>The initial value of rating column is <code>NULL</code>. Valid geocoding match have a rating number range from 0 to around 100. Some input don&#x2019;t have valid <code>geocode</code> function return value, which make the rating column to be <code>NULL</code>. Then it was replaced with <code>-1</code> by the <code>COALESCE</code> function to be separated with the unprocessed rows, so that the next run can skip them. </p>
+<p>The join of <code>a</code> and <code>g</code> may seem redundant at first since <code>g</code> already included the <code>addid</code> column. However when some rows has no match and no value is returned by <code>geocode</code> function, <code>g</code> will only have rows with return values.<br><img src="table3.png" alt="table 3"><br>Joining <code>g</code> with address table will only update these rows by <code>addid</code>. <code>COALESCE</code> function will not take any effect since the empty row <code>addid</code> were not even included. Then the next run will select them again because they still satisfied the sample selection condition, which will mess up the control logic.</p>
+<p>Instead joining <code>a</code> and <code>g</code> will have all <code>addid</code> in sample, and the no match rows have <code>NULL</code> in rating column.<br><img src="table4.png" alt="table 4"><br>The next joining with address table will have the rating column updated correctly by <code>COALESCE</code> function.<br><img src="table5.png" alt="table 5"></p>
+<p>This programming pattern is new for me. I think it&#x2019;s because SQL don&#x2019;t have the fine grade control of the regular procedure languages, but we still need more control some times so we have this.</p>
+<h3 id="problem-with-ill-formated-address">Problem With Ill Formated Address</h3><p>In my experiment with test data I found the example code above often had serious performance problems. It was very similar to another problem I observed: if I run this line with different table sizes, it should have similar performance since it is supposed to only process the first 3 rows.</p>
 <pre><code><span class="operator"><span class="keyword">SELECT</span> geocode(address_string,<span class="number">1</span>) 
     <span class="keyword">FROM</span> address_sample <span class="keyword">LIMIT</span> <span class="number">3</span>;</span>
-</code></pre><p>But the reality is it took much, much longer on a larger table. It seemed that it was geocoding the whole table first, then return the first 3 rows. If I subset the table more explicitly this problem disappeared:</p>
+</code></pre><p>Actually it took much, much longer on a larger table. It seemed that it was geocoding the whole table first, then only return the first 3 rows. If I subset the table more explicitly this problem disappeared:</p>
 <pre><code><span class="operator"><span class="keyword">SELECT</span> geocode(<span class="keyword">sample</span>.address_string, <span class="number">1</span>) 
     <span class="keyword">FROM</span> (<span class="keyword">SELECT</span> address_string 
             <span class="keyword">FROM</span> address_sample <span class="keyword">LIMIT</span> <span class="number">3</span>
          ) <span class="keyword">as</span> <span class="keyword">sample</span>;</span>
-</code></pre><p>The example code above have very similar problem. So I modified it similarly. Instead of using <code>LIMIT</code> directly in the <code>WHERE</code> clause, </p>
+</code></pre><p>I modified the example code similarly. Instead of using <code>LIMIT</code> directly in the <code>WHERE</code> clause, </p>
 <pre><code><span class="operator"><span class="keyword">SELECT</span> addid, (geocode(address,<span class="number">1</span>)) <span class="keyword">AS</span> geo
     <span class="keyword">FROM</span> addresses_to_geocode <span class="keyword">AS</span> ag
     <span class="keyword">WHERE</span> ag.rating <span class="keyword">IS</span> <span class="literal">NULL</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> addid <span class="keyword">LIMIT</span> <span class="number">3</span></span>
-</code></pre><p>I explicitly subsetted the sample table then put it in the <code>FROM</code> clause, problem solved.</p>
+</code></pre><p>I explicitly select the sample rows then put it in the <code>FROM</code> clause, problem solved.</p>
 <pre><code><span class="operator"><span class="keyword">SELECT</span> <span class="keyword">sample</span>.addid, geocode(<span class="keyword">sample</span>.input_address,<span class="number">1</span>) <span class="keyword">AS</span> geo
     <span class="keyword">FROM</span> (<span class="keyword">SELECT</span> addid, input_address
             <span class="keyword">FROM</span> address_table <span class="keyword">WHERE</span> rating <span class="keyword">IS</span> <span class="literal">NULL</span>
             <span class="keyword">ORDER</span> <span class="keyword">BY</span> addid <span class="keyword">LIMIT</span> sample_size
          ) <span class="keyword">AS</span> <span class="keyword">sample</span></span>
-</code></pre><p>Later I found this problem only occurs when the first row of table have invalid address when the geocode function have no return value. If this row has been processed and marked with <code>-1</code> in rating column, next run will not have problem. These are the <code>explain analysis</code> results from pgAdmin SQL query tool:</p>
+</code></pre><p>Later I found this problem only occurs when the first row of table have invalid address for which the geocode function have no return value. These are the <code>explain analysis</code> results from pgAdmin SQL query tool:</p>
 <p>The example code runs on 100 row table on first time, with first row address invalid. The first step of <code>Seq Scan</code> take 284 s (this was on my home pc server running on regulard hard drive with all states data, so the performance was bad) to return 99 rows of geocoding result(one row has no match).</p>
 <p><img src="1_explain_scan_v1.png" alt="1. example code returned 99 rows in seq scan "></p>
 <p><img src="2_explain_limit_v1.png" alt="2. example code limited results to 3 rows later"></p>
 <p>While my modified version only processed 3 rows in first step.<br><img src="3_explain_scan_v2.png" alt="3. modified version geocoded 3 rows only"></p>
-<p>After the first row has been processed, the example code no longer have the problem<br><img src="4_explain_scan_v1_2nd_run.png" alt="4. example code no longer have problem with valid inputs"></p>
-<p>I also tested the case when I move the problematic row to the second row, there was no problem either. It seemed that the postgresql planner had some trouble only when the first row didn&#x2019;t have valid return value, that&#x2019;s why the geocode authors didn&#x2019;t find this bug because it&#x2019;s a special case, but it&#x2019;s pretty frequent case in my data.</p>
+<p>After the first row has been processed and marked with <code>-1</code> in rating, the example code no longer have the problem<br><img src="4_explain_scan_v1_2nd_run.png" alt="4. example code no longer have problem with valid inputs"></p>
+<p>If I move the problematic row to the second row, there was no problem either. It seemed that the postgresql planner had some trouble only when the first row didn&#x2019;t have valid return value. The <code>geocode</code> function authors didn&#x2019;t find this bug probably because this is a special case, but it&#x2019;s very common in my data. Because I sorted the addresses by zipcode, many ill formated addresses with invalid zipcode always appear in the beginning of the file.</p>
 <h3 id="making-a-full-script">Making A full Script</h3><p>To have a better control of the whole process, I need some <a href="http://www.postgresql.org/docs/current/static/plpgsql-control-structures.html" target="_blank" rel="external">control structures</a> from PL/pgSQL - sql procedural Language.</p>
-<p>First I make the geocoding code as a function <code>geocode_sample</code> with the sample size for each run as parameter.</p>
+<p>First I make the geocoding code as a <code>geocode_sample</code> function with the sample size for each run as parameter.</p>
 <pre><code><span class="operator"><span class="keyword">CREATE</span> <span class="keyword">OR</span> <span class="keyword">REPLACE</span> <span class="keyword">FUNCTION</span> geocode_sample(sample_size <span class="built_in">integer</span>) 
     <span class="keyword">RETURNS</span> <span class="built_in">void</span> <span class="keyword">AS</span> $$
 <span class="keyword">BEGIN</span>
@@ -377,7 +406,7 @@
 <span class="keyword">END</span>;</span>
 $$ LANGUAGE plpgsql;
 </code></pre><p><code>Create or replace</code> make debugging and making changes easier because new version will replace existing version.</p>
-<p>Then this main control function <code>geocode_table</code> will calculate the number of rows for whole table, decide how many geocoding function runs it needed to update the whole table, then run the function in a loop. I don&#x2019;t want to use a conditional loop because if there is something wrong, the code could stuck at some point and have a endless loop. I&#x2019;d rather just run the code with calculated times then check the table to make sure all rows are processed correctly.</p>
+<p>Then this main control function <code>geocode_table</code> will calculate the number of rows for whole table, decide how many sample runs it needed to update the whole table, then run the <code>geocode_sample</code> function in a loop with that number. I don&#x2019;t want to use a conditional loop because if there is something wrong, the code could stuck at some point and have a endless loop. I&#x2019;d rather just run the code with calculated times then check the table to make sure all rows are processed correctly.</p>
 <pre><code><span class="operator"><span class="keyword">DROP</span> <span class="keyword">FUNCTION</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> geocode_table();</span>
 <span class="operator"><span class="keyword">CREATE</span> <span class="keyword">OR</span> <span class="keyword">REPLACE</span> <span class="keyword">FUNCTION</span> geocode_table(
     <span class="keyword">OUT</span> table_size <span class="built_in">integer</span>,
@@ -395,11 +424,11 @@ $$ LANGUAGE plpgsql;
         <span class="keyword">FROM</span> address_table <span class="keyword">WHERE</span> rating <span class="keyword">IS</span> <span class="literal">NULL</span>;</span>
 <span class="operator"><span class="keyword">END</span>
 $func$ <span class="keyword">LANGUAGE</span> plpgsql;</span>
-</code></pre><ul>
+</code></pre><ol>
 <li>I used <code>drop function if exists</code> here because the <code>Create or replace</code> doesn&#x2019;t work if the function return type was changed.</li>
-<li>It&#x2019;s widely acknowledged that calculating row count for a table by <code>count(*)</code> is not optimal. The method I used should be much quicker if the table statistics is up to date. I used to put a line of <code>Vacuum Analyze</code> after the table is constructed and prepared, but every time of running it&#x2019;s reported as no update is needed so I didn&#x2019;t do that now. It probably because the default postgresql settings made sure the information is up to date right after the table construction.</li>
-<li>In the end I counted the rows not processed. The total row number and the remaining row number will be the return value of this function.</li>
-</ul>
+<li>It&#x2019;s widely acknowledged that calculating row count for a table by <code>count(*)</code> is not optimal. The method I used should be much quicker if the table statistics is up to date. I used to put a line of <code>VACUUM ANALYZE</code> after the table was constructed and csv data was imported, but in every run it reported that no update was needed. It probably because the default postgresql settings made sure the information is up to date right for my case.</li>
+<li>In the end I counted the rows not processed yet. The total row number and the remaining row number will be the return value of this function.</li>
+</ol>
 <p>The whole PL/pgSQL script looks like this:</p>
 <pre><code><span class="operator"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> address_table;</span>
 <span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> address_table(
@@ -439,18 +468,18 @@ $func$ <span class="keyword">LANGUAGE</span> plpgsql;</span>
 <span class="comment">-- main control &gt;&gt;--</span>
 
 <span class="operator"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> geocode_table();</span>
-</code></pre><ul>
-<li>First I drop the address table if previously exists, create the table with columns in characters type because I don&#x2019;t want the leading zero in zipcode lost in converting to integer.</li>
-<li>I have two version of reading csv into table, one for testing in windows pc, another one for AWS linux instance. The sql <code>copy</code> command need to have postgresql server user permission for the input file, so make sure the folder permission is correct. The linux version used a parameter for input file path, I&#x2019;ll discuss this later in work flow for batch geocoding.</li>
+</code></pre><ol>
+<li>First I dropped the address table if previously exists, created the table with columns in characters type because I don&#x2019;t want the leading zero in zipcode lost in converting to integer.</li>
+<li>I have two version of importing csv into table, one for testing in windows pc, another one for AWS linux instance. The SQL <code>copy</code> command need the postgresql server user to have permission for the input file, so you need to make sure the folder permission is correct. The linux version used a parameter for input file path.</li>
 <li>Then the necessary columns were added to table and the index was built.</li>
 <li>The last line run the main control function and print the return value of it in the end, which is the total row number and remaining row number of input table.</li>
-</ul>
+</ol>
 <h3 id="intersection-address">Intersection address</h3><p>Another type of input is intersections. Tiger Geocoder have a function <a href="http://postgis.net/docs/Geocode_Intersection.html" target="_blank" rel="external"><code>Geocode_Intersection</code></a> work like this:</p>
 <pre><code><span class="operator"><span class="keyword">SELECT</span> pprint_addy(addy), st_astext(geomout), rating
     <span class="keyword">FROM</span> geocode_intersection( <span class="string">&apos;Haverford St&apos;</span>,<span class="string">&apos;Germania St&apos;</span>, <span class="string">&apos;MA&apos;</span>, <span class="string">&apos;Boston&apos;</span>, <span class="string">&apos;02130&apos;</span>,<span class="number">1</span>);</span>
 </code></pre><p>It take two street names, state, city and zipcode then output multiple location candidates with ratings. The script of geocoding street addresses only need some minor changes on input table column format and function parameters to work on intersections. I&#x2019;ll just post the finished whole script for reference after all discussions.</p>
 <h3 id="map-to-census-block">Map to Census Block</h3><p>One important goal of my project is to map addresses to census block, then we can link the NFIRS data with other public data and produce much more powerful analysis, especially the <a href="http://www.census.gov/programs-surveys/ahs.html" target="_blank" rel="external">American Housing Survey(AHS)</a> and the <a href="https://www.census.gov/programs-surveys/acs/" target="_blank" rel="external">American Community Survey(ACS)</a>.</p>
-<p>There is a <a href="http://postgis.net/docs/Get_Tract.html" target="_blank" rel="external"><code>Get_Tract</code> function</a> in Tiger Geocoder which return the census tract id for a location. For census block mapping people seemed to be just using <a href="http://postgis.org/docs/ST_Contains.html" target="_blank" rel="external">ST_Contains</a> like <a href="http://gis.stackexchange.com/questions/137870/finding-census-block-for-given-address-using-tiger-geocoder" target="_blank" rel="external">this answer</a> in stackexchange:</p>
+<p>There is a <a href="http://postgis.net/docs/Get_Tract.html" target="_blank" rel="external"><code>Get_Tract</code> function</a> in Tiger Geocoder which return the <em>census tract</em> id for a location. For <em>census block</em> mapping people seemed to be just using <a href="http://postgis.org/docs/ST_Contains.html" target="_blank" rel="external">ST_Contains</a> like <a href="http://gis.stackexchange.com/questions/137870/finding-census-block-for-given-address-using-tiger-geocoder" target="_blank" rel="external">this answer</a> in stackexchange:</p>
 <pre><code><span class="operator"><span class="keyword">SELECT</span> tabblock_id <span class="keyword">AS</span> <span class="keyword">Block</span>,
     <span class="keyword">substring</span>(tabblock_id <span class="keyword">FROM</span> <span class="number">1</span> <span class="keyword">FOR</span> <span class="number">11</span>) <span class="keyword">AS</span> Blockgroup,
     <span class="keyword">substring</span>(tabblock_id <span class="keyword">FROM</span> <span class="number">1</span> <span class="keyword">FOR</span> <span class="number">9</span>) <span class="keyword">AS</span> Tract,
@@ -458,8 +487,8 @@ $func$ <span class="keyword">LANGUAGE</span> plpgsql;</span>
     <span class="keyword">substring</span>(tabblock_id <span class="keyword">FROM</span> <span class="number">1</span> <span class="keyword">FOR</span> <span class="number">2</span>) <span class="keyword">AS</span> STATE
 <span class="keyword">FROM</span> tabblock
 <span class="keyword">WHERE</span> ST_Contains(the_geom, ST_SetSRID(ST_Point(-<span class="number">71.101375</span>, <span class="number">42.31376</span>), <span class="number">4269</span>))</span>
-</code></pre><p>The national data I loaded into PostGIS by Tiger Geocoder have a table <code>tabblock</code> which have the information of census blocks. <code>ST_Contains</code> will test the spatial relationship between two geometries, in our case it will be whether polygon or multi polygon of census block contains the point of interest. The <code>Where</code> clause select the only record that satisfy this condition for the point.</p>
-<p>The census block id is a 15 digits code constructed from state and county fips code, census tract id, blockgroup id and the census block number. The code example above actually are not ideal since it included all the prefix in each column. My version of code to map census block is this:</p>
+</code></pre><p>The national data loaded by Tiger Geocoder have a table <code>tabblock</code> which have the information of census blocks. <code>ST_Contains</code> will test the spatial relationship between two geometries, in our case it will be whether polygon or multi polygon of census block contains the point of interest. The <code>Where</code> clause select the only record that satisfy this condition for the point.</p>
+<p>The census block id is a 15 digits code constructed from state and county fips code, census tract id, blockgroup id and the census block number. The code example above actually are not ideal for me since it included all the prefix in each column. My code will work on the results from the geocoding script above:</p>
 <pre><code><span class="operator"><span class="keyword">UPDATE</span> address_table
     <span class="keyword">SET</span> (tabblock_id, STATE, county, tractid)
       = (<span class="keyword">COALESCE</span>(ab.tabblock_id,<span class="string">&apos;FFFF&apos;</span>),
@@ -481,12 +510,12 @@ $func$ <span class="keyword">LANGUAGE</span> plpgsql;</span>
 </code></pre><ul>
 <li>I didn&#x2019;t include the state fips as prefix in county fips since strictly speaking county fips is 3 digits, although you always need to use it with state fips together. I included the census tract because some location may have ambiguity but the census tract most likely will be same.</li>
 <li>This code is based on same principle of the geocoding code with a little bit change:<ul>
-<li>It need to work on top of geocoding results, so the sample for each run are the rows that have been geocoded (thus geomout column is not null), but not yet mapped to census block (tabblock_id is null), and sorted by addid, limited by sample size.</li>
-<li>Similar to geocode code, I need to join the sample addid with lookup result to make sure even the rows without return value are included in result and with a NULL value of tabblock_id. Then the NULL value will be replaced with an special value to mark the row as processed already but without match. This procedure is critical for the updating process to work on new sample in every run.</li>
+<li>It need to work on top of geocoding results, so the sample for each run are the rows that have been geocoded (thus geomout column is not <code>NULL</code>), but not yet mapped to census block (<code>tabblock_id</code> is <code>NULL</code>), and sorted by <code>addid</code>, limited by sample size.</li>
+<li>Similar to geocode code, I need to join the sample <code>addid</code> with lookup result to make sure even the rows without return value are included in result. Then the <code>NULL</code> rating value of those rows will be replaced with an special value to mark the row as processed already but without match. This step is critical for the updating process to work properly.</li>
 </ul>
 </li>
 </ul>
-<p>One important exception to this is that I found <a href="http://gis.stackexchange.com/questions/170217/find-census-block-for-street-intersection-with-tiger-geocoder" target="_blank" rel="external">many street intersections cannot be mapped to census block</a>. I inputed the same address to <a href="http://geocoding.geo.census.gov/geocoder/" target="_blank" rel="external">the offcial Census website</a> and they had result! </p>
+<p>In theory this mapping is much easier than geocoding since there is not much ambiguity. And every address should belong to some census block. Actually I found <a href="http://gis.stackexchange.com/questions/170217/find-census-block-for-street-intersection-with-tiger-geocoder" target="_blank" rel="external">many street intersections don&#x2019;t have matches</a>. I tested the same address in <a href="http://geocoding.geo.census.gov/geocoder/" target="_blank" rel="external">the offcial Census website</a> and it find the match! </p>
 <p>Here is the example data I used, the <code>geocode_intersection</code> function returned a street address and coordinates from two streets:</p>
 <pre><code>row_seq        <span class="string">| 2716</span>
 street_1       <span class="string">|  FLORIDA AVE NW</span>
@@ -499,7 +528,7 @@ rating         <span class="string">| 3</span>
 lon            <span class="string">| -77.04879</span>
 lat            <span class="string">| 38.91150</span>
 output_address <span class="string">| 2198 Florida Ave NW, Washington, DC 20008</span>
-</code></pre><p>I experimented more and found more interesting results.</p>
+</code></pre><p>I used different test methods and found interesting results:</p>
 <table>
 <thead>
 <tr>
@@ -542,29 +571,26 @@ output_address <span class="string">| 2198 Florida Ave NW, Washington, DC 20008<
 </tbody>
 </table>
 <ul>
-<li>If I used <code>geocode</code> function back on the street address output from <code>geocode_intersection</code>, the coordinates output will have slight difference. My theory is that <code>geocode_intersection</code> function first calculate the intersection point from the geomtry information of two streets, then reverse geocode that coordinates into street address. The street number is usually interpolated so that explained the difference between coordinates and street address.</li>
-<li>The slight difference could result in different census block output, probably because these locations are on street intersections which are more than likely to be boundary of census blocks.</li>
-<li>Using the geometry or the 6 digits coordinates from <code>geocode_intersection</code> in <code>ST_Contains</code> could have empty result, i.e. no census block have contain relationship of these points. I&#x2019;m not sure the reason of this, only observed that using 5 digits coordinates will find a match in most time. This is an open question need to consulting with the experts on this.</li>
+<li>If I feed the street address output from <code>geocode_intersection</code> back to <code>geocode</code> function, the coordinates output will have slight difference with the coordinates output from <code>geocode_intersection</code>. My theory is that <code>geocode_intersection</code> function first calculate the intersection point from the geometry information of two streets, then reverse geocode that coordinates into street address. The street number is usually interpolated so if you geocode that street address back to coordinates there could be difference.</li>
+<li>The slight difference may result in different census block output, probably because these locations are on street intersections which are more than likely to be boundary of census blocks.</li>
+<li>Using the geometry or the coordinates output (6 digits after dot) from <code>geocode_intersection</code> for <code>ST_Contains</code> could have empty result, i.e. no census block have contain relationship of these points. I&#x2019;m not sure the reason of this, only observed that using coordinates with 5 digits after dot will find a match in most time. This is an open question need to consulting with the experts on this.</li>
 </ul>
 <h3 id="work-in-batch">Work In Batch</h3><p>I was planning to geocode addresses by states to improve the performance, so I&#x2019;ll need to process lots of files. After some experimentations, I developed a batch work flow:</p>
 <ol>
-<li><p>The script discussed above can take a csv input, geocode addresses, map census block, update the table. I used psql command to execute the script. Note I have a .pgpass file in my user folder so I don&#x2019;t need to write database password in the command line.</p>
-<p> psql -d census -U postgres -h localhost -w -v input_file=&#x201D;&#x2018;/home/ubuntu/geocode/address_sample.csv&#x2019;&#x201D; -f geocode_batch.sql 2&gt;&amp;1 | tee address.log</p>
-</li>
-</ol>
-<p>This command take input file name as parameter, execute the PL/pgSQL script, and save a copy of the console messages to log file. </p>
-<ol>
-<li><p>I need to write the result to csv file. The <code>Copy</code> in SQL require the postgresql user to have permission for output file which often bring troubles, so I used the psql meta command <code>\Copy</code> instead. It can be written inside the PL/pgSQL script but I cannot make it accept parameter as output file name. So I have to write another psql command line:</p>
-<p> psql -d census -U postgres -h localhost -w -c &#x2018;\copy address_table to /home/ubuntu/geocode/address_output/1.csv csv header&#x2019;</p>
-</li>
-<li><p>The above two lines will take care of one input file. If I put all input files into one folder, I can generate a shell script to process each input file with above command line. At first I tried to use shell script directly with reading file names and loop with commands, but it became very cubersome and error prone when I tried to generate output file name dynamically from input file name then transfer as psql commandline parameters. I ended up with a simple python script to generate the shell script I wanted. </p>
-<p> Before running the shell script you may need to change the permission:</p>
+<li><p>The script discussed above can take a csv input, geocode addresses, map census block, update the table. I used this psql command line to execute the script. Note I have a .pgpass file in my user folder so I don&#x2019;t need to write database password in the command line, and I saved a copy of the console messages to log file. </p>
+<pre><code>psql -<span class="keyword">d</span> census -<span class="keyword">U</span> postgres -<span class="keyword">h</span> localhost -w -v input_file=<span class="string">&quot;&apos;/home/ubuntu/geocode/address_input/address_sample.csv&apos;&quot;</span> -f geocode_batch.sql 2&gt;&amp;1 | tee address.<span class="literal">log</span>
+</code></pre></li>
+<li><p>I need to save the result table to csv. The <code>Copy</code> in SQL require the postgresql user to have permission for output file, so I used the psql meta command <code>\Copy</code> instead. It can be written inside the PL/pgSQL script but I cannot make it to use parameter as output file name. So I have to write another psql command line:</p>
+<pre><code>psql -<span class="keyword">d</span> census -<span class="keyword">U</span> postgres -<span class="keyword">h</span> localhost -w -c &apos;\<span class="keyword">copy</span> address_table to /home/ubuntu/geocode/address_output/1.csv csv header&apos;
+</code></pre></li>
+<li><p>The above two lines will take care of one input file. If I put all input files into one folder, I can generate a shell script to process each input file with above command line. At first I tried to use shell script directly to read file names and loop with them, but it became very cumbersome and error prone because I want to generate <em>output file</em> name dynamically from <em>input file</em> names then transfer them as psql command line parameters. I ended up with a simple python script to generate the shell script I wanted. </p>
+<p> Before running the shell script I need to change the permission:</p>
 <pre><code>chmod +x ./batch<span class="class">.sh</span>
 sh ./batch<span class="class">.sh</span>  
 </code></pre></li>
 </ol>
 <h3 id="exception-handling-and-progress-report">Exception Handling And Progress Report</h3><p>The NFIRS data have many ill formated addresses that could cause problem for <code>geocode</code> function. I decided that it&#x2019;s better to process one year&#x2019;s data first, then collect all the problem cases and design a cleaning procedure before processing other years&#x2019; data. </p>
-<p>This means the work flow should be able to skip on errors and mark the problems. The script above can handle the cases when there is no match returned from the <code>geocode</code> function, but any exception occurred in runtime will interrupt the script. Since the <code>geocode_sample</code> is called in a loop inside the main control function, the whole script is one single transcation. Once the transaction is interrupted, it will be rolled back and all the previous geocoding results are lost. See more about this at <a href="http://www.postgresql.org/docs/current/static/plpgsql-structure.html" target="_blank" rel="external">here</a>. </p>
+<p>This means the work flow should be able to skip on errors and mark the problems. The script above can handle the cases when there is no match returned from the <code>geocode</code> function, but any exception occurred in runtime will interrupt the script. Since the <code>geocode_sample</code> is called in a loop inside the main control function, the whole script is one single transaction. Once the transaction is interrupted, it will be rolled back and all the previous geocoding results are lost. See <a href="http://www.postgresql.org/docs/current/static/plpgsql-structure.html" target="_blank" rel="external">more about this</a>. </p>
 <p>However, <a href="http://www.postgresql.org/docs/current/static/plpgsql-control-structures.html#PLPGSQL-ERROR-TRAPPING" target="_blank" rel="external">adding an EXCEPTION clause</a> effectively forms a subtransaction that can be rolled back without affecting the outer transaction.</p>
 <p>Therefore I added this exception handling part in the <code>geocode_sample</code> function:</p>
 <pre><code><span class="keyword">CREATE</span> <span class="keyword">OR</span> REPLACE <span class="function"><span class="keyword">FUNCTION</span> <span class="title">geocode_sample</span><span class="params">(sample_size integer)</span> 
@@ -594,36 +620,37 @@ $$ LANGUAGE plpgsql;
 <span class="label">CONTEXT:</span>  SQL statement <span class="string">&quot;SELECT geocode_sample(sample_size)&quot;</span>
 PL/pgSQL function geocode_table() line <span class="number">24</span> at PERFORM
 <span class="label">psql:geocode_batch.sql:179: NOTICE:  -- !!! invalid regular expression:</span> parentheses () <span class="literal">not</span> balanced <span class="number">2201</span>B !!!--
-</code></pre><p>To make sure the script will continue work on the remaining rows, it also set the rating column of the current sample to be <code>-2</code>, thus they will be skipped in the latter runs. </p>
+</code></pre><p>To make sure the script will continue work on the remaining rows, it also set the rating column of the current sample to be <code>-2</code>, thus they will be skipped in latter runs. </p>
 <p>One catch of this method is the whole sample will be skipped even only one row in it caused problem, then I may need to check them again after one pass. However I didn&#x2019;t find a better way to find the row caused the exception other than set up some marker for every row and keep updating it. Instead, I tested the performance with different sample size, i.e. how many rows will the <code>geocode_sample</code> function process in one run. It turned out sample size 1 didn&#x2019;t have obvious performance penalty, maybe because the extra cost of small sample is negligible compared to the geocoding function cost. With a sample size 1 the exception handling code will always mark the problematic row only, and the code is much simpler.</p>
-<p>Another important feature I want is progress report. If I split the NFIRS data by state, one state data tens of thousands of rows and take several hours to finish. I don&#x2019;t want to find error or problem until it finishes. So I added some progress report like this:</p>
+<p>Another important feature I want is progress report. If I split the NFIRS data by state, one state data often has tens of thousands of rows and take several hours to finish. I don&#x2019;t want to find error or problem until it finishes. So I added some progress report like this:</p>
 <pre><code>psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  &gt; <span class="number">2015</span>-<span class="number">11</span>-<span class="number">18</span> <span class="number">20</span>:<span class="number">26</span>:<span class="number">51</span>+<span class="number">00</span> : Start on table of <span class="number">10845</span>
 psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  &gt; time passed | address processed &lt;&lt;&lt;&lt; address left
 psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  &gt; <span class="number">00</span>:<span class="number">00</span>:<span class="number">54.3</span>  |    <span class="number">100</span> &lt;&lt;&lt;&lt;    <span class="number">10745</span>
 psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  &gt; <span class="number">00</span>:<span class="number">00</span>:<span class="number">21.7</span>  |    <span class="number">200</span> &lt;&lt;&lt;&lt;    <span class="number">10645</span>
-</code></pre><p>First it report the size of whole table, then the time taken for every 100 rows processed, and how many rows are left. It&#x2019;s pretty obvious that the first 100 rows take more time because the address with ill formated zipcode are often sorted on top.</p>
+</code></pre><p>First it report the size of whole table, then the time taken for every 100 rows processed, and how many rows are left. It&#x2019;s pretty obvious in above example that the first 100 rows take more time. It&#x2019;s because many address with ill formated zipcode were sorted on top.</p>
 <p>Similarly, the mapping of census block have a progress report:</p>
 <pre><code>psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  ==== start mapping census block ====
 psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  <span class="preprocessor"># time passed | address to block &lt;&lt;&lt;&lt; address left</span>
 psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  <span class="preprocessor"># <span class="number">00</span>:<span class="number">00</span>:<span class="number">02.6</span>  |    <span class="number">1000</span>    &lt;&lt;&lt;&lt;    <span class="number">9845</span></span>
 psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  <span class="preprocessor"># <span class="number">00</span>:<span class="number">00</span>:<span class="number">03.4</span>  |    <span class="number">2000</span>    &lt;&lt;&lt;&lt;    <span class="number">8845</span></span>
 </code></pre><h3 id="summary-and-open-questions">Summary And Open Questions</h3><p>I put everything in <a href="https://github.com/dracodoc/Geocode" target="_blank" rel="external">this Github repository</a>. </p>
-<p>My script has processed almost one year&#x2019;s data, but I&#x2019;m not really satisfied with the performance yet. When I tested the 44185 MD, DC addresses in the AWS free tier server with MD, DC database, the average time per row is about 60 ms. While the full server with all states have the average time of 342 ms. Some other states with more ill formated addresses have worse performance. </p>
+<p>My script has processed almost one year&#x2019;s data, but I&#x2019;m not really satisfied with the performance yet. When I tested the 44185 MD, DC addresses in the AWS free tier server with MD, DC database, the average time per row is about 60 ms, while the full server with all states have the average time of 342 ms. Some other states with more ill formated addresses have worse performance. </p>
 <p>I have updated the Tiger database index and tuned the postgresql configurations. I can try parallel but the cpu should not be the bottle neck here, and <a href="http://geeohspatial.blogspot.com/2013/12/a-simple-function-for-parallel-queries_18.html" target="_blank" rel="external">the hack I found to enable postgresql run parallel</a> is not easily managable. Somebody also mentioned partitioning database, but I&#x2019;m not sure if this will help.</p>
-<p>And here are some open questions I will ask in PostGIS community:</p>
+<p>And here are some open questions I will ask in PostGIS community, some of them may have the potential to further improve performance:</p>
 <ol>
-<li><p>Why is a server with 2 states data much faster than the server with all states data? I assume it&#x2019;s because the bad address that don&#x2019;t have a exact hit at first will cost much more time when the geocoder looked in all states. With only 2 states this search is limited and stop much early. This can be further verified by comparing the performance of two test cases in each server, one with exact match perfect address, another one with lots of invalid addresses.</p>
+<li><p>Why is a server with 2 states data much faster than the server with all states data? I assume it&#x2019;s because the bad address that don&#x2019;t have a exact hit at first will cost much more time when the geocoder checked all states. With only 2 states this search is limited and stopped much early. This can be further verified by comparing the performance of two test cases in each server, one with exact match perfect address, another one with lots of invalid addresses.</p>
 <p> There is a <code>restrict_region</code> parameter in <code>geocode</code> function looks promising if it can limit the search range, since I have enough information or reason to believe the state information is correct. I wrote a query trying to use one state&#x2019;s geometry as the limiting parameter:</p>
 <pre><code><span class="operator"><span class="keyword">SELECT</span> geocode(<span class="string">&apos;501 Fairmount DR , Annapolis, MD 20137&apos;</span>, <span class="number">1</span>, the_geom) 
     <span class="keyword">FROM</span> tiger.state <span class="keyword">WHERE</span> statefp = <span class="string">&apos;24&apos;</span>;</span>
 </code></pre><p> and compared the performance with the simple version</p>
 <pre><code><span class="operator"><span class="keyword">SELECT</span> geocode(<span class="string">&apos;501 Fairmount DR , Annapolis, MD 20137&apos;</span>,<span class="number">1</span>);</span>
 </code></pre><p> I didn&#x2019;t find performance gain with the parameter. Instead it lost the performance gain from caching, which usually came from running same query immediately again because all the needed data have been cached in RAM. </p>
-<p> Maybe my usage is not proper, or this parameter is not intended to work as I expected. However if it really can limit the search range, the performance gain should be substantial.</p>
+<p> Maybe my usage is not proper, or this parameter is not intended to work as I expected. However if the search range can be limited, the performance gain should be substantial.</p>
 </li>
-<li><p>If normalizing address first will improve the performance? I don&#x2019;t think it will help unless I can filter bad address and remove them from input totally, which may not be the case for my usage of NFIRS data.</p>
+<li><p>Will normalizing address first improve the performance? I don&#x2019;t think it will help unless I can filter bad address and remove them from input totally, which may not be the case for my usage of NFIRS data.</p>
 </li>
-<li>Will replacing the default normalizing function with the <a href="http://postgis.net/docs/Address_Standardizer.html" target="_blank" rel="external">Address Standardizer</a> help? I didn&#x2019;t find the normalizing step too time consuming in my experiments. However if it can produce better formated address from bad input, that will help a lot.</li>
+<li>Will replacing the default normalizing function with the <a href="http://postgis.net/docs/Address_Standardizer.html" target="_blank" rel="external">Address Standardizer</a> help? I didn&#x2019;t find the normalizing step too time consuming in my experiments. However if it can produce better formated address from bad input, that could help the geocoding process.</li>
+<li>Why 6 digits coordinates of street intersections output often don&#x2019;t have matched census block, but coordinates round up to 5 digits have match in most of time?</li>
 </ol>
 </span>
       
@@ -732,17 +759,17 @@ psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  <span class="pr
           </div>
 
           <div class="site-state-item site-state-categories">
-            
+            <a href="/categories">
               <span class="site-state-item-count">3</span>
               <span class="site-state-item-name">categories</span>
-              
+              </a>
           </div>
 
           <div class="site-state-item site-state-tags">
-            
+            <a href="/tags">
               <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">tags</span>
-              
+              </a>
           </div>
 
         </nav>
@@ -772,7 +799,7 @@ psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  <span class="pr
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tiger-geocoder-geocode-function"><span class="nav-number">2.</span> <span class="nav-text">Tiger Geocoder Geocode function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#preparing-addresses"><span class="nav-number">3.</span> <span class="nav-text">Preparing Addresses</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#test-geocoding-function"><span class="nav-number">4.</span> <span class="nav-text">Test Geocoding function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#problem-with-ill-formated-address"><span class="nav-number">5.</span> <span class="nav-text">Problem With Ill Formated Address</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#making-a-full-script"><span class="nav-number">6.</span> <span class="nav-text">Making A full Script</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#intersection-address"><span class="nav-number">7.</span> <span class="nav-text">Intersection address</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map-to-census-block"><span class="nav-number">8.</span> <span class="nav-text">Map to Census Block</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#work-in-batch"><span class="nav-number">9.</span> <span class="nav-text">Work In Batch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exception-handling-and-progress-report"><span class="nav-number">10.</span> <span class="nav-text">Exception Handling And Progress Report</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#summary-and-open-questions"><span class="nav-number">11.</span> <span class="nav-text">Summary And Open Questions</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#introduction"><span class="nav-number">1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tiger-geocoder-geocode-function"><span class="nav-number">2.</span> <span class="nav-text">Tiger Geocoder Geocode Function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#preparing-addresses"><span class="nav-number">3.</span> <span class="nav-text">Preparing Addresses</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#test-geocoding-function"><span class="nav-number">4.</span> <span class="nav-text">Test Geocoding Function</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#problem-with-ill-formated-address"><span class="nav-number">5.</span> <span class="nav-text">Problem With Ill Formated Address</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#making-a-full-script"><span class="nav-number">6.</span> <span class="nav-text">Making A full Script</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#intersection-address"><span class="nav-number">7.</span> <span class="nav-text">Intersection address</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map-to-census-block"><span class="nav-number">8.</span> <span class="nav-text">Map to Census Block</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#work-in-batch"><span class="nav-number">9.</span> <span class="nav-text">Work In Batch</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#exception-handling-and-progress-report"><span class="nav-number">10.</span> <span class="nav-text">Exception Handling And Progress Report</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#summary-and-open-questions"><span class="nav-number">11.</span> <span class="nav-text">Summary And Open Questions</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">

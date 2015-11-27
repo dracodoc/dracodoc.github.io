@@ -66,7 +66,7 @@
 <script type="text/javascript" id="hexo.configuration">
   var CONFIG = {
     scheme: 'Mist',
-    sidebar: 'hide',
+    sidebar: 'post',
     motion: false
   };
 </script>
@@ -126,12 +126,32 @@
     <ul id="menu" class="menu ">
       
         
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
             
               <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
             
             Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            Tags
           </a>
         </li>
       
@@ -259,7 +279,7 @@
 
       
         
-          <h3 id="Introduction">Introduction</h3><p>This is the detailed discussion of my script and work flow for geocoding 18 million address from NFIRS data. See <a href="http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/">background of project</a> and <a href="http://dracodoc.github.io/2015/11/17/Geocoding/">the system setup</a> in my previous posts.<br>
+          <h3 id="Introduction">Introduction</h3><p>This is the detailed discussion of my script and work flow for geocoding NFIRS data. See <a href="http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/">background of project</a> and <a href="http://dracodoc.github.io/2015/11/17/Geocoding/">the system setup</a> in my previous posts.<br>
           <div class="post-more-link text-center">
             <a class="btn" href="/2015/11/19/Script-workflow/" rel="contents">
               Read more &raquo;
@@ -772,17 +792,17 @@
           </div>
 
           <div class="site-state-item site-state-categories">
-            
+            <a href="/categories">
               <span class="site-state-item-count">3</span>
               <span class="site-state-item-name">categories</span>
-              
+              </a>
           </div>
 
           <div class="site-state-item site-state-tags">
-            
+            <a href="/tags">
               <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">tags</span>
-              
+              </a>
           </div>
 
         </nav>
