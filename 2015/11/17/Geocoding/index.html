@@ -61,7 +61,7 @@ verify all the addresses beca">
 <meta property="og:description" content="BackgroundI found I want to geocode lots of addresses in my Red Cross Smoke Alarm Project. The NFIRS data have 18 million addresses in 9 years data, and I would like to 
 
 verify all the addresses beca">
-<meta property="og:updated_time" content="2015-11-26T04:10:00.253Z">
+<meta property="og:updated_time" content="2015-11-28T00:36:23.357Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Geocoding 18 million addresses with PostGIS Tiger Geocoder">
 <meta name="twitter:description" content="BackgroundI found I want to geocode lots of addresses in my Red Cross Smoke Alarm Project. The NFIRS data have 18 million addresses in 9 years data, and I would like to 
@@ -275,6 +275,7 @@ verify all the addresses beca">
 <h3 id="possible-approaches">Possible Approaches</h3><p>I did some research on the possible options:</p>
 <ul>
 <li>Online service. Most free online API have limit, and paid service would be too expensive for my task. Surprisingly FCC have <a href="https://www.fcc.gov/developers/census-block-conversions-api" target="_blank" rel="external">an API</a> to map coordinates to census block which didn&#x2019;t mention limit, but it cannot geocode street address to coordinates.</li>
+<li><a href="http://www.tigergeocoder.com/" target="_blank" rel="external">This company</a> provide service in Amazon EC2 for a fee. They have <a href="https://github.com/bibanul/tiger-geocoder/wiki/Running-your-own-Geocoder-in-Amazon-EC2" target="_blank" rel="external">more information about their setup in github</a>. What I did is actually a similar approach but in a totally DIY way.</li>
 <li>Setup your own geocoder. <a href="http://postgis.net/docs/Extras.html#Tiger_Geocoder" target="_blank" rel="external">Tiger geocoder</a> is a PostGIS extension which use Census Tiger data to geocode addresses.</li>
 </ul>
 <p>PostGIS can work in both windows and linux, and Enigma.io has shared their <a href="https://github.com/enigma-io/ansible-tiger-geocoder-playbook" target="_blank" rel="external">automated Tiger Geocoder setup tool</a> for linux. However the Tiger database itself need 105G space and I don&#x2019;t have a linux box for that(Amazon AWS free tier service only allow for 30G storage), so I decided to install PostGIS in windows and experiment with everything first.</p>
@@ -293,7 +294,7 @@ verify all the addresses beca">
 <pre><code><span class="operator"><span class="keyword">SELECT</span> loader_generate_nation_script(<span class="string">&apos;windows&apos;</span>);</span> 
 </code></pre><p>to generate the script to load national tables. It will be a file with the name specified with <code>\o nation_generator.bat</code> before located in the same folder of <code>psql.exe</code>, which should be the postgresql bin folder.</p>
 </li>
-<li><p>Technically you can input the parameters specific to your system settings in the table <code>loader_variables</code> and <code>loader_platform</code> which are under <code>tiger</code> schema. However after I inputed the parameters, only the stage folder(i.e. where to download data to) was taken into generated script. My guess is the file path with spaces need be proper escaped and quoted. The script generating function is reading from database then write to file, hat means the file path will go through several different internal representations, which make the escaping and quoting more complicated. I just replaced the default parameters with mine in the generated script later.</p>
+<li><p>Technically you can input the parameters specific to your system settings in the table <code>loader_variables</code> and <code>loader_platform</code> which are under <code>tiger</code> schema. However after I inputed the parameters, only the stage folder(i.e. where to download data to) was taken into generated script. My guess is the file path with spaces need be proper escaped and quoted. The script generating function is reading from database then write to file, hat means the file path will go through several different internal representations, which make the escaping and quoting more complicated. I just replaced the default parameters with mine in the generated script later. <strong>Update</strong>: I found <a href="http://gis.stackexchange.com/questions/116803/installing-tiger-geocoder" target="_blank" rel="external">this answer</a> later. I probably should use <code>SET</code> command instead of directly editing the table columns. Anyway, replacing the settings afterwards still works, and you need to double check it.</p>
 </li>
 <li>All the parameters are listed in the first section of generated script, and <code>cd your_stage_folder</code> will be used several times through the script. You need to edit the parameters in first section and make sure the stage folder is correct in all places.</li>
 <li><p>After the national data is loaded by running with the script, you can specify the states that you want to load. Actually the tiger database support 56 states/regions. You can find them by </p>
