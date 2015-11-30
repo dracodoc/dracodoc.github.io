@@ -270,13 +270,13 @@ p {
   margin: 0 0 25px 0;
 }
 a {
-  color: #555;
+  color: #0684bd;
   text-decoration: none;
   border-bottom: 1px solid #999;
 }
 a:hover {
-  color: #222;
-  border-bottom-color: #222;
+  color: #87daff;
+  border-bottom-color: #262a30;
 }
 ul {
   list-style: none;
@@ -350,7 +350,7 @@ dd {
 }
 .highlight a,
 .gist a {
-  color: #222 !important;
+  color: #87daff !important;
   text-decoration: none !important;
 }
 .video-container {
@@ -962,7 +962,7 @@ body {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #b59ab6;
+  background: #63fffe;
 }
 .sidebar-nav {
   margin: 0 0 20px;
