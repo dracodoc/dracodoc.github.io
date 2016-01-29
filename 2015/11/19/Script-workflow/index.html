@@ -67,7 +67,7 @@
 <meta property="og:image" content="http://dracodoc.github.io/2_explain_limit_v1.png">
 <meta property="og:image" content="http://dracodoc.github.io/3_explain_scan_v2.png">
 <meta property="og:image" content="http://dracodoc.github.io/4_explain_scan_v1_2nd_run.png">
-<meta property="og:updated_time" content="2015-11-28T01:08:52.055Z">
+<meta property="og:updated_time" content="2016-01-29T13:46:19.550Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder">
 <meta name="twitter:description" content="IntroductionThis is the detailed discussion of my script and workflow for geocoding NFIRS data. See background of project and the system setup in my previous posts.">
@@ -429,7 +429,7 @@ $func$ <span class="keyword">LANGUAGE</span> plpgsql;</span>
 <li>It&#x2019;s widely acknowledged that calculating row count for a table by <code>count(*)</code> is not optimal. The method I used should be much quicker if the table statistics is up to date. I used to put a line of <code>VACUUM ANALYZE</code> after the table was constructed and csv data was imported, but in every run it reported that no update was needed. It probably because the default postgresql settings made sure the information is up to date right for my case.</li>
 <li>In the end I counted the rows not processed yet. The total row number and the remaining row number will be the return value of this function.</li>
 </ol>
-<p>The whole PL/pgSQL script looks like this:</p>
+<p>The whole PL/pgSQL script is structured like this (<em>actual details inside functions are omitted to have a clear view of whole picture. See complete scripts and everything else in <a href="https://github.com/dracodoc/Geocode" target="_blank" rel="external">my github repo</a></em>):</p>
 <pre><code><span class="operator"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> address_table;</span>
 <span class="operator"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> address_table(
     row_seq <span class="built_in">varchar</span>(<span class="number">255</span>),
@@ -633,7 +633,7 @@ psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  &gt; <span clas
 psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  <span class="preprocessor"># time passed | address to block &lt;&lt;&lt;&lt; address left</span>
 psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  <span class="preprocessor"># <span class="number">00</span>:<span class="number">00</span>:<span class="number">02.6</span>  |    <span class="number">1000</span>    &lt;&lt;&lt;&lt;    <span class="number">9845</span></span>
 psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  <span class="preprocessor"># <span class="number">00</span>:<span class="number">00</span>:<span class="number">03.4</span>  |    <span class="number">2000</span>    &lt;&lt;&lt;&lt;    <span class="number">8845</span></span>
-</code></pre><h3 id="summary-and-open-questions">Summary And Open Questions</h3><p>I put everything in <a href="https://github.com/dracodoc/Geocode" target="_blank" rel="external">this Github repository</a>. </p>
+</code></pre><h3 id="summary-and-open-questions">Summary And Open Questions</h3><p><strong>I put everything in <a href="https://github.com/dracodoc/Geocode" target="_blank" rel="external">this Github repository</a></strong>. </p>
 <p>My script has processed almost one year&#x2019;s data, but I&#x2019;m not really satisfied with the performance yet. When I tested the 44185 MD, DC addresses in the AWS free tier server with MD, DC database, the average time per row is about 60 ms, while the full server with all states have the average time of 342 ms. Some other states with more ill formated addresses have worse performance. </p>
 <p>I have updated the Tiger database index and tuned the postgresql configurations. I can try parallel but the cpu should not be the bottle neck here, and <a href="http://geeohspatial.blogspot.com/2013/12/a-simple-function-for-parallel-queries_18.html" target="_blank" rel="external">the hack I found to enable postgresql run parallel</a> is not easily manageable. Somebody also mentioned partitioning database, but I&#x2019;m not sure if this will help.</p>
 <p>And here are some open questions I will ask in PostGIS community, some of them may have the potential to further improve performance:</p>
@@ -823,7 +823,7 @@ psql:geocode_batch.sql:<span class="number">178</span>: NOTICE:  <span class="pr
         <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2015</span>
+  <span itemprop="copyrightYear">2016</span>
   <span class="with-love">
     <i class="icon-next-heart fa fa-heart"></i>
   </span>
