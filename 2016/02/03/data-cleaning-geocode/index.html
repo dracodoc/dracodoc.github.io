@@ -58,7 +58,7 @@
 <meta property="og:site_name" content="Artificial Learning and Evolution inspired by Nature">
 <meta property="og:description" content="I discussed a lot of interesting findings I discovered in NYC Taxi Trip data in last post. However it was not clear whether the cleaning added much value to the analysis other than some anomaly record">
 <meta property="og:image" content="http://dracodoc.github.io/2015/11/19/Script-workflow/NFIRS_data_sample.png">
-<meta property="og:updated_time" content="2016-02-06T02:15:30.796Z">
+<meta property="og:updated_time" content="2016-02-06T02:41:35.521Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning">
 <meta name="twitter:description" content="I discussed a lot of interesting findings I discovered in NYC Taxi Trip data in last post. However it was not clear whether the cleaning added much value to the analysis other than some anomaly record">
@@ -438,7 +438,9 @@
  [<span class="number">5</span>] <span class="string">&quot;#15 LITTLE KANAWHA RIVER RD , PARKERSBURG, WV 26101&quot;</span> <span class="string">&quot;# 12 HOLLOW RD , WELLSTON, OH 45692&quot;</span>                
  [<span class="number">7</span>] <span class="string">&quot;#10 I-24 , Paducah, KY 42003&quot;</span>                        <span class="string">&quot;#10.5 mm St RD 264 , Yahtahey, NM 87375&quot;</span>            
  [<span class="number">9</span>] <span class="string">&quot;#1 CANAL RD , SENECA, IL 61360&quot;</span>                      <span class="string">&quot;#08 N Ola DR , Yahtahey, NM 87375&quot;</span> 
-</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(input_address, <span class="string">&quot;^#&quot;</span>), address_type := <span class="string">&apos;a#&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;a#&apos;</span>, input_address := str_replace_all(input_address, <span class="string">&quot;^#&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure></span>
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(input_address, <span class="string">&quot;^#&quot;</span>), address_type := <span class="string">&apos;a#&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;a#&apos;</span>, input_address := str_replace_all(input_address, <span class="string">&quot;^#&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>All these steps may look cumbersome. Actually I just check the Geocoding results on one year data raw input, find all the problems and errors, clean them by types. Then I apply same cleaning code to other years because they are very similar, and I got the Geocoding performance doubled! I think this cleaning is well worth the effort.</p>
+</span>
       
     </div>
 
