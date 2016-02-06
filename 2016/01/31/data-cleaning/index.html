@@ -1,0 +1,744 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Data Cleaning," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="Data Cleaning, the unavoidable, time consuming, cumbersome nontrivial taskData Science may sound fancy, but I saw many posts/blogs of data scientists complaining that much of their time were spending">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Data Cleaning Part 1 - NYC Taxi Trip Data, Looking For Stories Behind Errors">
+<meta property="og:url" content="http://dracodoc.github.io/2016/01/31/data-cleaning/index.html">
+<meta property="og:site_name" content="Artificial Learning and Evolution inspired by Nature">
+<meta property="og:description" content="Data Cleaning, the unavoidable, time consuming, cumbersome nontrivial taskData Science may sound fancy, but I saw many posts/blogs of data scientists complaining that much of their time were spending">
+<meta property="og:image" content="http://dracodoc.github.io/zero_passenger.png">
+<meta property="og:image" content="http://dracodoc.github.io/short_trip.png">
+<meta property="og:image" content="http://dracodoc.github.io/long_distance_in_short_time.png">
+<meta property="og:image" content="http://dracodoc.github.io/fare_hist.png">
+<meta property="og:image" content="http://dracodoc.github.io/big_fare_in_short_trip.png">
+<meta property="og:image" content="http://dracodoc.github.io/dis_by_gps.png">
+<meta property="og:image" content="http://dracodoc.github.io/more_great_circle_distance.png">
+<meta property="og:image" content="http://dracodoc.github.io/off_gps_coordinates.png">
+<meta property="og:image" content="http://dracodoc.github.io/JFK_trip.png">
+<meta property="og:image" content="http://dracodoc.github.io/superman_driver.png">
+<meta property="og:updated_time" content="2016-02-06T02:20:32.911Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Data Cleaning Part 1 - NYC Taxi Trip Data, Looking For Stories Behind Errors">
+<meta name="twitter:description" content="Data Cleaning, the unavoidable, time consuming, cumbersome nontrivial taskData Science may sound fancy, but I saw many posts/blogs of data scientists complaining that much of their time were spending">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> Data Cleaning Part 1 - NYC Taxi Trip Data, Looking For Stories Behind Errors | Artificial Learning and Evolution inspired by Nature </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Artificial Learning and Evolution inspired by Nature</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Data Cleaning Part 1 - NYC Taxi Trip Data, Looking For Stories Behind Errors
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            Posted on
+            <time itemprop="dateCreated" datetime="2016-01-31T20:27:06-05:00" content="2016-01-31">
+              2016-01-31
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; In
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Data-Science/" itemprop="url" rel="index">
+                    <span itemprop="name">Data Science</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2016/01/31/data-cleaning/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2016/01/31/data-cleaning/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><h2 id="data-cleaning-the-unavoidable-time-consuming-cumbersome-nontrivial-task">Data Cleaning, the unavoidable, time consuming, cumbersome nontrivial task</h2><p>Data Science may sound fancy, but I saw many posts/blogs of data scientists complaining that much of their time were spending on data cleaning. From my own experience on several learning/volunteer projects, this step do require lots of time and much attention to details. However I often felt the abnormal or wrong data are actually more interesting. There must be some explanations behind the error, and that could be some interesting stories. Every time after I filtered some data with errors, I can have better understanding of the whole picture and estimate of the information content of the data set.</p>
+<h3 id="nyc-taxi-trip-data">NYC Taxi Trip Data</h3><p>One good example is the <a href="http://chriswhong.com/open-data/foil_nyc_taxi/" target="_blank" rel="external">the NYC Taxi Trip Data</a>. </p>
+<a id="more"></a>
+<p><em>By the way, <a href="http://toddwschneider.com/posts/analyzing-1-1-billion-nyc-taxi-and-uber-trips-with-a-vengeance/" target="_blank" rel="external">this analysis and exploration</a> is pretty impressive. I think it&#x2019;s partly because the author is NYC native and already have lots of possible pattern ideas in mind. For same reason I like to explore my local area of any national data to gain more understandings from the data. Besides, it turned out that you don&#x2019;t even need a base map layer for the taxi pickup point map when you have enough data points. The pickup points themselves shaped all the streets and roads!</em></p>
+<p>First I prepared and merged the two data file, trip data and trip fare.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="keyword">library</span>(data.table)</span><br><span class="line"><span class="keyword">library</span>(stringr)</span><br><span class="line"><span class="keyword">library</span>(lubridate)</span><br><span class="line"><span class="keyword">library</span>(geosphere)</span><br><span class="line"><span class="keyword">library</span>(ggplot2)</span><br><span class="line"><span class="keyword">library</span>(ggmap)</span><br><span class="line"><span class="comment">## ------------------ read and check data ---------------------------------</span></span><br><span class="line">trip.data = fread(<span class="string">&quot;trip_data_3.csv&quot;</span>, sep = <span class="string">&apos;,&apos;</span>, header = <span class="literal">TRUE</span>, showProgress = <span class="literal">TRUE</span>)</span><br><span class="line">trip.fare = fread(<span class="string">&quot;trip_fare_3.csv&quot;</span>, sep = <span class="string">&apos;,&apos;</span>, header = <span class="literal">TRUE</span>, showProgress = <span class="literal">TRUE</span>)</span><br><span class="line">summary(trip.data)</span><br><span class="line">summary(trip.fare)</span><br><span class="line"><span class="comment">## ------------------ column format -----------------------</span></span><br><span class="line"><span class="comment">## all conversion were done on new copy first to make sure it was done right, </span></span><br><span class="line"><span class="comment">## then the original columns were overwrite in place to save memory</span></span><br><span class="line"><span class="comment"># remove leading space in column names from fread</span></span><br><span class="line">setnames(trip.data, str_trim(colnames(trip.data)))</span><br><span class="line">setnames(trip.fare, str_trim(colnames(trip.fare)))</span><br><span class="line"><span class="comment"># convert characters to factor to verify missing values, easier to observe </span></span><br><span class="line">trip.data[, medallion := as.factor(medallion)]</span><br><span class="line">trip.data[, hack_license := as.factor(hack_license)]</span><br><span class="line">trip.data[, vendor_id := as.factor(vendor_id)]</span><br><span class="line">trip.data[, store_and_fwd_flag := as.factor(store_and_fwd_flag)]</span><br><span class="line">trip.fare[, medallion := as.factor(medallion)]</span><br><span class="line">trip.fare[, hack_license := as.factor(hack_license)]</span><br><span class="line">trip.fare[, vendor_id := as.factor(vendor_id)]</span><br><span class="line">trip.fare[, payment_type := as.factor(payment_type)]</span><br><span class="line"><span class="comment"># date time conversion. </span></span><br><span class="line">trip.data[, pickup_datetime := fast_strptime(pickup_datetime,<span class="string">&quot;%Y-%m-%d %H:%M:%S&quot;</span>)]</span><br><span class="line">trip.data[, dropoff_datetime := fast_strptime(dropoff_datetime,<span class="string">&quot;%Y-%m-%d %H:%M:%S&quot;</span>)]</span><br><span class="line">trip.fare[, pickup_datetime := fast_strptime(pickup_datetime,<span class="string">&quot;%Y-%m-%d %H:%M:%S&quot;</span>)]</span><br><span class="line"><span class="comment">## ------------- join two data set by pickup_datetime, medallion, hack_license -------------</span></span><br><span class="line"><span class="comment"># after join by 3 columns, all vendor_id also matches: </span></span><br><span class="line"><span class="comment"># trip.all[vendor_id.x == vendor_id.y, .N] so add vendor_id to key too.</span></span><br><span class="line">setkey(trip.data, pickup_datetime, medallion, hack_license, vendor_id)</span><br><span class="line">setkey(trip.fare, pickup_datetime, medallion, hack_license, vendor_id)</span><br><span class="line"><span class="comment"># we can add transaction number to trip and fare so we can identify missed match more easily</span></span><br><span class="line">trip.data[, trip_no := .I]</span><br><span class="line">trip.fare[, fare_no := .I]</span><br><span class="line">trip.all = merge(trip.data, trip.fare, all = <span class="literal">TRUE</span>, suffixes = c(<span class="string">&quot;.x&quot;</span>, <span class="string">&quot;.y&quot;</span>))</span><br></pre></td></tr></table></figure>
+<p>Then I found many obvious data errors.</p>
+<h4 id="some-columns-have-obvious-wrong-values-like-zero-passenger-count">Some columns have obvious wrong values, like zero passenger count.</h4><p><img src="zero_passenger.png" alt="zero passenger count"></p>
+<p>Though the other columns look perfectly normal. As long as you are not using passenger count information, I think these rows are still valid.</p>
+<h4 id="another-interesting-phenomenon-is-the-super-short-trip">Another interesting phenomenon is the super short trip:</h4><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">short = trip.all[trip_time_in_secs &lt;<span class="number">10</span>][order(total_amount)]  </span><br><span class="line">View(short)</span><br></pre></td></tr></table></figure>
+<p><img src="short_trip.png" alt="short trip"></p>
+<ul>
+<li><p>One possible explanation I can imagine is that maybe some passengers get on taxi then get off immediately, so the time and distance is near zero and they paid the minimal fare of $2.5. Many rows do have zero for pickup or drop off location or almost same location for pick up and drop off.</p>
+</li>
+<li><p>Then how is the longer trip distance possible? Especially when most pick up and drop off coordinates are either zero or same location. Even if the taxi was stuck in traffic so there is no location change and trip distance recorded by the taximeter, the less than 10 seconds trip time still cannot be explained. </p>
+</li>
+</ul>
+<p><img src="long_distance_in_short_time.png" alt="long distance in short time"></p>
+<ul>
+<li>There are also quite some big value trip fares for very short trips. Most of them have pick up and drop off coordinates at zero or at same locations.</li>
+</ul>
+<p><img src="fare_hist.png" alt="fare amount"></p>
+<p><img src="big_fare_in_short_trip.png" alt="big fare in short trip"></p>
+<p>I don&#x2019;t have good explanations for these phenomenon and I don&#x2019;t want to make too many assumptions since I&#x2019;m not really familiar with NYC taxi trips. I guess a NYC local probably can give some insights on them, and we can verify them with data.</p>
+<h4 id="average-driving-speed">Average driving speed</h4><p>We can further verify the trip time/distance combination by checking the average driving speed. The near zero time or distance could cause too much variance in calculated driving speed. Considering the possible input error in time and distance, we can round up the time in seconds to minutes before calculating driving speed.</p>
+<p>First check on the records that have very short time and nontrivial trip distance:</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">distance.conflict = trip.all[trip_time_in_secs &lt; <span class="number">10</span> &amp; trip_distance &gt; <span class="number">0.5</span>][order(trip_distance)]</span><br></pre></td></tr></table></figure>
+<p>If the pick up and drop off coordinates are not empty, we can calculate the great-circle distance between the coordinates. The actual trip distance must be equal or bigger than this distance.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">distance.conflict.with.gps = distance.conflict[pickup_longitude != <span class="number">0</span> &amp; </span><br><span class="line">								pickup_latitude != <span class="number">0</span> &amp; </span><br><span class="line">								dropoff_longitude != <span class="number">0</span> &amp; </span><br><span class="line">								dropoff_latitude != <span class="number">0</span>]</span><br><span class="line">gps.mat = as.matrix(distance.conflict.with.gps[, </span><br><span class="line">		.(pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude)])</span><br><span class="line">distance.conflict.with.gps[, dis.by.gps.meter := distHaversine(gps.mat[, <span class="number">1</span>:<span class="number">2</span>],gps.mat[, <span class="number">3</span>:<span class="number">4</span>])][order(dis.by.gps.meter)]</span><br><span class="line">distance.conflict.with.gps[, dis.by.gps.mile := dis.by.gps.meter * <span class="number">0.000621371</span>]</span><br></pre></td></tr></table></figure>
+<p>If both the great-circle distance and trip distance are nontrivial, it&#x2019;s more likely the less than 10 seconds trip time are wrong.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">wrong.time = distance.conflict.with.gps[dis.by.gps.mile &gt;= <span class="number">0.5</span>]</span><br><span class="line">View(wrong.time[, .(trip_time_in_secs, trip_distance, fare_amount, dis.by.gps.mile)])</span><br></pre></td></tr></table></figure>
+<p><img src="dis_by_gps.png" alt="distance by gps"></p>
+<p>And there must be something wrong if the great-circle distance is much bigger than the trip distance. Note the data here is limited to the short trip time subset, but this type of error can happen in all records.</p>
+<p><img src="more_great_circle_distance.png" alt="more great circle distance"></p>
+<p>Either the taximeter had some errors in reporting trip distance, or the gps coordinates were wrong. Because all the trip time very short, I think it&#x2019;s more likely to be the problem with gps coordinates. And the time and distance measurement should be much simpler and reliable than the gps coordinates measurement.</p>
+<h4 id="gps-coordinates-distribution">gps coordinates distribution</h4><p>We can further check the accuracy of the gps coordinates by matching with NYC boundary. The code below is a simplified method which take center of NYC area then add 100 miles in four directions as the boundary. More sophisticated way is to use a shapefile, but it will be much slower in checking data points. Since the taxi trip actually can have at least one end outside of NYC area, I don&#x2019;t think we need to be too strict on NYC area boundary.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">trip.valid.gps = trip.all[pickup_longitude != <span class="number">0</span> &amp; pickup_latitude != <span class="number">0</span> &amp; </span><br><span class="line">							dropoff_longitude != <span class="number">0</span> &amp; dropoff_latitude != <span class="number">0</span>]</span><br><span class="line">nyc.lat = <span class="number">40.719681</span>  <span class="comment"># picked &quot;center of NYC area&quot; from google map</span></span><br><span class="line">nyc.lon = -<span class="number">74.00536</span></span><br><span class="line">nyc.lat.max = nyc.lat + <span class="number">100</span>/<span class="number">69</span></span><br><span class="line">nyc.lat.min = nyc.lat - <span class="number">100</span>/<span class="number">69</span></span><br><span class="line">nyc.lon.max = nyc.lon + <span class="number">100</span>/<span class="number">52</span></span><br><span class="line">nyc.lon.min = nyc.lon - <span class="number">100</span>/<span class="number">52</span></span><br><span class="line">trip.valid.gps.nyc = trip.valid.gps[nyc.lon.max &gt; pickup_longitude  &amp; pickup_longitude  &gt; nyc.lon.min &amp;</span><br><span class="line">                                nyc.lon.max &gt; dropoff_longitude &amp; dropoff_longitude &gt; nyc.lon.min &amp;</span><br><span class="line">                                nyc.lat.max &gt; pickup_latitude  &amp; pickup_latitude  &gt; nyc.lat.min &amp;</span><br><span class="line">                                nyc.lat.max &gt; dropoff_latitude &amp; dropoff_latitude &gt; nyc.lat.min]</span><br><span class="line">View(trip.valid.gps[!trip.valid.gps.nyc][order(trip_distance)])</span><br><span class="line">mat.nyc = as.matrix(trip.valid.gps.nyc[, .(pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude)])</span><br><span class="line">dis = distHaversine(mat.nyc[, <span class="number">1</span>:<span class="number">2</span>],mat.nyc[, <span class="number">3</span>:<span class="number">4</span>]) / <span class="number">1639.344</span></span><br><span class="line">trip.valid.gps.nyc[, dis.by.gps := dis]</span><br></pre></td></tr></table></figure>
+<p><img src="off_gps_coordinates.png" alt="off gps coordinates"></p>
+<p>I found another verification on gps coordinates when I was checking the trips started from the JFK airport. Note I used two reference points in JFK airport to better filter all the trips that originated from inside the airport and the immediate neighborhood of JFK exit.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># the official loc of JFK is too far on east, we choose 2 point to better represent possible pickup areas.</span></span><br><span class="line">jfk.inside = data.frame(lon = -<span class="number">73.783074</span>, lat = <span class="number">40.64561</span>)</span><br><span class="line">jfk.exit = data.frame(lon = -<span class="number">73.798523</span>, lat = <span class="number">40.658439</span>)</span><br><span class="line">jfk.map = get_map(location = unlist(jfk.inside), zoom = <span class="number">13</span>, maptype = <span class="string">&apos;roadmap&apos;</span>)</span><br><span class="line"><span class="comment"># rides from JFK could end at out of NYC, but there are too many obvious wrong gps information in that part of data, we will just use the data that have gps location in NYC area this time. This area is actually rather big, a square area with 200 miles edge.</span></span><br><span class="line">trip.valid.gps.nyc[, dis.jfk.center.meter := distHaversine(mat.nyc[, <span class="number">1</span>:<span class="number">2</span>], jfk.inside)]</span><br><span class="line">trip.valid.gps.nyc[, dis.jfk.exit.meter := distHaversine(mat.nyc[, <span class="number">1</span>:<span class="number">2</span>], jfk.exit)]</span><br><span class="line"><span class="comment"># the actual distance threshold is adjusted by visual checking the map below, so that it includes most rides picked up from JFK, and excludes rides in neighborhood but not from JFK.</span></span><br><span class="line">near.jfk = trip.valid.gps.nyc[dis.jfk.center.meter &lt; <span class="number">2500</span> | dis.jfk.exit.meter &lt; <span class="number">1200</span>]</span><br><span class="line">ggmap(jfk.map) +geom_point(data = rbind(jfk.inside, jfk.exit), aes(x = lon, y = lat)) + geom_point(data = near.jfk, aes(x = pickup_longitude, y = pickup_latitude, colour = <span class="string">&apos;red&apos;</span>))</span><br></pre></td></tr></table></figure>
+<p><img src="JFK_trip.png" alt="JFK trip"></p>
+<p>Interestingly, there are some pick up points in the airplane runway or the bay. These are obvious errors, actually I think gps coorindates report in big city could have all kinds of error.</p>
+<h4 id="superman-taxi-driver">Superman taxi driver</h4><p>I also found some interesting records in checking taxi driver revenue.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">trip.march = trip.all[month(dropoff_datetime) == <span class="number">3</span>]</span><br><span class="line">revenue = trip.march[, .(revenue.march = sum(total_amount)), by = hack_license]  </span><br><span class="line">summary(revenue$revenue.march)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   2.6  4955.0  7220.0  6871.0  9032.0 43770.0</span><br></pre></td></tr></table></figure>
+<p>Who are these superman taxi driver that earned significantly more?</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">tail(revenue[order(revenue.march)])</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">                       hack_license revenue.march
+1: 3AAB94CA53FE93A64811F65690654649      21437.62
+2: 74CC809D28AE726DDB32249C044DA4F8      22113.14
+3: F153D0336BF48F93EC3913548164DDBD      22744.56
+4: D85749E8852FCC66A990E40605607B2F      23171.50
+5: 847349F8845A667D9AC7CDEDD1C873CB      23366.48
+6: CFCD208495D565EF66E7DFF9F98764DA      43771.85</span><br></pre></td></tr></table></figure>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">View(trip.all[hack_license == <span class="string">&apos;CFCD208495D565EF66E7DFF9F98764DA&apos;</span>])</span><br></pre></td></tr></table></figure>
+<p><img src="superman_driver.png" alt="superman driver"></p>
+<p>So this driver were using different medallion with same hack license, picked up 1412 rides in March, some rides even started before last end(No.17, 18, 22 etc). The simplest explanation is that these records are not from one single driver.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">rides = trip.march[, .N, by = hack_license]</span><br><span class="line">summary(rides)</span><br><span class="line">tail(rides[order(N)])</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">                       hack_license    N
+1: 74CC809D28AE726DDB32249C044DA4F8 1514
+2: 51C1BE97280A80EBFA8DAD34E1956CF6 1530
+3: 5C19018ED8557E5400F191D531411D89 1575
+4: 847349F8845A667D9AC7CDEDD1C873CB 1602
+5: F49FD0D84449AE7F72F3BC492CD6C754 1638
+6: D85749E8852FCC66A990E40605607B2F 1649</span><br></pre></td></tr></table></figure>
+<p>These hack license owner picked up more than 1500 rides in March, that&#x2019;s 50 per day. </p>
+<p>We can further check if there is any time overlap between drop off and next pickup, or if the pick up location was too far from last drop off location, but I think there is no need to do that before I have better theory.</p>
+<h2 id="summary">Summary</h2><p>In this case I didn&#x2019;t dig too much yet because I&#x2019;m not really familiar with NYC taxi, but there are lots of interesting phenomenons already. We can know a lot about the quality of certain data fields from these errors.</p>
+<p>In my other project, data cleaning is not just about digging interesting stories. It actually helped with the data process a lot. See more details in my <a href="http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/">next post</a>.</p>
+</span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Data-Cleaning/" rel="tag">#Data Cleaning</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/11/19/Script-workflow/" rel="next" title="Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder">
+                <i class="fa fa-chevron-left"></i> Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/02/03/data-cleaning-geocode/" rel="prev" title="Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning">
+                Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table Of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="dracodoc" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">dracodoc</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Artificial learning and Evolution inspired by nature</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-name">posts</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-name">categories</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">tags</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#data-cleaning-the-unavoidable-time-consuming-cumbersome-nontrivial-task"><span class="nav-number">1.</span> <span class="nav-text">Data Cleaning, the unavoidable, time consuming, cumbersome nontrivial task</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#nyc-taxi-trip-data"><span class="nav-number">1.1.</span> <span class="nav-text">NYC Taxi Trip Data</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#some-columns-have-obvious-wrong-values-like-zero-passenger-count"><span class="nav-number">1.1.1.</span> <span class="nav-text">Some columns have obvious wrong values, like zero passenger count.</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#another-interesting-phenomenon-is-the-super-short-trip"><span class="nav-number">1.1.2.</span> <span class="nav-text">Another interesting phenomenon is the super short trip:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#average-driving-speed"><span class="nav-number">1.1.3.</span> <span class="nav-text">Average driving speed</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#gps-coordinates-distribution"><span class="nav-number">1.1.4.</span> <span class="nav-text">gps coordinates distribution</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#superman-taxi-driver"><span class="nav-number">1.1.5.</span> <span class="nav-text">Superman taxi driver</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#summary"><span class="nav-number">2.</span> <span class="nav-text">Summary</span></a></li></ol></div>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dracodoc</span>
+</div>
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'dracodocgithub';
+      var disqus_identifier = '2016/01/31/data-cleaning/';
+      var disqus_title = 'Data Cleaning Part 1 - NYC Taxi Trip Data, Looking For Stories Behind Errors';
+      var disqus_url = 'http://dracodoc.github.io/2016/01/31/data-cleaning/';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post' || CONFIG.sidebar === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>

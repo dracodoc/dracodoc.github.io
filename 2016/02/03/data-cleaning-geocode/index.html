@@ -1,0 +1,851 @@
+<!doctype html>
+<html class="theme-next ">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+
+
+
+
+  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Data Cleaning," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+
+
+
+
+
+
+<meta name="description" content="I discussed a lot of interesting findings I discovered in NYC Taxi Trip data in last post. However it was not clear whether the cleaning added much value to the analysis other than some anomaly record">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning">
+<meta property="og:url" content="http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/index.html">
+<meta property="og:site_name" content="Artificial Learning and Evolution inspired by Nature">
+<meta property="og:description" content="I discussed a lot of interesting findings I discovered in NYC Taxi Trip data in last post. However it was not clear whether the cleaning added much value to the analysis other than some anomaly record">
+<meta property="og:image" content="http://dracodoc.github.io/2015/11/19/Script-workflow/NFIRS_data_sample.png">
+<meta property="og:updated_time" content="2016-02-06T02:15:30.796Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning">
+<meta name="twitter:description" content="I discussed a lot of interesting findings I discovered in NYC Taxi Trip data in last post. However it was not clear whether the cleaning added much value to the analysis other than some anomaly record">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: 'always',
+    motion: false
+  };
+</script>
+
+  <title> Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning | Artificial Learning and Evolution inspired by Nature </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  <!--[if lte IE 8]>
+  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
+    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
+      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
+           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
+           style='margin-left:auto;margin-right:auto;display: block;'/>
+    </a>
+  </div>
+<![endif]-->
+  
+
+
+
+
+
+
+  <div class="container one-column page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Artificial Learning and Evolution inspired by Nature</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu ">
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div id="content" class="content">
+          
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            Posted on
+            <time itemprop="dateCreated" datetime="2016-02-03T16:17:59-05:00" content="2016-02-03">
+              2016-02-03
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp; In
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/Data-Science/" itemprop="url" rel="index">
+                    <span itemprop="name">Data Science</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+              &nbsp; | &nbsp;
+              <a href="/2016/02/03/data-cleaning-geocode/#comments" itemprop="discussionUrl">
+                <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2016/02/03/data-cleaning-geocode/" itemprop="commentsCount"></span>
+              </a>
+            </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body">
+
+      
+      
+
+      
+        <span itemprop="articleBody"><p>I discussed a lot of interesting findings I discovered in NYC Taxi Trip data in <a href="dracodoc.github.io/2016/01/31/data-cleaning/">last post</a>. However it was not clear whether the cleaning added much value to the analysis other than some anomaly records were removed, and you can always check the outliers for any calculation and remove them when appropriate.</p>
+<p>Actually there are some times that the data cleaning can have great benefits. I was <a href="http://dracodoc.github.io/2015/11/17/Geocoding/">geocoding lots of addresses from public data</a> recently, and found cleaning the addresses almost doubled the geocoding performance. This effect is not really mentioned anywhere as far as I know, and I only have a theory about how that is possible.</p>
+<a id="more"></a>
+<p>In short, I was feeding address strings to PostGIS Tiger Geocoder extension for geocoding.</p>
+<p><img src="http://dracodoc.github.io/2015/11/19/Script-workflow/NFIRS_data_sample.png" alt="address format"></p>
+<p>Simple assembling the columns could have lots of dirty inputs which will interfere with the Geocoder parsing. I first did one pass Geocoding on 2010 data, then checked the geocoding results. I filtered many type of dirty inputs that caused problems and cleaned them up. Using the cleaning routine on other years&#x2019; data, the geocoding performance doubled. </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">NFIRS Data Year</th>
+<th style="text-align:left">Addresses Count</th>
+<th>Time Used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">2009</td>
+<td style="text-align:left">1,767,797</td>
+<td>6.3 days</td>
+</tr>
+<tr>
+<td style="text-align:left">2010</td>
+<td style="text-align:left">1,829,731</td>
+<td>14.28 days</td>
+</tr>
+<tr>
+<td style="text-align:left">2011</td>
+<td style="text-align:left">1,980,622</td>
+<td>7.06 days</td>
+</tr>
+<tr>
+<td style="text-align:left">2012</td>
+<td style="text-align:left">1,843,434</td>
+<td>6.57 days</td>
+</tr>
+<tr>
+<td style="text-align:left">2013</td>
+<td style="text-align:left">1,753,145</td>
+<td>6.51 days</td>
+</tr>
+</tbody>
+</table>
+<p>I didn&#x2019;t find anybody mentioned this kind of performance gain in my thorough research on Geocoding performance tuning. Somebody suggested to normalize address first, but that didn&#x2019;t help on performance because the Geocoder actually will normalize address input anyway, unless your normalize procedure is vastly better than the built-in normalizer. My theory about this performance gain is as follows:</p>
+<ol>
+<li>Postgresql PostGIS server will try to cache all the data needed for geocoding in RAM. My Geocoding server can hold 1 ~ 2 states&#x2019; data in RAM, so I split the input addresses by states. Every input file are single state only. Ideally the server will not need to read from disk in most of time.</li>
+<li>The problem is there are lots of addresses that have wrong zip code or city. The Geocoder can still process them but it will be much more slower because the Geocoder need to scan in a much broader range. It seemed that it will scan all states even if the state information is correct. I didn&#x2019;t find a way to limit the scan range to a known state, and this was confirmed by the Geocoder author.</li>
+<li>The problematic addresses are scattered in the input file. Every time when the Geocoder meet them, it will scan all states and mess up the perfect cache, which caused lots of performance drop on the good addresses followed.</li>
+<li>With the cleaning procedure in use, the bad address are either removed from input or collected into a special input file, separated from the good addresses. Now the Geocoder can process the good addresses much faster.</li>
+</ol>
+<p>Here are the cleaning procedures I used. In the end I filtered and cleaned about 14% of data in many types.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># loading data and preparing address string</span></span><br><span class="line">data_year = <span class="string">&apos;2010&apos;</span></span><br><span class="line"><span class="comment"># create year directory, load original address data, change year number here.</span></span><br><span class="line">load(paste0(<span class="string">&apos;data/address/&apos;</span>, data_year, <span class="string">&apos;_formated_addresses.Rdata&apos;</span>)) </span><br><span class="line">setnames(address,<span class="string">&apos;ZIP5&apos;</span>, <span class="string">&apos;zip&apos;</span>)</span><br><span class="line">address[, row_seq := as.numeric(row.names(address))]</span><br><span class="line">setkey(address, zip)</span><br><span class="line">address[, address_type := <span class="string">&apos;a&apos;</span>] <span class="comment"># type 1, 3,4,5 as addresses can be geocoded.</span></span><br><span class="line">address[LOC_TYPE == <span class="string">&apos;2&apos;</span>, address_type := <span class="string">&apos;i&apos;</span>]  <span class="comment"># to be combined with intersections in type 1 as intersections input</span></span><br><span class="line">address[LOC_TYPE %<span class="keyword">in</span>% c(<span class="string">&apos;6&apos;</span>, <span class="string">&apos;7&apos;</span>), address_type := <span class="string">&apos;n&apos;</span>] <span class="comment"># ignore 6,7</span></span><br><span class="line"><span class="comment"># original reference, change input string instead of original fields if possible</span></span><br><span class="line">address[, original_address :=</span><br><span class="line">                    paste0(NUM_MILE,<span class="string">&apos; &apos;</span>, STREET_PRE,<span class="string">&apos; &apos;</span>, STREETNAME,<span class="string">&apos; &apos;</span>, STREETTYPE, </span><br><span class="line">                           <span class="string">&apos; &apos;</span>, STREETSUF, <span class="string">&apos; &apos;</span>,APT_NO, <span class="string">&apos;, &apos;</span>, CITY, <span class="string">&apos;, &apos;</span>, STATE_ID, <span class="string">&apos; &apos;</span>, zip)]</span><br></pre></td></tr></table></figure>
+<p>There are many manually inputed symbols for NA:</p>
+<pre><code>&gt; head(str_subset(address<span class="variable">$original</span>_address, <span class="string">&quot;N/A&quot;</span>))
+[<span class="number">1</span>] <span class="string">&quot;55  Margaret ST  N/A, Monson, MA 01057&quot;</span>         <span class="string">&quot;55  Margaret ST  N/A, Monson, MA 01057&quot;</span>        
+[<span class="number">3</span>] <span class="string">&quot;1657  WORCESTER RD   N/A, FRAMINGHAM, MA 01701&quot;</span> <span class="string">&quot;132  UNION AV   N/A, FRAMINGHAM, MA 01702&quot;</span>     
+[<span class="number">5</span>] <span class="string">&quot;N/A  OAKLAND BEACH AV   , Warwick, RI 02889&quot;</span>    <span class="string">&quot;00601  MERRITT 7 N/A  , NORWALK, CT 06850&quot;</span>  
+
+&gt; head(str_subset(address<span class="variable">$original</span>_address, <span class="string">&quot;null&quot;</span>))
+[<span class="number">1</span>] <span class="string">&quot;96  Walworth ST  null, Saratoga Springs, NY 12866&quot;</span> <span class="string">&quot;197 S Broadway   null, Saratoga Springs, NY 12866&quot;</span>
+[<span class="number">3</span>] <span class="string">&quot;640  West Broadway   , Conconully, WA 98819&quot;</span>       <span class="string">&quot;58  W Fork Rd   , Conconully, WA 98819&quot;</span>           
+[<span class="number">5</span>] <span class="string">&quot;  Mineral Hill Rd   , Conconully, WA 98819&quot;</span>        <span class="string">&quot;225  Conconully ST  , OKANOGAN, WA 98840&quot;</span>   
+</code></pre><p>Because &#x2018;NA&#x2019; or &#x2018;na&#x2019; could be a valid part in address string, it&#x2019;s better to clean them before concatenating fields into one address string. </p>
+<pre><code>&gt; head(str_subset(address<span class="variable">$original</span>_address, <span class="string">&quot;NA&quot;</span>))
+[<span class="number">1</span>] <span class="string">&quot;7821 W CINNABAR AV  , PEORIA, AZ 00000&quot;</span>      <span class="string">&quot;7818 W PINNACLE PEAK RD  , PEORIA, AZ 00000&quot;</span>
+[<span class="number">3</span>] <span class="string">&quot;8828 W SANNA ST  , PEORIA, AZ 00000&quot;</span>         <span class="string">&quot;8221 W DEANNA DR  , PEORIA, AZ 00000&quot;</span>       
+[<span class="number">5</span>] <span class="string">&quot;2026 W NANCY LN  , PHOENIX, AZ 00000&quot;</span>        <span class="string">&quot;3548 E HELENA DR  , PHOENIX, AZ 00000&quot;</span>  
+</code></pre><p>Once I finished cleaning on fields, I will prepare a cleaner address string and do the further cleaning in that concatenated string. That&#x2019;s why I concatenated all original fields into <code>original_address</code>, which is for reference in case some fields changed in later process.</p>
+<p>Most other cleaning process are better done in the whole string, because some input may go to wrong fields, like street number in street name instead of street number column. With the whole string this kind of error doesn&#x2019;t matter any more.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># remove all kinds of input for NA</span></span><br><span class="line">str_subset(address$original_address, <span class="string">&quot;N/A&quot;</span>)</span><br><span class="line"><span class="keyword">for</span> (j <span class="keyword">in</span> seq_len(ncol(address)))</span><br><span class="line">    set(address,which(is.na(address[[j]]) | </span><br><span class="line">                        (address[[j]] %<span class="keyword">in</span>% c(<span class="string">&apos;N/A&apos;</span>,<span class="string">&apos;n/a&apos;</span>, <span class="string">&apos;NA&apos;</span>,<span class="string">&apos;na&apos;</span>, <span class="string">&apos;NULL&apos;</span>, <span class="string">&apos;null&apos;</span>))),j,<span class="string">&apos;&apos;</span>)</span><br></pre></td></tr></table></figure>
+<p>Many addresses&#x2019; zip code are wrong. </p>
+<pre><code>&gt; <span class="keyword">sample</span>(address[!grep(&apos;\\<span class="keyword">d</span>\\<span class="keyword">d</span>\\<span class="keyword">d</span>\\<span class="keyword">d</span>\\<span class="keyword">d</span>&apos;, <span class="keyword">zip</span>), <span class="keyword">zip</span>], 20)
+ [1] <span class="string">&quot;&quot;</span>     <span class="string">&quot;06&quot;</span>   <span class="string">&quot;&quot;</span>     <span class="string">&quot;&quot;</span>     <span class="string">&quot;625&quot;</span>  <span class="string">&quot;021&quot;</span>  <span class="string">&quot;33&quot;</span>   <span class="string">&quot;021&quot;</span>  <span class="string">&quot;461&quot;</span>  <span class="string">&quot;&quot;</span>     <span class="string">&quot;021&quot;</span>  <span class="string">&quot;2008&quot;</span> <span class="string">&quot;970&quot;</span>  <span class="string">&quot;&quot;</span>     <span class="string">&quot;11&quot;</span>   <span class="string">&quot;021&quot;</span>  <span class="string">&quot;021&quot;</span> 
+[18] <span class="string">&quot;9177&quot;</span> <span class="string">&quot;&quot;</span>     <span class="string">&quot;021&quot;</span> 
+</code></pre><p>The Geocoder can process address without zip code, but it have to be format like &#x2018;00000&#x2019;.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># ---- some zip are invalid ----</span></span><br><span class="line">address[!grep(<span class="string">&apos;\\d\\d\\d\\d\\d&apos;</span>, zip), <span class="string">&apos;:=&apos;</span> (zip = <span class="string">&apos;00000&apos;</span>, address_type = <span class="string">&apos;az&apos;</span>)]</span><br></pre></td></tr></table></figure>
+<p>After the above 2 steps of direct modifying address fields, I prepared the address string and will process the whole string in all later cleaning.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># ---- prepare address string (ignore apt_no) ---- </span></span><br><span class="line">address[, input_address :=</span><br><span class="line">                    paste0(NUM_MILE,<span class="string">&apos; &apos;</span>, STREET_PRE,<span class="string">&apos; &apos;</span>, STREETNAME,<span class="string">&apos; &apos;</span>, STREETTYPE, </span><br><span class="line">                           <span class="string">&apos; &apos;</span>, STREETSUF, <span class="string">&apos; &apos;</span>, <span class="string">&apos;, &apos;</span>, CITY, <span class="string">&apos;, &apos;</span>, STATE_ID, <span class="string">&apos; &apos;</span>, zip)]  </span><br><span class="line">address[, input_address := str_trim(gsub(<span class="string">&quot;\\s+&quot;</span>,<span class="string">&quot; &quot;</span>,input_address))]</span><br></pre></td></tr></table></figure>
+<p>Some addresses are empty. </p>
+<pre><code>&gt; <span class="function"><span class="title">head</span><span class="params">(address[STATE_ID == <span class="string">&apos;&apos;</span> &amp; STREETNAME == <span class="string">&apos;&apos;</span>, original_address])</span></span>
+[<span class="number">1</span>] <span class="string">&quot;     , ,  &quot;</span> <span class="string">&quot;     , ,  &quot;</span> <span class="string">&quot;     , ,  &quot;</span> <span class="string">&quot;     , ,  &quot;</span> <span class="string">&quot;     , ,  &quot;</span> <span class="string">&quot;     , ,  &quot;</span>
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># ---- ignore empty rows, most with empty state and zip ---- </span></span><br><span class="line"><span class="comment"># may came from duplicate records for same event from 2 dept</span></span><br><span class="line">address[STATE_ID == <span class="string">&apos;&apos;</span> &amp; STREETNAME == <span class="string">&apos;&apos;</span>, address_type := <span class="string">&apos;e&apos;</span>]</span><br></pre></td></tr></table></figure>
+<p>There are lots of usage of speical symobls like <code>/</code>, <code>@</code>, <code>&amp;</code>, <code>*</code> in input which will interfere with the Geocoder.</p>
+<pre><code>&gt; sample(address[LOC_TYPE == <span class="string">&apos;1&apos;</span> &amp; str_detect(address$input_address, <span class="string">&quot;[/|@|&amp;]&quot;</span>), input_address], <span class="number">10</span>)
+ [<span class="number">1</span>] <span class="string">&quot;743 CHENANGO ST , BINGHAMTON/FENTON, NY 13901&quot;</span>             <span class="string">&quot;123/127 tennyson , highland park, MI 48203&quot;</span>               
+ [<span class="number">3</span>] <span class="string">&quot;318 1/2 McMILLEN ST , Johnstown, PA 15902&quot;</span>                 <span class="string">&quot;712 1/2 BURNSIDE DR , GARDEN CITY, KS 67846&quot;</span>              
+ [<span class="number">5</span>] <span class="string">&quot;m/m143 W Interstate 16 , Ellabell, GA 31308&quot;</span>               <span class="string">&quot;12538 Greensbrook Forest DR , Houston / Sheldon, TX 77044&quot;</span>
+ [<span class="number">7</span>] <span class="string">&quot;F/O 1179 CASTLEHILL AVE , New York City, NY 10462&quot;</span>         <span class="string">&quot;509 1/2 N Court , Ottumwa, IA 52501&quot;</span>                      
+ [<span class="number">9</span>] <span class="string">&quot;7945 Larson , Hereford/Palominas, AZ 85615&quot;</span>                <span class="string">&quot;1022 1/2 N Langdon ST , MITCHELL, SD 57301&quot;</span>    
+</code></pre><p>First I remove all the <code>1/2</code> since the Geocoder cannot recognize them, and removing them will not affect the Geocoding result accuracy.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(address$input_address, <span class="string">&quot;1/2&quot;</span>), </span><br><span class="line">        input_address := str_replace_all(input_address, <span class="string">&quot;1/2&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>Some used <code>*</code> to label intersections, which I will use different Geocoding scripts to process later.</p>
+<pre><code>&gt; <span class="atom">head</span>(<span class="atom">address</span>[<span class="atom">str_detect</span>(<span class="atom">input_address</span>, <span class="string">&quot;[a-zA-Z]\\*[a-zA-Z]&quot;</span>), <span class="atom">input_address</span>])
+[<span class="number">1</span>] <span class="string">&quot;16 MC*COOK PL , East Lyme, CT 06333&quot;</span>             <span class="string">&quot;1236 WAL*MART PLZ , PHILLIPSBURG, NJ 08865&quot;</span>     
+[<span class="number">3</span>] <span class="string">&quot;0 GREENSPRING AV*JFX , BROOKLANDVILLE, MD 21022&quot;</span> <span class="string">&quot;0 BELFAST RD*SHAWAN RD , COCKEYSVILLE, MD 21030&quot;</span>
+[<span class="number">5</span>] <span class="string">&quot;0 SHAWAN RD*WARREN RD , COCKEYSVILLE, MD 21030&quot;</span>  <span class="string">&quot;0 SHAWAN RD*BELFAST RD , COCKEYSVILLE, MD 21030&quot;</span>
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(input_address, <span class="string">&quot;[a-zA-Z]\\*[a-zA-Z]&quot;</span>), address_type := <span class="string">&apos;i_*&apos;</span>]</span><br></pre></td></tr></table></figure>
+<p>Similarly filter other special symbols.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[address_type == <span class="string">&apos;a&apos;</span> &amp; str_detect(address$input_address, <span class="string">&quot;[/|@|&amp;]&quot;</span>),</span><br><span class="line">        address_type := <span class="string">&apos;i_/@&amp;&apos;</span>]</span><br></pre></td></tr></table></figure>
+<p>Many addresses used milepost numbers, which is a miles count along highway. They are not street addresses and cannot be processed by the Geocoder. There are all kinds of usage to record this type of address.</p>
+<pre><code>&gt; head(str_subset(address<span class="variable">$input</span>_address, <span class="string">&quot;(?i)milepost&quot;</span>))
+[<span class="number">1</span>] <span class="string">&quot;452.2E NYS Thruway Milepost , Angola, NY 14006&quot;</span> <span class="string">&quot;447.4W NYS Thruway Milepost , Angola, NY 14006&quot;</span>
+[<span class="number">3</span>] <span class="string">&quot;446W NYS Thruway Milepost , Angola, NY 14006&quot;</span>   <span class="string">&quot;447.4 NYS Thruway Milepost , Angola, NY 14006&quot;</span> 
+[<span class="number">5</span>] <span class="string">&quot;444.1W NYS Thruway Milepost , Angola, NY 14006&quot;</span> <span class="string">&quot;I-94 MILEPOST 68 , Eau Claire, WI 54701&quot;</span>       
+
+&gt; head(str_subset(address<span class="variable">$input</span>_address, <span class="string">&quot;\\bmile\\b|\\bmiles\\b&quot;</span>))
+[<span class="number">1</span>] <span class="string">&quot;2.5 mile Schillinger RD , T8R3 NBPP, ME 00000&quot;</span>        <span class="string">&quot;cr 103(2 miles west of 717) , breckenridge, TX 00000&quot;</span>
+[<span class="number">3</span>] <span class="string">&quot;Interstate 93 south mile mark , WINDHAM, NH 03087&quot;</span>    <span class="string">&quot;183 lost mile rd. , parsonfield, ME 04047&quot;</span>           
+[<span class="number">5</span>] <span class="string">&quot;168 lost mile RD , w.newfield, ME 04095&quot;</span>              <span class="string">&quot;20 mile stream rd , proctorsville, VT 05153&quot;</span>   
+</code></pre><p>Note it&#x2019;s still possible to have some valid street address with <code>mile</code> as a word in address(my regular expression only check when <code>mile</code> is a whole word, not part of word), but it should be very rare and difficult to separate the valid addresses from the milepost usage. So I&#x2019;ll just ignore all of them.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(paste0(NUM_MILE, STREETNAME), <span class="string">&quot;\\bmile\\b|\\bmiles\\b&quot;</span>), address_type := <span class="string">&apos;m&apos;</span>]</span><br><span class="line">address[str_detect(address$input_address, <span class="string">&quot;(?i)milepost&quot;</span>), address_type := <span class="string">&apos;m&apos;</span>]</span><br></pre></td></tr></table></figure>
+<p>Another special format of address is grid style address. I decided to remove the grid number part and keep the rest of address. The Geocoder will get a rough location for that street or city, which is still helpful for my purpose. The Geocoding match score will separate this kind of rough match from the exact match of street addresses.</p>
+<blockquote>
+<p>Grid-style Complete Address Numbers (Example: &#x201C;N89W16758&#x201D;). In certain communities in and around southern Wisconsin, Complete Address Numbers include a map grid cell reference preceding the Address Number. In the examples above, &#x201C;N89W16758&#x201D; should be read as &#x201C;North 89, West 167, Address Number 58&#x201D;. &#x201C;W63N645&#x201D; should be read as &#x201C;West 63, North, Address Number 645.&#x201D; The north and west values specify a locally-defined map grid cell with which the address is located. Local knowledge is needed to know when the grid reference stops and the Address Number begins.<br>Page 37, <a href="https://www.fgdc.gov/standards/projects/FGDC-standards-projects/street-address/index_html" target="_blank" rel="external">United States Thoroughfare, Landmark, and Postal Address Data Standard</a></p>
+</blockquote>
+<p>Most are WI and MN addresses. Except the <code>E003</code> NY address, I&#x2019;m not sure what does that means. Since the Geocoder cannot handle it either, they can be removed.</p>
+<pre><code>&gt; sample(address[str_detect(address$input_address, <span class="string">&quot;^[NSWEnswe]\\d&quot;</span>), input_address], <span class="number">10</span>)
+ [<span class="number">1</span>] <span class="string">&quot;W26820 Shelly Lynn DR , Pewaukee, WI 53072&quot;</span>      <span class="string">&quot;E14 GATE , St. Paul, MN 55111&quot;</span>                  
+ [<span class="number">3</span>] <span class="string">&quot;W5336 Fairview ROAD , Monticello, WI 53570&quot;</span>      <span class="string">&quot;W22870 Marjean LA , Pewaukee, WI 53072&quot;</span>         
+ [<span class="number">5</span>] <span class="string">&quot;E003 , New York City, NY 10011&quot;</span>                  <span class="string">&quot;W15085 Appleton AVE , Menomonee Falls, WI 53051&quot;</span>
+ [<span class="number">7</span>] <span class="string">&quot;N7324 Lake Knutson RD , Iola, WI 54945&quot;</span>          <span class="string">&quot;N10729 Hwy 17 S. , Rhinelander, WI 54501&quot;</span>       
+ [<span class="number">9</span>] <span class="string">&quot;N2494 St. Hwy. 162 , La Crosse, WI 54601&quot;</span>        <span class="string">&quot;N2639 Cty Hwy Z , Palmyra, WI 53156&quot;</span>   
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(address$input_address, <span class="string">&quot;^[NSWEnswe]\\d&quot;</span>) &amp; address_type == <span class="string">&apos;a&apos;</span>, </span><br><span class="line">        address_type := <span class="string">&apos;ag&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;ag&apos;</span>, </span><br><span class="line">        input_address := str_replace(input_address, <span class="string">&quot;^[NSWEnswe]\\d\\w*\\s&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>Some addresses have double quotes in it. Paired double quotes can be handled by the csv and Geocoder, but single double quote will cause problem for csv file.</p>
+<pre><code>&gt; sample(address<span class="string">[str_detect(input_address, &apos;&quot;&apos;), input_address]</span>, <span class="number">10</span>)
+ <span class="string">[1]</span> <span class="string">&quot;317 IND \&quot;</span>C\<span class="string">&quot; line at 14th ST , New York City, NY 10011&quot;</span> <span class="string">&quot;750 W \&quot;</span>D\<span class="string">&quot; AVE , Kingman, KS 67068&quot;</span>                    
+ <span class="string">[3]</span> <span class="string">&quot;HWY \&quot;</span><span class="number">32</span>\<span class="string">&quot; , SHEBOYGAN, WI 53083&quot;</span>                        <span class="string">&quot;22796 \&quot;</span>H\<span class="string">&quot; DR N , Marshall, MI 49068&quot;</span>                  
+ <span class="string">[5]</span> <span class="string">&quot;5745 CR 631 \&quot;</span>C\<span class="string">&quot; ST , Bushnell, FL 33513&quot;</span>               <span class="string">&quot;CTY \&quot;</span>MM\<span class="string">&quot; , HOWARDS GROVE, WI 53083&quot;</span>                   
+ <span class="string">[7]</span> <span class="string">&quot;\&quot;</span>BB\<span class="string">&quot; HWY , West Plains, MO 65775&quot;</span>                      <span class="string">&quot;I-55 (MAIN TO HWY \&quot;</span>M\<span class="string">&quot;) , Imperial, MO 63052&quot;</span>          
+ <span class="string">[9]</span> <span class="string">&quot;3400 Wy\&quot;</span>East RD , Hood River, OR <span class="number">97031</span><span class="string">&quot;                 &quot;</span><span class="number">6555</span> Hwy \<span class="string">&quot;D\&quot;</span> , parma, MO <span class="number">63870</span><span class="string">&quot;    </span>
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># remove single double quote</span></span><br><span class="line">address[str_detect(input_address, <span class="string">&apos;(?m)(^[^&quot;]*)&quot;([^&quot;]*$)&apos;</span>) &amp; </span><br><span class="line">          str_detect(address_type, <span class="string">&quot;^a&quot;</span>), address_type := <span class="string">&apos;aq&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;aq&apos;</span>, </span><br><span class="line">        input_address := str_replace_all(input_address, <span class="string">&apos;(?m)(^[^&quot;]*)&quot;([^&quot;]*$)&apos;</span>, <span class="string">&quot;\\1\\2&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>Some addresses used (), which cause problems for the Geocoder. The stuff inside () can be removed.</p>
+<pre><code>&gt; sample(address[str_detect(address$input_address, <span class="string">&quot;\\(.*\\)&quot;</span>), input_address], <span class="number">10</span>)
+ [<span class="number">1</span>] <span class="string">&quot;hwy 56 (side of beersheba mt) , beersheba springs, TN 37305&quot;</span>
+ [<span class="number">2</span>] <span class="string">&quot;805 PARKWAY (DOWNTOWN) RD , Gatlinburg, TN 37738&quot;</span>           
+ [<span class="number">3</span>] <span class="string">&quot;3409 JAMESWAY DR SW , Bernalillo (County), NM 87105&quot;</span>        
+ [<span class="number">4</span>] <span class="string">&quot;96 Arroyo Hondo Road , Santa Fe (County), NM 87508&quot;</span>         
+ [<span class="number">5</span>] <span class="string">&quot;3555 Dobbins Bridge RD , Anderson (County), SC 29625&quot;</span>       
+ [<span class="number">6</span>] <span class="string">&quot;KARPER (12100-14999) RD , MERCERSBURG, PA 17236&quot;</span>            
+ [<span class="number">7</span>] <span class="string">&quot;15.5 I-81 (10001-16000) LN N , Chambersburg, PA 17201&quot;</span>      
+ [<span class="number">8</span>] <span class="string">&quot;30 Wintergreen DR , Beaufort (County), SC 29906&quot;</span>            
+ [<span class="number">9</span>] <span class="string">&quot;305 Rosecrest RD , Spartanburg (County), SC 29303&quot;</span>          
+[<span class="number">10</span>] <span class="string">&quot;1678 ROUTE 12 (Gales Ferry) , Gales Ferry, CT 06335&quot;</span>   
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># remove paired ()</span></span><br><span class="line">address[str_detect(address$input_address, <span class="string">&quot;\\(.*\\)&quot;</span>), address_type := <span class="string">&apos;a()&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;a()&apos;</span>, </span><br><span class="line">        input_address := str_replace_all(input_address, <span class="string">&quot;\\(.*\\)&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>After this step, there are still some single ( cases.</p>
+<pre><code>&gt; sample(address[str_detect(input_address, <span class="string">&quot;\\(&quot;</span>), input_address], <span class="number">10</span>)
+ [<span class="number">1</span>] <span class="string">&quot;65 E Interstate 26 HWY , Columbus (Township o, NC 28722&quot;</span>   
+ [<span class="number">2</span>] <span class="string">&quot;4496 SYCAMORE GROVE (4300-4799 RD , Chambersburg, PA 17201&quot;</span>
+ [<span class="number">3</span>] <span class="string">&quot;AAA RD , Fort Hood (U.S. Army, TX 76544&quot;</span>                   
+ [<span class="number">4</span>] <span class="string">&quot;2010 Catherine Lake RD , Richlands (Township, NC 28574&quot;</span>    
+ [<span class="number">5</span>] <span class="string">&quot;285 Scott CIR NW , Calhoun (St. Address, GA 30701&quot;</span>         
+ [<span class="number">6</span>] <span class="string">&quot;Highway 411 NE , Calhoun (St. Address, GA 30701&quot;</span>           
+ [<span class="number">7</span>] <span class="string">&quot;2626 HILLTOP CT SW , Littlerock (RR name, WA 98556&quot;</span>        
+ [<span class="number">8</span>] <span class="string">&quot;144 Tyler Ct. , Richland (Township o, PA 15904&quot;</span>            
+ [<span class="number">9</span>] <span class="string">&quot;263 Farmington AVE , Farmington (Health C, CT 06030&quot;</span>       
+[<span class="number">10</span>] <span class="string">&quot;12957 Roberts RD , Hartford (Township o, OH 43013&quot;</span>     
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(input_address, <span class="string">&quot;\\(&quot;</span>), address_type := <span class="string">&apos;a(&apos;</span>]</span><br><span class="line"><span class="comment"># other than the case that ( in beginning, all content from ( to , to be removed.</span></span><br><span class="line">address[str_detect(input_address, <span class="string">&quot;^\\(&quot;</span>), </span><br><span class="line">                        input_address := str_replace(input_address, <span class="string">&quot;^\\(&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br><span class="line">address[str_detect(input_address, <span class="string">&quot;\\(&quot;</span>), </span><br><span class="line">                        input_address := str_replace(input_address, <span class="string">&quot;\\(.*(,)&quot;</span>, <span class="string">&quot;\\1&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>Some used ; to add additional information, which will only cause trouble for the Geocoder.</p>
+<pre><code>&gt; sample(address[str_detect(input_address, <span class="string">&quot;;&quot;</span>), input_address], <span class="number">10</span>)
+ [<span class="number">1</span>] <span class="string">&quot;1816 MT WASHINGTON AV #1; WHIT , Colorado Springs, CO 80906&quot;</span>
+ [<span class="number">2</span>] <span class="string">&quot;3201 E PLATTE AV; WAL-MART STO , Colorado Springs, CO 00000&quot;</span>
+ [<span class="number">3</span>] <span class="string">&quot;1511 YUMA ST #2; CONOVER APART , Colorado Springs, CO 80909&quot;</span>
+ [<span class="number">4</span>] <span class="string">&quot;3550 AFTERNOON CR; MSGT ROY P , Colorado Springs, CO 80910&quot;</span> 
+ [<span class="number">5</span>] <span class="string">&quot;805 S CIRCLE DR #B2; APOLLO PA , Colorado Springs, CO 00000&quot;</span>
+ [<span class="number">6</span>] <span class="string">&quot;5590 POWERS CENTER PT; SEVEN E , Colorado Springs, CO 80920&quot;</span>
+ [<span class="number">7</span>] <span class="string">&quot;715 CHEYENNE MEADOWS RD; DIAMO , Colorado Springs, CO 80906&quot;</span>
+ [<span class="number">8</span>] <span class="string">&quot;3140 VAN TEYLINGEN DR #A; SIER , Colorado Springs, CO 00000&quot;</span>
+ [<span class="number">9</span>] <span class="string">&quot;Meadow Rd; rifle clu , Hampden, OO 04444&quot;</span>                   
+[<span class="number">10</span>] <span class="string">&quot;3301 E SKELLY DR;J , TULSA, OK 74105&quot;</span>       
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(input_address, <span class="string">&quot;;&quot;</span>), address_type := <span class="string">&apos;a;&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;a;&apos;</span>, </span><br><span class="line">        input_address := str_replace(input_address, <span class="string">&quot;;.*?(,)&quot;</span>, <span class="string">&quot;\\1&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>Some have *.</p>
+<pre><code>&gt; sample(address[str_detect(address$input_address, <span class="string">&quot;\\*&quot;</span>) &amp; address_type == <span class="string">&apos;a&apos;</span>, input_address], <span class="number">10</span>)
+ [<span class="number">1</span>] <span class="string">&quot;TAYLOR ST , *Holyoke, MA 01040&quot;</span>            <span class="string">&quot;NORTHAMPTON ST , *Holyoke, MA 01040&quot;</span>      
+ [<span class="number">3</span>] <span class="string">&quot;1*5* W Coral RD , Stanton, MI 48888&quot;</span>       <span class="string">&quot;Cr 727 *26 , angleton, TX 77515&quot;</span>          
+ [<span class="number">5</span>] <span class="string">&quot;378 APPLETON ST , *Holyoke, MA 01040&quot;</span>      <span class="string">&quot;0 I195*I895 , ARBUTUS, MD 21227&quot;</span>          
+ [<span class="number">7</span>] <span class="string">&quot;1504 NORTHAMPTON ST , *Holyoke, MA 01040&quot;</span>  <span class="string">&quot;50 RIVER TER , *Holyoke, MA 01040&quot;</span>        
+ [<span class="number">9</span>] <span class="string">&quot;BOOKER ST * CARVER ST , Palatka, FL 32177&quot;</span> <span class="string">&quot;19 OCONNOR AVE , *HOLYOKE, MA 01040&quot;</span>   
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(address$input_address, <span class="string">&quot;\\*&quot;</span>) &amp; address_type == <span class="string">&apos;a&apos;</span>, address_type := <span class="string">&apos;a*&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;a*&apos;</span>, input_address := str_replace_all(input_address, <span class="string">&quot;\\*&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>This looks like came from some program output.</p>
+<pre><code>&gt; <span class="function"><span class="title">head</span><span class="params">(address[str_detect(address_type, <span class="string">&quot;^a&quot;</span>)</span></span> &amp; <span class="function"><span class="title">str_detect</span><span class="params">(input_address, <span class="string">&quot;\\*&quot;</span>)</span></span>, input_address])
+[<span class="number">1</span>] <span class="string">&quot;5280 Bruns RD , **UNDEFINED, CA 00000&quot;</span>         <span class="string">&quot;6500 Lindeman RD , **UNDEFINED, CA 00000&quot;</span>     
+[<span class="number">3</span>] <span class="string">&quot;5280 Bruns RD , **UNDEFINED, CA 00000&quot;</span>         <span class="string">&quot;17501 Sr 4 , **UNDEFINED, CA 00000&quot;</span>           
+[<span class="number">5</span>] <span class="string">&quot;5993 Bethel Island RD , **UNDEFINED, CA 00000&quot;</span> <span class="string">&quot;1 Quail Hill LN , **UNDEFINED, CA 00000&quot;</span>   
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(address_type, <span class="string">&quot;^a&quot;</span>) &amp; str_detect(input_address, <span class="string">&quot;\\*&quot;</span>),</span><br><span class="line">        input_address := str_replace(input_address, <span class="string">&quot;\\*\\*UNDEFINED&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>Almost any special character that OK for human reading still cannot be handled by the Geocoder.</p>
+<pre><code>&gt; sample(address[str_detect(input_address, <span class="string">&quot;^#&quot;</span>), input_address], <span class="number">10</span>)
+ [<span class="number">1</span>] <span class="string">&quot;# 6 HIGH , Marks, MS 38646&quot;</span>                          <span class="string">&quot;#560 CR56 , MAPLECREST, NY 12454&quot;</span>                   
+ [<span class="number">3</span>] <span class="string">&quot;#250blk Durgintown rd. , Hiram, ME 04041&quot;</span>            <span class="string">&quot;#888 Durgintown Rd. , Hiram, ME 04041&quot;</span>              
+ [<span class="number">5</span>] <span class="string">&quot;#15 LITTLE KANAWHA RIVER RD , PARKERSBURG, WV 26101&quot;</span> <span class="string">&quot;# 12 HOLLOW RD , WELLSTON, OH 45692&quot;</span>                
+ [<span class="number">7</span>] <span class="string">&quot;#10 I-24 , Paducah, KY 42003&quot;</span>                        <span class="string">&quot;#10.5 mm St RD 264 , Yahtahey, NM 87375&quot;</span>            
+ [<span class="number">9</span>] <span class="string">&quot;#1 CANAL RD , SENECA, IL 61360&quot;</span>                      <span class="string">&quot;#08 N Ola DR , Yahtahey, NM 87375&quot;</span> 
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(input_address, <span class="string">&quot;^#&quot;</span>), address_type := <span class="string">&apos;a#&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;a#&apos;</span>, input_address := str_replace_all(input_address, <span class="string">&quot;^#&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure></span>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Data-Cleaning/" rel="tag">#Data Cleaning</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/01/31/data-cleaning/" rel="next" title="Data Cleaning Part 1 - NYC Taxi Trip Data, Looking For Stories Behind Errors">
+                <i class="fa fa-chevron-left"></i> Data Cleaning Part 1 - NYC Taxi Trip Data, Looking For Stories Behind Errors
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+        </div>
+
+        
+
+
+        
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      </div>
+    
+  </div>
+
+
+      </div>
+
+      
+        
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table Of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" src="/images/default_avatar.jpg" alt="dracodoc" itemprop="image"/>
+          <p class="site-author-name" itemprop="name">dracodoc</p>
+        </div>
+        <p class="site-description motion-element" itemprop="description">Artificial learning and Evolution inspired by nature</p>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-name">posts</span>
+            </a>
+          </div>
+
+          <div class="site-state-item site-state-categories">
+            <a href="/categories">
+              <span class="site-state-item-count">3</span>
+              <span class="site-state-item-name">categories</span>
+              </a>
+          </div>
+
+          <div class="site-state-item site-state-tags">
+            <a href="/tags">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">tags</span>
+              </a>
+          </div>
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc-indicator-top post-toc-indicator">
+            <i class="fa fa-angle-double-up"></i>
+          </div>
+          <div class="post-toc">
+            
+              
+            
+            
+              <p class="post-toc-empty">This post does not have a Table Of Contents</p>
+            
+          </div>
+          <div class="post-toc-indicator-bottom post-toc-indicator">
+            <i class="fa fa-angle-double-down"></i>
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+      
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="icon-next-heart fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dracodoc</span>
+</div>
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="http://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+
+      </div>
+    </footer>
+
+    <div class="back-to-top"></div>
+  </div>
+
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  
+
+  
+    
+    
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'dracodocgithub';
+      var disqus_identifier = '2016/02/03/data-cleaning-geocode/';
+      var disqus_title = 'Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning';
+      var disqus_url = 'http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+  
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
+
+
+  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
+<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
+
+<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
+
+
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  
+<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
+
+
+<script type="text/javascript" id="sidebar.toc.highlight">
+  $(document).ready(function () {
+    var tocSelector = '.post-toc';
+    var $tocSelector = $(tocSelector);
+    var activeCurrentSelector = '.active-current';
+
+    $tocSelector
+      .on('activate.bs.scrollspy', function () {
+        var $currentActiveElement = $(tocSelector + ' .active').last();
+
+        removeCurrentActiveClass();
+        $currentActiveElement.addClass('active-current');
+
+        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
+      })
+      .on('clear.bs.scrollspy', function () {
+        removeCurrentActiveClass();
+      });
+
+    function removeCurrentActiveClass () {
+      $(tocSelector + ' ' + activeCurrentSelector)
+        .removeClass(activeCurrentSelector.substring(1));
+    }
+
+    function processTOC () {
+      getTOCMaxHeight();
+      toggleTOCOverflowIndicators();
+    }
+
+    function getTOCMaxHeight () {
+      var height = $('.sidebar').height() -
+                   $tocSelector.position().top -
+                   $('.post-toc-indicator-bottom').height();
+
+      $tocSelector.css('height', height);
+
+      return height;
+    }
+
+    function toggleTOCOverflowIndicators () {
+      tocOverflowIndicator(
+        '.post-toc-indicator-top',
+        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
+      );
+
+      tocOverflowIndicator(
+        '.post-toc-indicator-bottom',
+        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
+      )
+    }
+
+    $(document).on('sidebar.motion.complete', function () {
+      processTOC();
+    });
+
+    $('body').scrollspy({ target: tocSelector });
+    $(window).on('resize', function () {
+      if ( $('.sidebar').hasClass('sidebar-active') ) {
+        processTOC();
+      }
+    });
+
+    onScroll($tocSelector);
+
+    function onScroll (element) {
+      element.on('mousewheel DOMMouseScroll', function (event) {
+          var oe = event.originalEvent;
+          var delta = oe.wheelDelta || -oe.detail;
+
+          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
+          event.preventDefault();
+
+          toggleTOCOverflowIndicators();
+      });
+    }
+
+    function tocOverflowIndicator (indicator, action) {
+      var $indicator = $(indicator);
+      var opacity = action === 'show' ? 1 : 0;
+      $indicator.velocity ?
+        $indicator.velocity('stop').velocity({
+          opacity: opacity
+        }, { duration: 100 }) :
+        $indicator.stop().animate({
+          opacity: opacity
+        }, 100);
+    }
+
+  });
+</script>
+
+<script type="text/javascript" id="sidebar.nav">
+  $(document).ready(function () {
+    var html = $('html');
+    var TAB_ANIMATE_DURATION = 200;
+    var hasVelocity = $.isFunction(html.velocity);
+
+    $('.sidebar-nav li').on('click', function () {
+      var item = $(this);
+      var activeTabClassName = 'sidebar-nav-active';
+      var activePanelClassName = 'sidebar-panel-active';
+      if (item.hasClass(activeTabClassName)) {
+        return;
+      }
+
+      var currentTarget = $('.' + activePanelClassName);
+      var target = $('.' + item.data('target'));
+
+      hasVelocity ?
+        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
+          target
+            .velocity('stop')
+            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
+            .addClass(activePanelClassName);
+        }) :
+        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
+          currentTarget.hide();
+          target
+            .stop()
+            .css({'opacity': 0, 'display': 'block'})
+            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
+              currentTarget.removeClass(activePanelClassName);
+              target.addClass(activePanelClassName);
+            });
+        });
+
+      item.siblings().removeClass(activeTabClassName);
+      item.addClass(activeTabClassName);
+    });
+
+    $('.post-toc a').on('click', function (e) {
+      e.preventDefault();
+      var targetSelector = escapeSelector(this.getAttribute('href'));
+      var offset = $(targetSelector).offset().top;
+      hasVelocity ?
+        html.velocity('stop').velocity('scroll', {
+          offset: offset  + 'px',
+          mobileHA: false
+        }) :
+        $('html, body').stop().animate({
+          scrollTop: offset
+        }, 500);
+    });
+
+    // Expand sidebar on post detail page by default, when post has a toc.
+    motionMiddleWares.sidebar = function () {
+      var $tocContent = $('.post-toc-content');
+      if (CONFIG.sidebar === 'post' || CONFIG.sidebar === 'always') {
+        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
+          displaySidebar();
+        }
+      }
+    };
+  });
+</script>
+
+
+
+  <script type="text/javascript" src="/js/bootstrap.js"></script>
+
+  
+  
+
+  
+  
+
+</body>
+</html>
