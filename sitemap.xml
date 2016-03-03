@@ -2,6 +2,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://dracodoc.github.io/about/index.html</loc>
+    <lastmod>2016-03-03T21:50:39.523Z</lastmod>
+  </url>
+  
+  <url>
     <loc>http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</loc>
     <lastmod>2016-02-06T02:41:35.521Z</lastmod>
   </url>
