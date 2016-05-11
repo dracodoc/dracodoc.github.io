@@ -2,58 +2,80 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://dracodoc.github.io/about/index.html</loc>
-    <lastmod>2016-03-03T21:50:39.523Z</lastmod>
-  </url>
-  
-  <url>
     <loc>http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</loc>
-    <lastmod>2016-02-06T02:41:35.521Z</lastmod>
+    
+    <lastmod>2016-05-11T14:42:53.857Z</lastmod>
+    
   </url>
   
   <url>
     <loc>http://dracodoc.github.io/2016/01/31/data-cleaning/</loc>
-    <lastmod>2016-02-06T02:20:32.911Z</lastmod>
+    
+    <lastmod>2016-05-11T14:37:20.959Z</lastmod>
+    
   </url>
   
   <url>
     <loc>http://dracodoc.github.io/2015/11/19/Script-workflow/</loc>
-    <lastmod>2016-01-29T13:46:19.550Z</lastmod>
+    
+    <lastmod>2016-05-11T14:09:13.934Z</lastmod>
+    
   </url>
   
   <url>
     <loc>http://dracodoc.github.io/2015/11/17/Geocoding/</loc>
-    <lastmod>2015-11-28T00:36:23.357Z</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://dracodoc.github.io/categories/index.html</loc>
-    <lastmod>2015-11-27T03:34:19.970Z</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://dracodoc.github.io/tags/index.html</loc>
-    <lastmod>2015-11-27T03:34:01.167Z</lastmod>
-  </url>
-  
-  <url>
-    <loc>http://dracodoc.github.io/2015/10/23/house-price/</loc>
-    <lastmod>2015-11-21T22:53:41.258Z</lastmod>
+    
+    <lastmod>2016-05-11T14:01:48.700Z</lastmod>
+    
   </url>
   
   <url>
     <loc>http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/</loc>
-    <lastmod>2015-11-11T14:58:20.593Z</lastmod>
+    
+    <lastmod>2016-05-11T13:55:20.946Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://dracodoc.github.io/2015/10/23/house-price/</loc>
+    
+    <lastmod>2016-05-10T20:48:22.101Z</lastmod>
+    
   </url>
   
   <url>
     <loc>http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/</loc>
-    <lastmod>2015-10-25T03:22:38.878Z</lastmod>
+    
+    <lastmod>2016-05-10T20:46:53.117Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://dracodoc.github.io/about/index.html</loc>
+    
+    <lastmod>2016-05-10T20:42:17.757Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://dracodoc.github.io/categories/index.html</loc>
+    
+    <lastmod>2015-11-27T03:34:19.970Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://dracodoc.github.io/tags/index.html</loc>
+    
+    <lastmod>2015-11-27T03:34:01.167Z</lastmod>
+    
   </url>
   
   <url>
     <loc>http://dracodoc.github.io/downloads/webMap.html</loc>
+    
     <lastmod>2015-10-03T23:12:36.871Z</lastmod>
+    
   </url>
   
 </urlset>

@@ -51,17 +51,27 @@
 
 
 
-<meta name="description" content="I discussed a lot of interesting findings I discovered in NYC Taxi Trip data in last post. However it was not clear whether the cleaning added much value to the analysis other than some anomaly record">
+<meta name="description" content="Summary
+This is my second post on topic of Data Cleaning. 
+Cleaning addresses format turned out to have a substantial positive impact on Geocoding performance.
+Deep understandings of address format st">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning">
 <meta property="og:url" content="http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/index.html">
 <meta property="og:site_name" content="Artificial Learning and Evolution inspired by Nature">
-<meta property="og:description" content="I discussed a lot of interesting findings I discovered in NYC Taxi Trip data in last post. However it was not clear whether the cleaning added much value to the analysis other than some anomaly record">
+<meta property="og:description" content="Summary
+This is my second post on topic of Data Cleaning. 
+Cleaning addresses format turned out to have a substantial positive impact on Geocoding performance.
+Deep understandings of address format st">
 <meta property="og:image" content="http://dracodoc.github.io/2015/11/19/Script-workflow/NFIRS_data_sample.png">
-<meta property="og:updated_time" content="2016-02-06T02:41:35.521Z">
+<meta property="og:updated_time" content="2016-05-11T14:42:53.857Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning">
-<meta name="twitter:description" content="I discussed a lot of interesting findings I discovered in NYC Taxi Trip data in last post. However it was not clear whether the cleaning added much value to the analysis other than some anomaly record">
+<meta name="twitter:description" content="Summary
+This is my second post on topic of Data Cleaning. 
+Cleaning addresses format turned out to have a substantial positive impact on Geocoding performance.
+Deep understandings of address format st">
+<meta name="twitter:image" content="http://dracodoc.github.io/2015/11/19/Script-workflow/NFIRS_data_sample.png">
 
 
 
@@ -258,12 +268,17 @@
       
 
       
-        <span itemprop="articleBody"><p>I discussed a lot of interesting findings I discovered in NYC Taxi Trip data in <a href="dracodoc.github.io/2016/01/31/data-cleaning/">last post</a>. However it was not clear whether the cleaning added much value to the analysis other than some anomaly records were removed, and you can always check the outliers for any calculation and remove them when appropriate.</p>
-<p>Actually there are some times that the data cleaning can have great benefits. I was <a href="http://dracodoc.github.io/2015/11/17/Geocoding/">geocoding lots of addresses from public data</a> recently, and found cleaning the addresses almost doubled the geocoding performance. This effect is not really mentioned anywhere as far as I know, and I only have a theory about how that is possible.</p>
+        <span itemprop="articleBody"><h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>This is my second post on topic of Data Cleaning. </li>
+<li>Cleaning addresses format turned out to have a substantial positive impact on Geocoding performance.</li>
+<li>Deep understandings of address format standard is needed to deal with all kinds of special cases.</li>
+</ul>
 <a id="more"></a>
+<h2 id="introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>I discussed a lot of interesting findings I discovered in NYC Taxi Trip data in <a href="dracodoc.github.io/2016/01/31/data-cleaning/">last post</a>. However it was not clear whether the cleaning added much value to the analysis other than some anomaly records were removed, and you can always check the outliers for any calculation and remove them when appropriate.</p>
+<p>Actually there are some times that the data cleaning can have great benefits. I was <a href="http://dracodoc.github.io/2015/11/17/Geocoding/">geocoding lots of addresses from public data</a> recently, and found cleaning the addresses almost doubled the geocoding performance. This effect is not really mentioned anywhere as far as I know, and I only have a theory about how that is possible.</p>
 <p>In short, I was feeding address strings to PostGIS Tiger Geocoder extension for geocoding.</p>
 <p><img src="http://dracodoc.github.io/2015/11/19/Script-workflow/NFIRS_data_sample.png" alt="address format"></p>
-<p>Simple assembling the columns could have lots of dirty inputs which will interfere with the Geocoder parsing. I first did one pass Geocoding on 2010 data, then checked the geocoding results. I filtered many type of dirty inputs that caused problems and cleaned them up. Using the cleaning routine on other years&#x2019; data, the geocoding performance doubled. </p>
+<h2 id="clean-addresses-have-much-better-geocoding-performance"><a href="#Clean-Addresses-Have-Much-Better-Geocoding-Performance" class="headerlink" title="Clean Addresses Have Much Better Geocoding Performance"></a>Clean Addresses Have Much Better Geocoding Performance</h2><p>Simple assembling the columns could have lots of dirty inputs which will interfere with the Geocoder parsing. I first did one pass Geocoding on 2010 data, then checked the geocoding results. I filtered many type of dirty inputs that caused problems and cleaned them up. Using the cleaning routine on other years&#x2019; data, the geocoding performance doubled. </p>
 <table>
 <thead>
 <tr>
@@ -307,65 +322,65 @@
 <li>The problematic addresses are scattered in the input file. Every time when the Geocoder meet them, it will scan all states and mess up the perfect cache, which caused lots of performance drop on the good addresses followed.</li>
 <li>With the cleaning procedure in use, the bad address are either removed from input or collected into a special input file, separated from the good addresses. Now the Geocoder can process the good addresses much faster.</li>
 </ol>
-<p>Here are the cleaning procedures I used. In the end I filtered and cleaned about 14% of data in many types.</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># loading data and preparing address string</span></span><br><span class="line">data_year = <span class="string">&apos;2010&apos;</span></span><br><span class="line"><span class="comment"># create year directory, load original address data, change year number here.</span></span><br><span class="line">load(paste0(<span class="string">&apos;data/address/&apos;</span>, data_year, <span class="string">&apos;_formated_addresses.Rdata&apos;</span>)) </span><br><span class="line">setnames(address,<span class="string">&apos;ZIP5&apos;</span>, <span class="string">&apos;zip&apos;</span>)</span><br><span class="line">address[, row_seq := as.numeric(row.names(address))]</span><br><span class="line">setkey(address, zip)</span><br><span class="line">address[, address_type := <span class="string">&apos;a&apos;</span>] <span class="comment"># type 1, 3,4,5 as addresses can be geocoded.</span></span><br><span class="line">address[LOC_TYPE == <span class="string">&apos;2&apos;</span>, address_type := <span class="string">&apos;i&apos;</span>]  <span class="comment"># to be combined with intersections in type 1 as intersections input</span></span><br><span class="line">address[LOC_TYPE %<span class="keyword">in</span>% c(<span class="string">&apos;6&apos;</span>, <span class="string">&apos;7&apos;</span>), address_type := <span class="string">&apos;n&apos;</span>] <span class="comment"># ignore 6,7</span></span><br><span class="line"><span class="comment"># original reference, change input string instead of original fields if possible</span></span><br><span class="line">address[, original_address :=</span><br><span class="line">                    paste0(NUM_MILE,<span class="string">&apos; &apos;</span>, STREET_PRE,<span class="string">&apos; &apos;</span>, STREETNAME,<span class="string">&apos; &apos;</span>, STREETTYPE, </span><br><span class="line">                           <span class="string">&apos; &apos;</span>, STREETSUF, <span class="string">&apos; &apos;</span>,APT_NO, <span class="string">&apos;, &apos;</span>, CITY, <span class="string">&apos;, &apos;</span>, STATE_ID, <span class="string">&apos; &apos;</span>, zip)]</span><br></pre></td></tr></table></figure>
+<h2 id="all-the-format-errors"><a href="#All-the-format-errors" class="headerlink" title="All the format errors"></a>All the format errors</h2><p>Here are the cleaning procedures I used. In the end I filtered and cleaned about 14% of data in many types.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># loading data and preparing address string</span></span><br><span class="line">data_year = <span class="string">&apos;2010&apos;</span></span><br><span class="line"><span class="comment"># create year directory, load original address data, change year number here.</span></span><br><span class="line">load(paste0(<span class="string">&apos;data/address/&apos;</span>, data_year, <span class="string">&apos;_formated_addresses.Rdata&apos;</span>)) </span><br><span class="line">setnames(address,<span class="string">&apos;ZIP5&apos;</span>, <span class="string">&apos;zip&apos;</span>)</span><br><span class="line">address[, row_seq := as.numeric(row.names(address))]</span><br><span class="line">setkey(address, zip)</span><br><span class="line">address[, address_type := <span class="string">&apos;a&apos;</span>] <span class="comment"># type 1, 3,4,5 as addresses can be geocoded.</span></span><br><span class="line">address[LOC_TYPE == <span class="string">&apos;2&apos;</span>, address_type := <span class="string">&apos;i&apos;</span>]  <span class="comment"># to be combined with intersections in type 1 as intersections input</span></span><br><span class="line">address[LOC_TYPE %<span class="keyword">in</span>% c(<span class="string">&apos;6&apos;</span>, <span class="string">&apos;7&apos;</span>), address_type := <span class="string">&apos;n&apos;</span>] <span class="comment"># ignore 6,7</span></span><br><span class="line"><span class="comment"># original reference, change input string instead of original fields if possible</span></span><br><span class="line">address[, original_address :=</span><br><span class="line">                    paste0(NUM_MILE,<span class="string">&apos; &apos;</span>, STREET_PRE,<span class="string">&apos; &apos;</span>, STREETNAME,<span class="string">&apos; &apos;</span>, STREETTYPE, </span><br><span class="line">                           <span class="string">&apos; &apos;</span>, STREETSUF, <span class="string">&apos; &apos;</span>,APT_NO, <span class="string">&apos;, &apos;</span>, CITY, <span class="string">&apos;, &apos;</span>, STATE_ID, <span class="string">&apos; &apos;</span>, zip)]  </span><br></pre></td></tr></table></figure>
 <p>There are many manually inputed symbols for NA:</p>
-<pre><code>&gt; head(str_subset(address<span class="variable">$original</span>_address, <span class="string">&quot;N/A&quot;</span>))
-[<span class="number">1</span>] <span class="string">&quot;55  Margaret ST  N/A, Monson, MA 01057&quot;</span>         <span class="string">&quot;55  Margaret ST  N/A, Monson, MA 01057&quot;</span>        
-[<span class="number">3</span>] <span class="string">&quot;1657  WORCESTER RD   N/A, FRAMINGHAM, MA 01701&quot;</span> <span class="string">&quot;132  UNION AV   N/A, FRAMINGHAM, MA 01702&quot;</span>     
-[<span class="number">5</span>] <span class="string">&quot;N/A  OAKLAND BEACH AV   , Warwick, RI 02889&quot;</span>    <span class="string">&quot;00601  MERRITT 7 N/A  , NORWALK, CT 06850&quot;</span>  
+<pre><code>&gt; head(str_subset(address$original_address, &quot;N/A&quot;))
+[1] &quot;55  Margaret ST  N/A, Monson, MA 01057&quot;         &quot;55  Margaret ST  N/A, Monson, MA 01057&quot;        
+[3] &quot;1657  WORCESTER RD   N/A, FRAMINGHAM, MA 01701&quot; &quot;132  UNION AV   N/A, FRAMINGHAM, MA 01702&quot;     
+[5] &quot;N/A  OAKLAND BEACH AV   , Warwick, RI 02889&quot;    &quot;00601  MERRITT 7 N/A  , NORWALK, CT 06850&quot;  
 
-&gt; head(str_subset(address<span class="variable">$original</span>_address, <span class="string">&quot;null&quot;</span>))
-[<span class="number">1</span>] <span class="string">&quot;96  Walworth ST  null, Saratoga Springs, NY 12866&quot;</span> <span class="string">&quot;197 S Broadway   null, Saratoga Springs, NY 12866&quot;</span>
-[<span class="number">3</span>] <span class="string">&quot;640  West Broadway   , Conconully, WA 98819&quot;</span>       <span class="string">&quot;58  W Fork Rd   , Conconully, WA 98819&quot;</span>           
-[<span class="number">5</span>] <span class="string">&quot;  Mineral Hill Rd   , Conconully, WA 98819&quot;</span>        <span class="string">&quot;225  Conconully ST  , OKANOGAN, WA 98840&quot;</span>   
+&gt; head(str_subset(address$original_address, &quot;null&quot;))
+[1] &quot;96  Walworth ST  null, Saratoga Springs, NY 12866&quot; &quot;197 S Broadway   null, Saratoga Springs, NY 12866&quot;
+[3] &quot;640  West Broadway   , Conconully, WA 98819&quot;       &quot;58  W Fork Rd   , Conconully, WA 98819&quot;           
+[5] &quot;  Mineral Hill Rd   , Conconully, WA 98819&quot;        &quot;225  Conconully ST  , OKANOGAN, WA 98840&quot;   
 </code></pre><p>Because &#x2018;NA&#x2019; or &#x2018;na&#x2019; could be a valid part in address string, it&#x2019;s better to clean them before concatenating fields into one address string. </p>
-<pre><code>&gt; head(str_subset(address<span class="variable">$original</span>_address, <span class="string">&quot;NA&quot;</span>))
-[<span class="number">1</span>] <span class="string">&quot;7821 W CINNABAR AV  , PEORIA, AZ 00000&quot;</span>      <span class="string">&quot;7818 W PINNACLE PEAK RD  , PEORIA, AZ 00000&quot;</span>
-[<span class="number">3</span>] <span class="string">&quot;8828 W SANNA ST  , PEORIA, AZ 00000&quot;</span>         <span class="string">&quot;8221 W DEANNA DR  , PEORIA, AZ 00000&quot;</span>       
-[<span class="number">5</span>] <span class="string">&quot;2026 W NANCY LN  , PHOENIX, AZ 00000&quot;</span>        <span class="string">&quot;3548 E HELENA DR  , PHOENIX, AZ 00000&quot;</span>  
+<pre><code>&gt; head(str_subset(address$original_address, &quot;NA&quot;))
+[1] &quot;7821 W CINNABAR AV  , PEORIA, AZ 00000&quot;      &quot;7818 W PINNACLE PEAK RD  , PEORIA, AZ 00000&quot;
+[3] &quot;8828 W SANNA ST  , PEORIA, AZ 00000&quot;         &quot;8221 W DEANNA DR  , PEORIA, AZ 00000&quot;       
+[5] &quot;2026 W NANCY LN  , PHOENIX, AZ 00000&quot;        &quot;3548 E HELENA DR  , PHOENIX, AZ 00000&quot;  
 </code></pre><p>Once I finished cleaning on fields, I will prepare a cleaner address string and do the further cleaning in that concatenated string. That&#x2019;s why I concatenated all original fields into <code>original_address</code>, which is for reference in case some fields changed in later process.</p>
 <p>Most other cleaning process are better done in the whole string, because some input may go to wrong fields, like street number in street name instead of street number column. With the whole string this kind of error doesn&#x2019;t matter any more.</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># remove all kinds of input for NA</span></span><br><span class="line">str_subset(address$original_address, <span class="string">&quot;N/A&quot;</span>)</span><br><span class="line"><span class="keyword">for</span> (j <span class="keyword">in</span> seq_len(ncol(address)))</span><br><span class="line">    set(address,which(is.na(address[[j]]) | </span><br><span class="line">                        (address[[j]] %<span class="keyword">in</span>% c(<span class="string">&apos;N/A&apos;</span>,<span class="string">&apos;n/a&apos;</span>, <span class="string">&apos;NA&apos;</span>,<span class="string">&apos;na&apos;</span>, <span class="string">&apos;NULL&apos;</span>, <span class="string">&apos;null&apos;</span>))),j,<span class="string">&apos;&apos;</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># remove all kinds of input for NA</span></span><br><span class="line">str_subset(address$original_address, <span class="string">&quot;N/A&quot;</span>)</span><br><span class="line"><span class="keyword">for</span> (j <span class="keyword">in</span> seq_len(ncol(address)))</span><br><span class="line">    set(address,which(is.na(address[[j]]) | </span><br><span class="line">                        (address[[j]] %<span class="keyword">in</span>% c(<span class="string">&apos;N/A&apos;</span>,<span class="string">&apos;n/a&apos;</span>, <span class="string">&apos;NA&apos;</span>,<span class="string">&apos;na&apos;</span>, <span class="string">&apos;NULL&apos;</span>, <span class="string">&apos;null&apos;</span>))),j,<span class="string">&apos;&apos;</span>)  </span><br></pre></td></tr></table></figure>
 <p>Many addresses&#x2019; zip code are wrong. </p>
-<pre><code>&gt; <span class="keyword">sample</span>(address[!grep(&apos;\\<span class="keyword">d</span>\\<span class="keyword">d</span>\\<span class="keyword">d</span>\\<span class="keyword">d</span>\\<span class="keyword">d</span>&apos;, <span class="keyword">zip</span>), <span class="keyword">zip</span>], 20)
- [1] <span class="string">&quot;&quot;</span>     <span class="string">&quot;06&quot;</span>   <span class="string">&quot;&quot;</span>     <span class="string">&quot;&quot;</span>     <span class="string">&quot;625&quot;</span>  <span class="string">&quot;021&quot;</span>  <span class="string">&quot;33&quot;</span>   <span class="string">&quot;021&quot;</span>  <span class="string">&quot;461&quot;</span>  <span class="string">&quot;&quot;</span>     <span class="string">&quot;021&quot;</span>  <span class="string">&quot;2008&quot;</span> <span class="string">&quot;970&quot;</span>  <span class="string">&quot;&quot;</span>     <span class="string">&quot;11&quot;</span>   <span class="string">&quot;021&quot;</span>  <span class="string">&quot;021&quot;</span> 
-[18] <span class="string">&quot;9177&quot;</span> <span class="string">&quot;&quot;</span>     <span class="string">&quot;021&quot;</span> 
+<pre><code>&gt; sample(address[!grep(&apos;\\d\\d\\d\\d\\d&apos;, zip), zip], 20)
+ [1] &quot;&quot;     &quot;06&quot;   &quot;&quot;     &quot;&quot;     &quot;625&quot;  &quot;021&quot;  &quot;33&quot;   &quot;021&quot;  &quot;461&quot;  &quot;&quot;     &quot;021&quot;  &quot;2008&quot; &quot;970&quot;  &quot;&quot;     &quot;11&quot;   &quot;021&quot;  &quot;021&quot; 
+[18] &quot;9177&quot; &quot;&quot;     &quot;021&quot; 
 </code></pre><p>The Geocoder can process address without zip code, but it have to be format like &#x2018;00000&#x2019;.</p>
-<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># ---- some zip are invalid ----</span></span><br><span class="line">address[!grep(<span class="string">&apos;\\d\\d\\d\\d\\d&apos;</span>, zip), <span class="string">&apos;:=&apos;</span> (zip = <span class="string">&apos;00000&apos;</span>, address_type = <span class="string">&apos;az&apos;</span>)]</span><br></pre></td></tr></table></figure>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># ---- some zip are invalid ----</span></span><br><span class="line">address[!grep(<span class="string">&apos;\\d\\d\\d\\d\\d&apos;</span>, zip), <span class="string">&apos;:=&apos;</span> (zip = <span class="string">&apos;00000&apos;</span>, address_type = <span class="string">&apos;az&apos;</span>)]     </span><br></pre></td></tr></table></figure>
 <p>After the above 2 steps of direct modifying address fields, I prepared the address string and will process the whole string in all later cleaning.</p>
 <figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># ---- prepare address string (ignore apt_no) ---- </span></span><br><span class="line">address[, input_address :=</span><br><span class="line">                    paste0(NUM_MILE,<span class="string">&apos; &apos;</span>, STREET_PRE,<span class="string">&apos; &apos;</span>, STREETNAME,<span class="string">&apos; &apos;</span>, STREETTYPE, </span><br><span class="line">                           <span class="string">&apos; &apos;</span>, STREETSUF, <span class="string">&apos; &apos;</span>, <span class="string">&apos;, &apos;</span>, CITY, <span class="string">&apos;, &apos;</span>, STATE_ID, <span class="string">&apos; &apos;</span>, zip)]  </span><br><span class="line">address[, input_address := str_trim(gsub(<span class="string">&quot;\\s+&quot;</span>,<span class="string">&quot; &quot;</span>,input_address))]</span><br></pre></td></tr></table></figure>
 <p>Some addresses are empty. </p>
-<pre><code>&gt; <span class="function"><span class="title">head</span><span class="params">(address[STATE_ID == <span class="string">&apos;&apos;</span> &amp; STREETNAME == <span class="string">&apos;&apos;</span>, original_address])</span></span>
-[<span class="number">1</span>] <span class="string">&quot;     , ,  &quot;</span> <span class="string">&quot;     , ,  &quot;</span> <span class="string">&quot;     , ,  &quot;</span> <span class="string">&quot;     , ,  &quot;</span> <span class="string">&quot;     , ,  &quot;</span> <span class="string">&quot;     , ,  &quot;</span>
-</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># ---- ignore empty rows, most with empty state and zip ---- </span></span><br><span class="line"><span class="comment"># may came from duplicate records for same event from 2 dept</span></span><br><span class="line">address[STATE_ID == <span class="string">&apos;&apos;</span> &amp; STREETNAME == <span class="string">&apos;&apos;</span>, address_type := <span class="string">&apos;e&apos;</span>]</span><br></pre></td></tr></table></figure>
+<pre><code>&gt; head(address[STATE_ID == &apos;&apos; &amp; STREETNAME == &apos;&apos;, original_address])
+[1] &quot;     , ,  &quot; &quot;     , ,  &quot; &quot;     , ,  &quot; &quot;     , ,  &quot; &quot;     , ,  &quot; &quot;     , ,  &quot;
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># ---- ignore empty rows, most with empty state and zip ---- </span></span><br><span class="line"><span class="comment"># may came from duplicate records for same event from 2 dept</span></span><br><span class="line">address[STATE_ID == <span class="string">&apos;&apos;</span> &amp; STREETNAME == <span class="string">&apos;&apos;</span>, address_type := <span class="string">&apos;e&apos;</span>] </span><br></pre></td></tr></table></figure>
 <p>There are lots of usage of speical symobls like <code>/</code>, <code>@</code>, <code>&amp;</code>, <code>*</code> in input which will interfere with the Geocoder.</p>
-<pre><code>&gt; sample(address[LOC_TYPE == <span class="string">&apos;1&apos;</span> &amp; str_detect(address$input_address, <span class="string">&quot;[/|@|&amp;]&quot;</span>), input_address], <span class="number">10</span>)
- [<span class="number">1</span>] <span class="string">&quot;743 CHENANGO ST , BINGHAMTON/FENTON, NY 13901&quot;</span>             <span class="string">&quot;123/127 tennyson , highland park, MI 48203&quot;</span>               
- [<span class="number">3</span>] <span class="string">&quot;318 1/2 McMILLEN ST , Johnstown, PA 15902&quot;</span>                 <span class="string">&quot;712 1/2 BURNSIDE DR , GARDEN CITY, KS 67846&quot;</span>              
- [<span class="number">5</span>] <span class="string">&quot;m/m143 W Interstate 16 , Ellabell, GA 31308&quot;</span>               <span class="string">&quot;12538 Greensbrook Forest DR , Houston / Sheldon, TX 77044&quot;</span>
- [<span class="number">7</span>] <span class="string">&quot;F/O 1179 CASTLEHILL AVE , New York City, NY 10462&quot;</span>         <span class="string">&quot;509 1/2 N Court , Ottumwa, IA 52501&quot;</span>                      
- [<span class="number">9</span>] <span class="string">&quot;7945 Larson , Hereford/Palominas, AZ 85615&quot;</span>                <span class="string">&quot;1022 1/2 N Langdon ST , MITCHELL, SD 57301&quot;</span>    
+<pre><code>&gt; sample(address[LOC_TYPE == &apos;1&apos; &amp; str_detect(address$input_address, &quot;[/|@|&amp;]&quot;), input_address], 10)
+ [1] &quot;743 CHENANGO ST , BINGHAMTON/FENTON, NY 13901&quot;             &quot;123/127 tennyson , highland park, MI 48203&quot;               
+ [3] &quot;318 1/2 McMILLEN ST , Johnstown, PA 15902&quot;                 &quot;712 1/2 BURNSIDE DR , GARDEN CITY, KS 67846&quot;              
+ [5] &quot;m/m143 W Interstate 16 , Ellabell, GA 31308&quot;               &quot;12538 Greensbrook Forest DR , Houston / Sheldon, TX 77044&quot;
+ [7] &quot;F/O 1179 CASTLEHILL AVE , New York City, NY 10462&quot;         &quot;509 1/2 N Court , Ottumwa, IA 52501&quot;                      
+ [9] &quot;7945 Larson , Hereford/Palominas, AZ 85615&quot;                &quot;1022 1/2 N Langdon ST , MITCHELL, SD 57301&quot;    
 </code></pre><p>First I remove all the <code>1/2</code> since the Geocoder cannot recognize them, and removing them will not affect the Geocoding result accuracy.</p>
 <figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(address$input_address, <span class="string">&quot;1/2&quot;</span>), </span><br><span class="line">        input_address := str_replace_all(input_address, <span class="string">&quot;1/2&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
 <p>Some used <code>*</code> to label intersections, which I will use different Geocoding scripts to process later.</p>
-<pre><code>&gt; <span class="atom">head</span>(<span class="atom">address</span>[<span class="atom">str_detect</span>(<span class="atom">input_address</span>, <span class="string">&quot;[a-zA-Z]\\*[a-zA-Z]&quot;</span>), <span class="atom">input_address</span>])
-[<span class="number">1</span>] <span class="string">&quot;16 MC*COOK PL , East Lyme, CT 06333&quot;</span>             <span class="string">&quot;1236 WAL*MART PLZ , PHILLIPSBURG, NJ 08865&quot;</span>     
-[<span class="number">3</span>] <span class="string">&quot;0 GREENSPRING AV*JFX , BROOKLANDVILLE, MD 21022&quot;</span> <span class="string">&quot;0 BELFAST RD*SHAWAN RD , COCKEYSVILLE, MD 21030&quot;</span>
-[<span class="number">5</span>] <span class="string">&quot;0 SHAWAN RD*WARREN RD , COCKEYSVILLE, MD 21030&quot;</span>  <span class="string">&quot;0 SHAWAN RD*BELFAST RD , COCKEYSVILLE, MD 21030&quot;</span>
+<pre><code>&gt; head(address[str_detect(input_address, &quot;[a-zA-Z]\\*[a-zA-Z]&quot;), input_address])
+[1] &quot;16 MC*COOK PL , East Lyme, CT 06333&quot;             &quot;1236 WAL*MART PLZ , PHILLIPSBURG, NJ 08865&quot;     
+[3] &quot;0 GREENSPRING AV*JFX , BROOKLANDVILLE, MD 21022&quot; &quot;0 BELFAST RD*SHAWAN RD , COCKEYSVILLE, MD 21030&quot;
+[5] &quot;0 SHAWAN RD*WARREN RD , COCKEYSVILLE, MD 21030&quot;  &quot;0 SHAWAN RD*BELFAST RD , COCKEYSVILLE, MD 21030&quot;
 </code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(input_address, <span class="string">&quot;[a-zA-Z]\\*[a-zA-Z]&quot;</span>), address_type := <span class="string">&apos;i_*&apos;</span>]</span><br></pre></td></tr></table></figure>
 <p>Similarly filter other special symbols.</p>
 <figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[address_type == <span class="string">&apos;a&apos;</span> &amp; str_detect(address$input_address, <span class="string">&quot;[/|@|&amp;]&quot;</span>),</span><br><span class="line">        address_type := <span class="string">&apos;i_/@&amp;&apos;</span>]</span><br></pre></td></tr></table></figure>
 <p>Many addresses used milepost numbers, which is a miles count along highway. They are not street addresses and cannot be processed by the Geocoder. There are all kinds of usage to record this type of address.</p>
-<pre><code>&gt; head(str_subset(address<span class="variable">$input</span>_address, <span class="string">&quot;(?i)milepost&quot;</span>))
-[<span class="number">1</span>] <span class="string">&quot;452.2E NYS Thruway Milepost , Angola, NY 14006&quot;</span> <span class="string">&quot;447.4W NYS Thruway Milepost , Angola, NY 14006&quot;</span>
-[<span class="number">3</span>] <span class="string">&quot;446W NYS Thruway Milepost , Angola, NY 14006&quot;</span>   <span class="string">&quot;447.4 NYS Thruway Milepost , Angola, NY 14006&quot;</span> 
-[<span class="number">5</span>] <span class="string">&quot;444.1W NYS Thruway Milepost , Angola, NY 14006&quot;</span> <span class="string">&quot;I-94 MILEPOST 68 , Eau Claire, WI 54701&quot;</span>       
+<pre><code>&gt; head(str_subset(address$input_address, &quot;(?i)milepost&quot;))
+[1] &quot;452.2E NYS Thruway Milepost , Angola, NY 14006&quot; &quot;447.4W NYS Thruway Milepost , Angola, NY 14006&quot;
+[3] &quot;446W NYS Thruway Milepost , Angola, NY 14006&quot;   &quot;447.4 NYS Thruway Milepost , Angola, NY 14006&quot; 
+[5] &quot;444.1W NYS Thruway Milepost , Angola, NY 14006&quot; &quot;I-94 MILEPOST 68 , Eau Claire, WI 54701&quot;       
 
-&gt; head(str_subset(address<span class="variable">$input</span>_address, <span class="string">&quot;\\bmile\\b|\\bmiles\\b&quot;</span>))
-[<span class="number">1</span>] <span class="string">&quot;2.5 mile Schillinger RD , T8R3 NBPP, ME 00000&quot;</span>        <span class="string">&quot;cr 103(2 miles west of 717) , breckenridge, TX 00000&quot;</span>
-[<span class="number">3</span>] <span class="string">&quot;Interstate 93 south mile mark , WINDHAM, NH 03087&quot;</span>    <span class="string">&quot;183 lost mile rd. , parsonfield, ME 04047&quot;</span>           
-[<span class="number">5</span>] <span class="string">&quot;168 lost mile RD , w.newfield, ME 04095&quot;</span>              <span class="string">&quot;20 mile stream rd , proctorsville, VT 05153&quot;</span>   
+&gt; head(str_subset(address$input_address, &quot;\\bmile\\b|\\bmiles\\b&quot;))
+[1] &quot;2.5 mile Schillinger RD , T8R3 NBPP, ME 00000&quot;        &quot;cr 103(2 miles west of 717) , breckenridge, TX 00000&quot;
+[3] &quot;Interstate 93 south mile mark , WINDHAM, NH 03087&quot;    &quot;183 lost mile rd. , parsonfield, ME 04047&quot;           
+[5] &quot;168 lost mile RD , w.newfield, ME 04095&quot;              &quot;20 mile stream rd , proctorsville, VT 05153&quot;   
 </code></pre><p>Note it&#x2019;s still possible to have some valid street address with <code>mile</code> as a word in address(my regular expression only check when <code>mile</code> is a whole word, not part of word), but it should be very rare and difficult to separate the valid addresses from the milepost usage. So I&#x2019;ll just ignore all of them.</p>
 <figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(paste0(NUM_MILE, STREETNAME), <span class="string">&quot;\\bmile\\b|\\bmiles\\b&quot;</span>), address_type := <span class="string">&apos;m&apos;</span>]</span><br><span class="line">address[str_detect(address$input_address, <span class="string">&quot;(?i)milepost&quot;</span>), address_type := <span class="string">&apos;m&apos;</span>]</span><br></pre></td></tr></table></figure>
 <p>Another special format of address is grid style address. I decided to remove the grid number part and keep the rest of address. The Geocoder will get a rough location for that street or city, which is still helpful for my purpose. The Geocoding match score will separate this kind of rough match from the exact match of street addresses.</p>
@@ -373,83 +388,87 @@
 <p>Grid-style Complete Address Numbers (Example: &#x201C;N89W16758&#x201D;). In certain communities in and around southern Wisconsin, Complete Address Numbers include a map grid cell reference preceding the Address Number. In the examples above, &#x201C;N89W16758&#x201D; should be read as &#x201C;North 89, West 167, Address Number 58&#x201D;. &#x201C;W63N645&#x201D; should be read as &#x201C;West 63, North, Address Number 645.&#x201D; The north and west values specify a locally-defined map grid cell with which the address is located. Local knowledge is needed to know when the grid reference stops and the Address Number begins.<br>Page 37, <a href="https://www.fgdc.gov/standards/projects/FGDC-standards-projects/street-address/index_html" target="_blank" rel="external">United States Thoroughfare, Landmark, and Postal Address Data Standard</a></p>
 </blockquote>
 <p>Most are WI and MN addresses. Except the <code>E003</code> NY address, I&#x2019;m not sure what does that means. Since the Geocoder cannot handle it either, they can be removed.</p>
-<pre><code>&gt; sample(address[str_detect(address$input_address, <span class="string">&quot;^[NSWEnswe]\\d&quot;</span>), input_address], <span class="number">10</span>)
- [<span class="number">1</span>] <span class="string">&quot;W26820 Shelly Lynn DR , Pewaukee, WI 53072&quot;</span>      <span class="string">&quot;E14 GATE , St. Paul, MN 55111&quot;</span>                  
- [<span class="number">3</span>] <span class="string">&quot;W5336 Fairview ROAD , Monticello, WI 53570&quot;</span>      <span class="string">&quot;W22870 Marjean LA , Pewaukee, WI 53072&quot;</span>         
- [<span class="number">5</span>] <span class="string">&quot;E003 , New York City, NY 10011&quot;</span>                  <span class="string">&quot;W15085 Appleton AVE , Menomonee Falls, WI 53051&quot;</span>
- [<span class="number">7</span>] <span class="string">&quot;N7324 Lake Knutson RD , Iola, WI 54945&quot;</span>          <span class="string">&quot;N10729 Hwy 17 S. , Rhinelander, WI 54501&quot;</span>       
- [<span class="number">9</span>] <span class="string">&quot;N2494 St. Hwy. 162 , La Crosse, WI 54601&quot;</span>        <span class="string">&quot;N2639 Cty Hwy Z , Palmyra, WI 53156&quot;</span>   
+<pre><code>&gt; sample(address[str_detect(address$input_address, &quot;^[NSWEnswe]\\d&quot;), input_address], 10)
+ [1] &quot;W26820 Shelly Lynn DR , Pewaukee, WI 53072&quot;      &quot;E14 GATE , St. Paul, MN 55111&quot;                  
+ [3] &quot;W5336 Fairview ROAD , Monticello, WI 53570&quot;      &quot;W22870 Marjean LA , Pewaukee, WI 53072&quot;         
+ [5] &quot;E003 , New York City, NY 10011&quot;                  &quot;W15085 Appleton AVE , Menomonee Falls, WI 53051&quot;
+ [7] &quot;N7324 Lake Knutson RD , Iola, WI 54945&quot;          &quot;N10729 Hwy 17 S. , Rhinelander, WI 54501&quot;       
+ [9] &quot;N2494 St. Hwy. 162 , La Crosse, WI 54601&quot;        &quot;N2639 Cty Hwy Z , Palmyra, WI 53156&quot;   
 </code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(address$input_address, <span class="string">&quot;^[NSWEnswe]\\d&quot;</span>) &amp; address_type == <span class="string">&apos;a&apos;</span>, </span><br><span class="line">        address_type := <span class="string">&apos;ag&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;ag&apos;</span>, </span><br><span class="line">        input_address := str_replace(input_address, <span class="string">&quot;^[NSWEnswe]\\d\\w*\\s&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
 <p>Some addresses have double quotes in it. Paired double quotes can be handled by the csv and Geocoder, but single double quote will cause problem for csv file.</p>
-<pre><code>&gt; sample(address<span class="string">[str_detect(input_address, &apos;&quot;&apos;), input_address]</span>, <span class="number">10</span>)
- <span class="string">[1]</span> <span class="string">&quot;317 IND \&quot;</span>C\<span class="string">&quot; line at 14th ST , New York City, NY 10011&quot;</span> <span class="string">&quot;750 W \&quot;</span>D\<span class="string">&quot; AVE , Kingman, KS 67068&quot;</span>                    
- <span class="string">[3]</span> <span class="string">&quot;HWY \&quot;</span><span class="number">32</span>\<span class="string">&quot; , SHEBOYGAN, WI 53083&quot;</span>                        <span class="string">&quot;22796 \&quot;</span>H\<span class="string">&quot; DR N , Marshall, MI 49068&quot;</span>                  
- <span class="string">[5]</span> <span class="string">&quot;5745 CR 631 \&quot;</span>C\<span class="string">&quot; ST , Bushnell, FL 33513&quot;</span>               <span class="string">&quot;CTY \&quot;</span>MM\<span class="string">&quot; , HOWARDS GROVE, WI 53083&quot;</span>                   
- <span class="string">[7]</span> <span class="string">&quot;\&quot;</span>BB\<span class="string">&quot; HWY , West Plains, MO 65775&quot;</span>                      <span class="string">&quot;I-55 (MAIN TO HWY \&quot;</span>M\<span class="string">&quot;) , Imperial, MO 63052&quot;</span>          
- <span class="string">[9]</span> <span class="string">&quot;3400 Wy\&quot;</span>East RD , Hood River, OR <span class="number">97031</span><span class="string">&quot;                 &quot;</span><span class="number">6555</span> Hwy \<span class="string">&quot;D\&quot;</span> , parma, MO <span class="number">63870</span><span class="string">&quot;    </span>
+<pre><code>&gt; sample(address[str_detect(input_address, &apos;&quot;&apos;), input_address], 10)
+ [1] &quot;317 IND \&quot;C\&quot; line at 14th ST , New York City, NY 10011&quot; &quot;750 W \&quot;D\&quot; AVE , Kingman, KS 67068&quot;                    
+ [3] &quot;HWY \&quot;32\&quot; , SHEBOYGAN, WI 53083&quot;                        &quot;22796 \&quot;H\&quot; DR N , Marshall, MI 49068&quot;                  
+ [5] &quot;5745 CR 631 \&quot;C\&quot; ST , Bushnell, FL 33513&quot;               &quot;CTY \&quot;MM\&quot; , HOWARDS GROVE, WI 53083&quot;                   
+ [7] &quot;\&quot;BB\&quot; HWY , West Plains, MO 65775&quot;                      &quot;I-55 (MAIN TO HWY \&quot;M\&quot;) , Imperial, MO 63052&quot;          
+ [9] &quot;3400 Wy\&quot;East RD , Hood River, OR 97031&quot;                 &quot;6555 Hwy \&quot;D\&quot; , parma, MO 63870&quot;    
 </code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># remove single double quote</span></span><br><span class="line">address[str_detect(input_address, <span class="string">&apos;(?m)(^[^&quot;]*)&quot;([^&quot;]*$)&apos;</span>) &amp; </span><br><span class="line">          str_detect(address_type, <span class="string">&quot;^a&quot;</span>), address_type := <span class="string">&apos;aq&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;aq&apos;</span>, </span><br><span class="line">        input_address := str_replace_all(input_address, <span class="string">&apos;(?m)(^[^&quot;]*)&quot;([^&quot;]*$)&apos;</span>, <span class="string">&quot;\\1\\2&quot;</span>)]</span><br></pre></td></tr></table></figure>
 <p>Some addresses used (), which cause problems for the Geocoder. The stuff inside () can be removed.</p>
-<pre><code>&gt; sample(address[str_detect(address$input_address, <span class="string">&quot;\\(.*\\)&quot;</span>), input_address], <span class="number">10</span>)
- [<span class="number">1</span>] <span class="string">&quot;hwy 56 (side of beersheba mt) , beersheba springs, TN 37305&quot;</span>
- [<span class="number">2</span>] <span class="string">&quot;805 PARKWAY (DOWNTOWN) RD , Gatlinburg, TN 37738&quot;</span>           
- [<span class="number">3</span>] <span class="string">&quot;3409 JAMESWAY DR SW , Bernalillo (County), NM 87105&quot;</span>        
- [<span class="number">4</span>] <span class="string">&quot;96 Arroyo Hondo Road , Santa Fe (County), NM 87508&quot;</span>         
- [<span class="number">5</span>] <span class="string">&quot;3555 Dobbins Bridge RD , Anderson (County), SC 29625&quot;</span>       
- [<span class="number">6</span>] <span class="string">&quot;KARPER (12100-14999) RD , MERCERSBURG, PA 17236&quot;</span>            
- [<span class="number">7</span>] <span class="string">&quot;15.5 I-81 (10001-16000) LN N , Chambersburg, PA 17201&quot;</span>      
- [<span class="number">8</span>] <span class="string">&quot;30 Wintergreen DR , Beaufort (County), SC 29906&quot;</span>            
- [<span class="number">9</span>] <span class="string">&quot;305 Rosecrest RD , Spartanburg (County), SC 29303&quot;</span>          
-[<span class="number">10</span>] <span class="string">&quot;1678 ROUTE 12 (Gales Ferry) , Gales Ferry, CT 06335&quot;</span>   
+<pre><code>&gt; sample(address[str_detect(address$input_address, &quot;\\(.*\\)&quot;), input_address], 10)
+ [1] &quot;hwy 56 (side of beersheba mt) , beersheba springs, TN 37305&quot;
+ [2] &quot;805 PARKWAY (DOWNTOWN) RD , Gatlinburg, TN 37738&quot;           
+ [3] &quot;3409 JAMESWAY DR SW , Bernalillo (County), NM 87105&quot;        
+ [4] &quot;96 Arroyo Hondo Road , Santa Fe (County), NM 87508&quot;         
+ [5] &quot;3555 Dobbins Bridge RD , Anderson (County), SC 29625&quot;       
+ [6] &quot;KARPER (12100-14999) RD , MERCERSBURG, PA 17236&quot;            
+ [7] &quot;15.5 I-81 (10001-16000) LN N , Chambersburg, PA 17201&quot;      
+ [8] &quot;30 Wintergreen DR , Beaufort (County), SC 29906&quot;            
+ [9] &quot;305 Rosecrest RD , Spartanburg (County), SC 29303&quot;          
+[10] &quot;1678 ROUTE 12 (Gales Ferry) , Gales Ferry, CT 06335&quot;   
 </code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># remove paired ()</span></span><br><span class="line">address[str_detect(address$input_address, <span class="string">&quot;\\(.*\\)&quot;</span>), address_type := <span class="string">&apos;a()&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;a()&apos;</span>, </span><br><span class="line">        input_address := str_replace_all(input_address, <span class="string">&quot;\\(.*\\)&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
 <p>After this step, there are still some single ( cases.</p>
-<pre><code>&gt; sample(address[str_detect(input_address, <span class="string">&quot;\\(&quot;</span>), input_address], <span class="number">10</span>)
- [<span class="number">1</span>] <span class="string">&quot;65 E Interstate 26 HWY , Columbus (Township o, NC 28722&quot;</span>   
- [<span class="number">2</span>] <span class="string">&quot;4496 SYCAMORE GROVE (4300-4799 RD , Chambersburg, PA 17201&quot;</span>
- [<span class="number">3</span>] <span class="string">&quot;AAA RD , Fort Hood (U.S. Army, TX 76544&quot;</span>                   
- [<span class="number">4</span>] <span class="string">&quot;2010 Catherine Lake RD , Richlands (Township, NC 28574&quot;</span>    
- [<span class="number">5</span>] <span class="string">&quot;285 Scott CIR NW , Calhoun (St. Address, GA 30701&quot;</span>         
- [<span class="number">6</span>] <span class="string">&quot;Highway 411 NE , Calhoun (St. Address, GA 30701&quot;</span>           
- [<span class="number">7</span>] <span class="string">&quot;2626 HILLTOP CT SW , Littlerock (RR name, WA 98556&quot;</span>        
- [<span class="number">8</span>] <span class="string">&quot;144 Tyler Ct. , Richland (Township o, PA 15904&quot;</span>            
- [<span class="number">9</span>] <span class="string">&quot;263 Farmington AVE , Farmington (Health C, CT 06030&quot;</span>       
-[<span class="number">10</span>] <span class="string">&quot;12957 Roberts RD , Hartford (Township o, OH 43013&quot;</span>     
+<pre><code>&gt; sample(address[str_detect(input_address, &quot;\\(&quot;), input_address], 10)
+ [1] &quot;65 E Interstate 26 HWY , Columbus (Township o, NC 28722&quot;   
+ [2] &quot;4496 SYCAMORE GROVE (4300-4799 RD , Chambersburg, PA 17201&quot;
+ [3] &quot;AAA RD , Fort Hood (U.S. Army, TX 76544&quot;                   
+ [4] &quot;2010 Catherine Lake RD , Richlands (Township, NC 28574&quot;    
+ [5] &quot;285 Scott CIR NW , Calhoun (St. Address, GA 30701&quot;         
+ [6] &quot;Highway 411 NE , Calhoun (St. Address, GA 30701&quot;           
+ [7] &quot;2626 HILLTOP CT SW , Littlerock (RR name, WA 98556&quot;        
+ [8] &quot;144 Tyler Ct. , Richland (Township o, PA 15904&quot;            
+ [9] &quot;263 Farmington AVE , Farmington (Health C, CT 06030&quot;       
+[10] &quot;12957 Roberts RD , Hartford (Township o, OH 43013&quot;     
 </code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(input_address, <span class="string">&quot;\\(&quot;</span>), address_type := <span class="string">&apos;a(&apos;</span>]</span><br><span class="line"><span class="comment"># other than the case that ( in beginning, all content from ( to , to be removed.</span></span><br><span class="line">address[str_detect(input_address, <span class="string">&quot;^\\(&quot;</span>), </span><br><span class="line">                        input_address := str_replace(input_address, <span class="string">&quot;^\\(&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br><span class="line">address[str_detect(input_address, <span class="string">&quot;\\(&quot;</span>), </span><br><span class="line">                        input_address := str_replace(input_address, <span class="string">&quot;\\(.*(,)&quot;</span>, <span class="string">&quot;\\1&quot;</span>)]</span><br></pre></td></tr></table></figure>
 <p>Some used ; to add additional information, which will only cause trouble for the Geocoder.</p>
-<pre><code>&gt; sample(address[str_detect(input_address, <span class="string">&quot;;&quot;</span>), input_address], <span class="number">10</span>)
- [<span class="number">1</span>] <span class="string">&quot;1816 MT WASHINGTON AV #1; WHIT , Colorado Springs, CO 80906&quot;</span>
- [<span class="number">2</span>] <span class="string">&quot;3201 E PLATTE AV; WAL-MART STO , Colorado Springs, CO 00000&quot;</span>
- [<span class="number">3</span>] <span class="string">&quot;1511 YUMA ST #2; CONOVER APART , Colorado Springs, CO 80909&quot;</span>
- [<span class="number">4</span>] <span class="string">&quot;3550 AFTERNOON CR; MSGT ROY P , Colorado Springs, CO 80910&quot;</span> 
- [<span class="number">5</span>] <span class="string">&quot;805 S CIRCLE DR #B2; APOLLO PA , Colorado Springs, CO 00000&quot;</span>
- [<span class="number">6</span>] <span class="string">&quot;5590 POWERS CENTER PT; SEVEN E , Colorado Springs, CO 80920&quot;</span>
- [<span class="number">7</span>] <span class="string">&quot;715 CHEYENNE MEADOWS RD; DIAMO , Colorado Springs, CO 80906&quot;</span>
- [<span class="number">8</span>] <span class="string">&quot;3140 VAN TEYLINGEN DR #A; SIER , Colorado Springs, CO 00000&quot;</span>
- [<span class="number">9</span>] <span class="string">&quot;Meadow Rd; rifle clu , Hampden, OO 04444&quot;</span>                   
-[<span class="number">10</span>] <span class="string">&quot;3301 E SKELLY DR;J , TULSA, OK 74105&quot;</span>       
+<pre><code>&gt; sample(address[str_detect(input_address, &quot;;&quot;), input_address], 10)
+ [1] &quot;1816 MT WASHINGTON AV #1; WHIT , Colorado Springs, CO 80906&quot;
+ [2] &quot;3201 E PLATTE AV; WAL-MART STO , Colorado Springs, CO 00000&quot;
+ [3] &quot;1511 YUMA ST #2; CONOVER APART , Colorado Springs, CO 80909&quot;
+ [4] &quot;3550 AFTERNOON CR; MSGT ROY P , Colorado Springs, CO 80910&quot; 
+ [5] &quot;805 S CIRCLE DR #B2; APOLLO PA , Colorado Springs, CO 00000&quot;
+ [6] &quot;5590 POWERS CENTER PT; SEVEN E , Colorado Springs, CO 80920&quot;
+ [7] &quot;715 CHEYENNE MEADOWS RD; DIAMO , Colorado Springs, CO 80906&quot;
+ [8] &quot;3140 VAN TEYLINGEN DR #A; SIER , Colorado Springs, CO 00000&quot;
+ [9] &quot;Meadow Rd; rifle clu , Hampden, OO 04444&quot;                   
+[10] &quot;3301 E SKELLY DR;J , TULSA, OK 74105&quot;       
 </code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(input_address, <span class="string">&quot;;&quot;</span>), address_type := <span class="string">&apos;a;&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;a;&apos;</span>, </span><br><span class="line">        input_address := str_replace(input_address, <span class="string">&quot;;.*?(,)&quot;</span>, <span class="string">&quot;\\1&quot;</span>)]</span><br></pre></td></tr></table></figure>
 <p>Some have *.</p>
-<pre><code>&gt; sample(address[str_detect(address$input_address, <span class="string">&quot;\\*&quot;</span>) &amp; address_type == <span class="string">&apos;a&apos;</span>, input_address], <span class="number">10</span>)
- [<span class="number">1</span>] <span class="string">&quot;TAYLOR ST , *Holyoke, MA 01040&quot;</span>            <span class="string">&quot;NORTHAMPTON ST , *Holyoke, MA 01040&quot;</span>      
- [<span class="number">3</span>] <span class="string">&quot;1*5* W Coral RD , Stanton, MI 48888&quot;</span>       <span class="string">&quot;Cr 727 *26 , angleton, TX 77515&quot;</span>          
- [<span class="number">5</span>] <span class="string">&quot;378 APPLETON ST , *Holyoke, MA 01040&quot;</span>      <span class="string">&quot;0 I195*I895 , ARBUTUS, MD 21227&quot;</span>          
- [<span class="number">7</span>] <span class="string">&quot;1504 NORTHAMPTON ST , *Holyoke, MA 01040&quot;</span>  <span class="string">&quot;50 RIVER TER , *Holyoke, MA 01040&quot;</span>        
- [<span class="number">9</span>] <span class="string">&quot;BOOKER ST * CARVER ST , Palatka, FL 32177&quot;</span> <span class="string">&quot;19 OCONNOR AVE , *HOLYOKE, MA 01040&quot;</span>   
+<pre><code>&gt; sample(address[str_detect(address$input_address, &quot;\\*&quot;) &amp; address_type == &apos;a&apos;, input_address], 10)
+ [1] &quot;TAYLOR ST , *Holyoke, MA 01040&quot;            &quot;NORTHAMPTON ST , *Holyoke, MA 01040&quot;      
+ [3] &quot;1*5* W Coral RD , Stanton, MI 48888&quot;       &quot;Cr 727 *26 , angleton, TX 77515&quot;          
+ [5] &quot;378 APPLETON ST , *Holyoke, MA 01040&quot;      &quot;0 I195*I895 , ARBUTUS, MD 21227&quot;          
+ [7] &quot;1504 NORTHAMPTON ST , *Holyoke, MA 01040&quot;  &quot;50 RIVER TER , *Holyoke, MA 01040&quot;        
+ [9] &quot;BOOKER ST * CARVER ST , Palatka, FL 32177&quot; &quot;19 OCONNOR AVE , *HOLYOKE, MA 01040&quot;   
 </code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(address$input_address, <span class="string">&quot;\\*&quot;</span>) &amp; address_type == <span class="string">&apos;a&apos;</span>, address_type := <span class="string">&apos;a*&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;a*&apos;</span>, input_address := str_replace_all(input_address, <span class="string">&quot;\\*&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
 <p>This looks like came from some program output.</p>
-<pre><code>&gt; <span class="function"><span class="title">head</span><span class="params">(address[str_detect(address_type, <span class="string">&quot;^a&quot;</span>)</span></span> &amp; <span class="function"><span class="title">str_detect</span><span class="params">(input_address, <span class="string">&quot;\\*&quot;</span>)</span></span>, input_address])
-[<span class="number">1</span>] <span class="string">&quot;5280 Bruns RD , **UNDEFINED, CA 00000&quot;</span>         <span class="string">&quot;6500 Lindeman RD , **UNDEFINED, CA 00000&quot;</span>     
-[<span class="number">3</span>] <span class="string">&quot;5280 Bruns RD , **UNDEFINED, CA 00000&quot;</span>         <span class="string">&quot;17501 Sr 4 , **UNDEFINED, CA 00000&quot;</span>           
-[<span class="number">5</span>] <span class="string">&quot;5993 Bethel Island RD , **UNDEFINED, CA 00000&quot;</span> <span class="string">&quot;1 Quail Hill LN , **UNDEFINED, CA 00000&quot;</span>   
+<pre><code>&gt; head(address[str_detect(address_type, &quot;^a&quot;) &amp; str_detect(input_address, &quot;\\*&quot;), input_address])
+[1] &quot;5280 Bruns RD , **UNDEFINED, CA 00000&quot;         &quot;6500 Lindeman RD , **UNDEFINED, CA 00000&quot;     
+[3] &quot;5280 Bruns RD , **UNDEFINED, CA 00000&quot;         &quot;17501 Sr 4 , **UNDEFINED, CA 00000&quot;           
+[5] &quot;5993 Bethel Island RD , **UNDEFINED, CA 00000&quot; &quot;1 Quail Hill LN , **UNDEFINED, CA 00000&quot;   
 </code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(address_type, <span class="string">&quot;^a&quot;</span>) &amp; str_detect(input_address, <span class="string">&quot;\\*&quot;</span>),</span><br><span class="line">        input_address := str_replace(input_address, <span class="string">&quot;\\*\\*UNDEFINED&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
 <p>Almost any special character that OK for human reading still cannot be handled by the Geocoder.</p>
-<pre><code>&gt; sample(address[str_detect(input_address, <span class="string">&quot;^#&quot;</span>), input_address], <span class="number">10</span>)
- [<span class="number">1</span>] <span class="string">&quot;# 6 HIGH , Marks, MS 38646&quot;</span>                          <span class="string">&quot;#560 CR56 , MAPLECREST, NY 12454&quot;</span>                   
- [<span class="number">3</span>] <span class="string">&quot;#250blk Durgintown rd. , Hiram, ME 04041&quot;</span>            <span class="string">&quot;#888 Durgintown Rd. , Hiram, ME 04041&quot;</span>              
- [<span class="number">5</span>] <span class="string">&quot;#15 LITTLE KANAWHA RIVER RD , PARKERSBURG, WV 26101&quot;</span> <span class="string">&quot;# 12 HOLLOW RD , WELLSTON, OH 45692&quot;</span>                
- [<span class="number">7</span>] <span class="string">&quot;#10 I-24 , Paducah, KY 42003&quot;</span>                        <span class="string">&quot;#10.5 mm St RD 264 , Yahtahey, NM 87375&quot;</span>            
- [<span class="number">9</span>] <span class="string">&quot;#1 CANAL RD , SENECA, IL 61360&quot;</span>                      <span class="string">&quot;#08 N Ola DR , Yahtahey, NM 87375&quot;</span> 
+<pre><code>&gt; sample(address[str_detect(input_address, &quot;^#&quot;), input_address], 10)
+ [1] &quot;# 6 HIGH , Marks, MS 38646&quot;                          &quot;#560 CR56 , MAPLECREST, NY 12454&quot;                   
+ [3] &quot;#250blk Durgintown rd. , Hiram, ME 04041&quot;            &quot;#888 Durgintown Rd. , Hiram, ME 04041&quot;              
+ [5] &quot;#15 LITTLE KANAWHA RIVER RD , PARKERSBURG, WV 26101&quot; &quot;# 12 HOLLOW RD , WELLSTON, OH 45692&quot;                
+ [7] &quot;#10 I-24 , Paducah, KY 42003&quot;                        &quot;#10.5 mm St RD 264 , Yahtahey, NM 87375&quot;            
+ [9] &quot;#1 CANAL RD , SENECA, IL 61360&quot;                      &quot;#08 N Ola DR , Yahtahey, NM 87375&quot; 
 </code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(input_address, <span class="string">&quot;^#&quot;</span>), address_type := <span class="string">&apos;a#&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;a#&apos;</span>, input_address := str_replace_all(input_address, <span class="string">&quot;^#&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
 <p>All these steps may look cumbersome. Actually I just check the Geocoding results on one year data raw input, find all the problems and errors, clean them by types. Then I apply same cleaning code to other years because they are very similar, and I got the Geocoding performance doubled! I think this cleaning is well worth the effort.</p>
+<h2 id="version-history"><a href="#Version-History" class="headerlink" title="Version History"></a>Version History</h2><ul>
+<li>2016-02-03 : First version.</li>
+<li>2016-05-11 : Added Summary.</li>
+</ul>
 </span>
       
     </div>
@@ -591,7 +610,7 @@
               
             
             
-              <p class="post-toc-empty">This post does not have a Table Of Contents</p>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#summary"><span class="nav-number">1.</span> <span class="nav-text">Summary</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#clean-addresses-have-much-better-geocoding-performance"><span class="nav-number">3.</span> <span class="nav-text">Clean Addresses Have Much Better Geocoding Performance</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#all-the-format-errors"><span class="nav-number">4.</span> <span class="nav-text">All the format errors</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#version-history"><span class="nav-number">5.</span> <span class="nav-text">Version History</span></a></li></ol></div>
             
           </div>
           <div class="post-toc-indicator-bottom post-toc-indicator">

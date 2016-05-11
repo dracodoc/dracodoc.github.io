@@ -187,15 +187,6 @@
 
     
     
-      
-      
-        
-        
-        
-      
-
-      
-    
 
     
       
@@ -277,8 +268,11 @@
 
       
         
-          <p>I discussed a lot of interesting findings I discovered in NYC Taxi Trip data in <a href="dracodoc.github.io/2016/01/31/data-cleaning/">last post</a>. However it was not clear whether the cleaning added much value to the analysis other than some anomaly records were removed, and you can always check the outliers for any calculation and remove them when appropriate.</p>
-<p>Actually there are some times that the data cleaning can have great benefits. I was <a href="http://dracodoc.github.io/2015/11/17/Geocoding/">geocoding lots of addresses from public data</a> recently, and found cleaning the addresses almost doubled the geocoding performance. This effect is not really mentioned anywhere as far as I know, and I only have a theory about how that is possible.</p>
+          <h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>This is my second post on topic of Data Cleaning. </li>
+<li>Cleaning addresses format turned out to have a substantial positive impact on Geocoding performance.</li>
+<li>Deep understandings of address format standard is needed to deal with all kinds of special cases.</li>
+</ul>
           <div class="post-more-link text-center">
             <a class="btn" href="/2016/02/03/data-cleaning-geocode/" rel="contents">
               Read more &raquo;
@@ -381,8 +375,11 @@
 
       
         
-          <h2 id="Data_Cleaning,_the_unavoidable,_time_consuming,_cumbersome_nontrivial_task">Data Cleaning, the unavoidable, time consuming, cumbersome nontrivial task</h2><p>Data Science may sound fancy, but I saw many posts/blogs of data scientists complaining that much of their time were spending on data cleaning. From my own experience on several learning/volunteer projects, this step do require lots of time and much attention to details. However I often felt the abnormal or wrong data are actually more interesting. There must be some explanations behind the error, and that could be some interesting stories. Every time after I filtered some data with errors, I can have better understanding of the whole picture and estimate of the information content of the data set.</p>
-<h3 id="NYC_Taxi_Trip_Data">NYC Taxi Trip Data</h3><p>One good example is the <a href="http://chriswhong.com/open-data/foil_nyc_taxi/">the NYC Taxi Trip Data</a>. </p>
+          <h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>Data cleaning is a cumbersome but important task for Data Science project in reality.</li>
+<li>This is a discussion on my practice of data cleaning for NYC Taxi Trip data.</li>
+<li>There are lots of domain knowledge, common sense and business thinking involved.</li>
+</ul>
           <div class="post-more-link text-center">
             <a class="btn" href="/2016/01/31/data-cleaning/" rel="contents">
               Read more &raquo;
@@ -497,7 +494,11 @@
 
       
         
-          <h3 id="Introduction">Introduction</h3><p>This is the detailed discussion of my script and workflow for geocoding NFIRS data. See <a href="http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/">background of project</a> and <a href="http://dracodoc.github.io/2015/11/17/Geocoding/">the system setup</a> in my previous posts.<br>
+          <h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>I discussed all the problem I met, approaches I tried, and improvement I achieved in the Geocoding task.</li>
+<li>There are many subtle details, some open questions and areas can be improved.</li>
+<li>The final working script and complete workflow are hosted in <a href="https://github.com/dracodoc/Geocode">github</a>.</li>
+</ul>
           <div class="post-more-link text-center">
             <a class="btn" href="/2015/11/19/Script-workflow/" rel="contents">
               Read more &raquo;
@@ -612,11 +613,10 @@
 
       
         
-          <h3 id="Background">Background</h3><p>I found I want to geocode lots of addresses in my <a href="http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/">Red Cross Smoke Alarm Project</a>. The <a href="https://github.com/brooksandrew/arc_smoke_alarm/wiki/References-and-Data-Sources#public-data-sources">NFIRS data</a> have 18 million addresses in 9 years data, and I would like to </p>
-<ul>
-<li>verify all the addresses because many inputs have quality problems.</li>
-<li>map street address to coordinates, so we can map and do more geospatial analysis.</li>
-<li>map street address to census block, then we can link NFIRS data to other public data like census data of <a href="https://www.census.gov/programs-surveys/acs/">American Community Survey(ACS)</a> and <a href="http://www.census.gov/programs-surveys/ahs.html">American Housing Survey(AHS)</a>).
+          <h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>This post discussed the background, approaches, windows and linux environment setup for my Geocoding task.</li>
+<li>See more details about the script and workflow in next post.</li>
+</ul>
           <div class="post-more-link text-center">
             <a class="btn" href="/2015/11/17/Geocoding/" rel="contents">
               Read more &raquo;
@@ -719,8 +719,16 @@
 
       
         
-          <p><em>This is another my side project on learning Data Science. </em></p>
-<h3 id="Introduction">Introduction</h3><p>In May, 2015 I went to a <a href="http://www.meetup.com/DataKind-DC/events/220650281/">MeetUp</a> organized by <a href="http://www.datakind.org/">DataKind</a>, where Volunteers came from all kinds of background joined together to help non-profit organizations with Data Science. I joined a project <a href="https://hackpad.com/American-Red-Cross-DJuXtxOtqvw#:h=The-Effectiveness-of-Smoke-Ala"><em>The Effectiveness of Smoke Alarm Installs and Home Fire</em></a> for the American Red Cross. <a href="http://www.redcross.org/news/press-release/Red-Cross-Campaign-to-Reduce-Home-Fire-Deaths-and-Injuries-in-US">The Red Cross Smoke Alarm Home Visits</a> is already a <a href="http://nfpatoday.blog.nfpa.org/2015/08/more-than-100000-smoke-alarms-installed-and-15-lives-saved-less-than-one-year-into-red-cross-campaig.html">very successful</a> campaign, but they were looking forward to the power of data and data science to further improve the project.<br>
+          <h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>This is a write-up for my volunteer Data Science project for the American Red Cross.</li>
+<li>The project used public data to help Red Cross directing limited resources to homes that more vulnerable to fire risk and loss.</li>
+<li>My work in the project:<ul>
+<li>Discovered the hidden information in NFIRS dataset, obtained and analyzed 10G NFIRS data.</li>
+<li>Major contribution on model design, implemented NFIRS related predictors.</li>
+<li>Geocoded 18 millions address in NFIRS data with AWS server, Postgresql, PostGIS.</li>
+</ul>
+</li>
+</ul>
           <div class="post-more-link text-center">
             <a class="btn" href="/2015/11/11/Red-Cross-Smoke-Alarm-Project/" rel="contents">
               Read more &raquo;
@@ -823,14 +831,12 @@
 
       
         
-          <p><em>This is one of my side projects of learning on Data Science.</em></p>
-<h2 id="Introduction">Introduction</h2><p>I was looking at local housing market some time ago and found it was difficult to judge how much a house worth or how much it will be sold at. Real State agents could have a very good estimate based on their experience, but it is really an overwhelming problem for first time home buyer or seller.</p>
-<ol>
-<li>There are many aspects about a house that could affect how much it worth to buyer. And every buyer has different preference and priorities about these aspects. </li>
-<li>Only a subset of all possible buyers will see the house listing and consider it seriously. The actual candidate buyer pool is small and very susceptible to random factors like timing and other details.</li>
-<li>The negotiations involve more random events and human decisions.</li>
-</ol>
-<p>Naturally I searched for house price estimation tool on line. The best and most complete one is Zillow.com’s <a href="http://www.zillow.com/zestimate/">Zestimate®</a>. Using huge amount of data for more than 100 million homes and sophisticated algorithms to estimate house sale price.  <a href="http://www.zillow.com/zestimate/#acc">Their performance</a>? Estimation within 20% of sale price in 81.4% of times. Take a $500,000 house as example, that means $100,000 error.</p>
+          <h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>This personal project was inspired by my own experience in housing market. I was wondering what I can achieve with public data and Data Science methods.</li>
+<li>Built upon extensive research of domain knowledge, my model is very simple yet powerful. It used the data with most information, followed the trends in space and time.</li>
+<li>The prediction accuracy is comparable to Zillow Zestimate, although I don’t really think this accuracy number matters too much. The variation  is still too large which is in part due to the nature of house sale/bid process.</li>
+<li>Instead of trying to improve prediction accuracy numbers, I think it is more practical to list more reasonable comparable sales to user.</li>
+</ul>
           <div class="post-more-link text-center">
             <a class="btn" href="/2015/10/23/house-price/" rel="contents">
               Read more &raquo;
@@ -933,12 +939,10 @@
 
       
         
-          <p><em><a href="https://dracodoc.wordpress.com/2015/01/15/a-python-script-inline-timer/">The first version of this article</a> was written on 2015-01-15. It was updated when I moved my blog to github pages.</em></p>
-<h1 id="The_Problem_and_the_simple_timing_script">The Problem and the simple timing script</h1><p>I have been revisiting Python recently and walked through <a href="https://developers.google.com/edu/python/">Google’s tutorial</a>. Interestingly my first solution to one of the exercise <strong><em>word count</em></strong> took a lot of time to analysis a 600K text.</p>
-<p>I wanted some profile tool to locate the bottle neck. There are lots of profiler tools but they seemed to be too “heavy weighted” for my simple purpose. <a href="http://www.huyng.com/posts/python-performance-analysis/">This great Python profiler guide</a> introduced a simple <em>timing context manager</em> script to measure script execution. You will need to</p>
-<blockquote>
-<p>wrap blocks of code that you want to time with Python’s <em>with</em> keyword and this <em>Timer</em> context manager. It will take care of starting the timer when your code block begins execution and stopping the timer when your code block ends.</p>
-</blockquote>
+          <h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>This is a simple python script that can measure python program running time in fine levels. </li>
+<li>It’s simpler than a full profiler, easier to use than other currently available similar scripts.</li>
+</ul>
           <div class="post-more-link text-center">
             <a class="btn" href="/2015/10/20/simple-python-performance-timing-by-checkpoints/" rel="contents">
               Read more &raquo;
