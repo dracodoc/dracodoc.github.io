@@ -1,0 +1,1225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Artificial Learning and Evolution inspired by Nature</title>
+  
+  <link href="http://dracodoc.github.io/atom.xml" rel="self"/>
+  
+  <link href="http://dracodoc.github.io/"/>
+  <updated>2016-08-19T13:55:46.098Z</updated>
+  <id>http://dracodoc.github.io/</id>
+  
+  <author>
+    <name>dracodoc</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning</title>
+    <link href="http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/"/>
+    <id>http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</id>
+    <published>2016-02-03T21:17:59.000Z</published>
+    <updated>2016-08-19T13:55:46.098Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>This is my second post on topic of Data Cleaning. </li>
+<li>Cleaning addresses format turned out to have a substantial positive impact on Geocoding performance.</li>
+<li>Deep understandings of address format standard is needed to deal with all kinds of special cases.</li>
+</ul>
+<a id="more"></a>
+<h2 id="introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>I discussed a lot of interesting findings I discovered in NYC Taxi Trip data in <a href="dracodoc.github.io/2016/01/31/data-cleaning/">last post</a>. However it was not clear whether the cleaning added much value to the analysis other than some anomaly records were removed, and you can always check the outliers for any calculation and remove them when appropriate.</p>
+<p>Actually there are some times that the data cleaning can have great benefits. I was <a href="http://dracodoc.github.io/2015/11/17/Geocoding/">geocoding lots of addresses from public data</a> recently, and found cleaning the addresses almost doubled the geocoding performance. This effect is not really mentioned anywhere as far as I know, and I only have a theory about how that is possible.</p>
+<p>In short, I was feeding address strings to PostGIS Tiger Geocoder extension for geocoding.</p>
+<p><img src="http://dracodoc.github.io/2015/11/19/Script-workflow/NFIRS_data_sample.png" alt="address format"></p>
+<h2 id="clean-addresses-have-much-better-geocoding-performance"><a href="#Clean-Addresses-Have-Much-Better-Geocoding-Performance" class="headerlink" title="Clean Addresses Have Much Better Geocoding Performance"></a>Clean Addresses Have Much Better Geocoding Performance</h2><p>Simple assembling the columns could have lots of dirty inputs which will interfere with the Geocoder parsing. I first did one pass Geocoding on 2010 data, then checked the geocoding results. I filtered many type of dirty inputs that caused problems and cleaned them up. Using the cleaning routine on other years&#x2019; data, the geocoding performance doubled. </p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">NFIRS Data Year</th>
+<th style="text-align:left">Addresses Count</th>
+<th>Time Used</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">2009</td>
+<td style="text-align:left">1,767,797</td>
+<td>6.3 days</td>
+</tr>
+<tr>
+<td style="text-align:left">2010</td>
+<td style="text-align:left">1,829,731</td>
+<td>14.28 days</td>
+</tr>
+<tr>
+<td style="text-align:left">2011</td>
+<td style="text-align:left">1,980,622</td>
+<td>7.06 days</td>
+</tr>
+<tr>
+<td style="text-align:left">2012</td>
+<td style="text-align:left">1,843,434</td>
+<td>6.57 days</td>
+</tr>
+<tr>
+<td style="text-align:left">2013</td>
+<td style="text-align:left">1,753,145</td>
+<td>6.51 days</td>
+</tr>
+</tbody>
+</table>
+<p>I didn&#x2019;t find anybody mentioned this kind of performance gain in my thorough research on Geocoding performance tuning. Somebody suggested to normalize address first, but that didn&#x2019;t help on performance because the Geocoder actually will normalize address input anyway, unless your normalize procedure is vastly better than the built-in normalizer. My theory about this performance gain is as follows:</p>
+<ol>
+<li>Postgresql PostGIS server will try to cache all the data needed for geocoding in RAM. My Geocoding server can hold 1 ~ 2 states&#x2019; data in RAM, so I split the input addresses by states. Every input file are single state only. Ideally the server will not need to read from disk in most of time.</li>
+<li>The problem is there are lots of addresses that have wrong zip code or city. The Geocoder can still process them but it will be much more slower because the Geocoder need to scan in a much broader range. It seemed that it will scan all states even if the state information is correct. I didn&#x2019;t find a way to limit the scan range to a known state, and this was confirmed by the Geocoder author.</li>
+<li>The problematic addresses are scattered in the input file. Every time when the Geocoder meet them, it will scan all states and mess up the perfect cache, which caused lots of performance drop on the good addresses followed.</li>
+<li>With the cleaning procedure in use, the bad address are either removed from input or collected into a special input file, separated from the good addresses. Now the Geocoder can process the good addresses much faster.</li>
+</ol>
+<h2 id="all-the-format-errors"><a href="#All-the-format-errors" class="headerlink" title="All the format errors"></a>All the format errors</h2><p>Here are the cleaning procedures I used. In the end I filtered and cleaned about 14% of data in many types.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># loading data and preparing address string</span></span><br><span class="line">data_year = <span class="string">&apos;2010&apos;</span></span><br><span class="line"><span class="comment"># create year directory, load original address data, change year number here.</span></span><br><span class="line">load(paste0(<span class="string">&apos;data/address/&apos;</span>, data_year, <span class="string">&apos;_formated_addresses.Rdata&apos;</span>)) </span><br><span class="line">setnames(address,<span class="string">&apos;ZIP5&apos;</span>, <span class="string">&apos;zip&apos;</span>)</span><br><span class="line">address[, row_seq := as.numeric(row.names(address))]</span><br><span class="line">setkey(address, zip)</span><br><span class="line">address[, address_type := <span class="string">&apos;a&apos;</span>] <span class="comment"># type 1, 3,4,5 as addresses can be geocoded.</span></span><br><span class="line">address[LOC_TYPE == <span class="string">&apos;2&apos;</span>, address_type := <span class="string">&apos;i&apos;</span>]  <span class="comment"># to be combined with intersections in type 1 as intersections input</span></span><br><span class="line">address[LOC_TYPE %<span class="keyword">in</span>% c(<span class="string">&apos;6&apos;</span>, <span class="string">&apos;7&apos;</span>), address_type := <span class="string">&apos;n&apos;</span>] <span class="comment"># ignore 6,7</span></span><br><span class="line"><span class="comment"># original reference, change input string instead of original fields if possible</span></span><br><span class="line">address[, original_address :=</span><br><span class="line">                    paste0(NUM_MILE,<span class="string">&apos; &apos;</span>, STREET_PRE,<span class="string">&apos; &apos;</span>, STREETNAME,<span class="string">&apos; &apos;</span>, STREETTYPE, </span><br><span class="line">                           <span class="string">&apos; &apos;</span>, STREETSUF, <span class="string">&apos; &apos;</span>,APT_NO, <span class="string">&apos;, &apos;</span>, CITY, <span class="string">&apos;, &apos;</span>, STATE_ID, <span class="string">&apos; &apos;</span>, zip)]  </span><br></pre></td></tr></table></figure>
+<p>There are many manually inputed symbols for NA:</p>
+<pre><code>&gt; head(str_subset(address$original_address, &quot;N/A&quot;))
+[1] &quot;55  Margaret ST  N/A, Monson, MA 01057&quot;         &quot;55  Margaret ST  N/A, Monson, MA 01057&quot;        
+[3] &quot;1657  WORCESTER RD   N/A, FRAMINGHAM, MA 01701&quot; &quot;132  UNION AV   N/A, FRAMINGHAM, MA 01702&quot;     
+[5] &quot;N/A  OAKLAND BEACH AV   , Warwick, RI 02889&quot;    &quot;00601  MERRITT 7 N/A  , NORWALK, CT 06850&quot;  
+
+&gt; head(str_subset(address$original_address, &quot;null&quot;))
+[1] &quot;96  Walworth ST  null, Saratoga Springs, NY 12866&quot; &quot;197 S Broadway   null, Saratoga Springs, NY 12866&quot;
+[3] &quot;640  West Broadway   , Conconully, WA 98819&quot;       &quot;58  W Fork Rd   , Conconully, WA 98819&quot;           
+[5] &quot;  Mineral Hill Rd   , Conconully, WA 98819&quot;        &quot;225  Conconully ST  , OKANOGAN, WA 98840&quot;   
+</code></pre><p>Because &#x2018;NA&#x2019; or &#x2018;na&#x2019; could be a valid part in address string, it&#x2019;s better to clean them before concatenating fields into one address string. </p>
+<pre><code>&gt; head(str_subset(address$original_address, &quot;NA&quot;))
+[1] &quot;7821 W CINNABAR AV  , PEORIA, AZ 00000&quot;      &quot;7818 W PINNACLE PEAK RD  , PEORIA, AZ 00000&quot;
+[3] &quot;8828 W SANNA ST  , PEORIA, AZ 00000&quot;         &quot;8221 W DEANNA DR  , PEORIA, AZ 00000&quot;       
+[5] &quot;2026 W NANCY LN  , PHOENIX, AZ 00000&quot;        &quot;3548 E HELENA DR  , PHOENIX, AZ 00000&quot;  
+</code></pre><p>Once I finished cleaning on fields, I will prepare a cleaner address string and do the further cleaning in that concatenated string. That&#x2019;s why I concatenated all original fields into <code>original_address</code>, which is for reference in case some fields changed in later process.</p>
+<p>Most other cleaning process are better done in the whole string, because some input may go to wrong fields, like street number in street name instead of street number column. With the whole string this kind of error doesn&#x2019;t matter any more.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># remove all kinds of input for NA</span></span><br><span class="line">str_subset(address$original_address, <span class="string">&quot;N/A&quot;</span>)</span><br><span class="line"><span class="keyword">for</span> (j <span class="keyword">in</span> seq_len(ncol(address)))</span><br><span class="line">    set(address,which(is.na(address[[j]]) | </span><br><span class="line">                        (address[[j]] %<span class="keyword">in</span>% c(<span class="string">&apos;N/A&apos;</span>,<span class="string">&apos;n/a&apos;</span>, <span class="string">&apos;NA&apos;</span>,<span class="string">&apos;na&apos;</span>, <span class="string">&apos;NULL&apos;</span>, <span class="string">&apos;null&apos;</span>))),j,<span class="string">&apos;&apos;</span>)  </span><br></pre></td></tr></table></figure>
+<p>Many addresses&#x2019; zip code are wrong. </p>
+<pre><code>&gt; sample(address[!grep(&apos;\\d\\d\\d\\d\\d&apos;, zip), zip], 20)
+ [1] &quot;&quot;     &quot;06&quot;   &quot;&quot;     &quot;&quot;     &quot;625&quot;  &quot;021&quot;  &quot;33&quot;   &quot;021&quot;  &quot;461&quot;  &quot;&quot;     &quot;021&quot;  &quot;2008&quot; &quot;970&quot;  &quot;&quot;     &quot;11&quot;   &quot;021&quot;  &quot;021&quot; 
+[18] &quot;9177&quot; &quot;&quot;     &quot;021&quot; 
+</code></pre><p>The Geocoder can process address without zip code, but it have to be format like &#x2018;00000&#x2019;.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># ---- some zip are invalid ----</span></span><br><span class="line">address[!grep(<span class="string">&apos;\\d\\d\\d\\d\\d&apos;</span>, zip), <span class="string">&apos;:=&apos;</span> (zip = <span class="string">&apos;00000&apos;</span>, address_type = <span class="string">&apos;az&apos;</span>)]     </span><br></pre></td></tr></table></figure>
+<p>After the above 2 steps of direct modifying address fields, I prepared the address string and will process the whole string in all later cleaning.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># ---- prepare address string (ignore apt_no) ---- </span></span><br><span class="line">address[, input_address :=</span><br><span class="line">                    paste0(NUM_MILE,<span class="string">&apos; &apos;</span>, STREET_PRE,<span class="string">&apos; &apos;</span>, STREETNAME,<span class="string">&apos; &apos;</span>, STREETTYPE, </span><br><span class="line">                           <span class="string">&apos; &apos;</span>, STREETSUF, <span class="string">&apos; &apos;</span>, <span class="string">&apos;, &apos;</span>, CITY, <span class="string">&apos;, &apos;</span>, STATE_ID, <span class="string">&apos; &apos;</span>, zip)]  </span><br><span class="line">address[, input_address := str_trim(gsub(<span class="string">&quot;\\s+&quot;</span>,<span class="string">&quot; &quot;</span>,input_address))]</span><br></pre></td></tr></table></figure>
+<p>Some addresses are empty. </p>
+<pre><code>&gt; head(address[STATE_ID == &apos;&apos; &amp; STREETNAME == &apos;&apos;, original_address])
+[1] &quot;     , ,  &quot; &quot;     , ,  &quot; &quot;     , ,  &quot; &quot;     , ,  &quot; &quot;     , ,  &quot; &quot;     , ,  &quot;
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># ---- ignore empty rows, most with empty state and zip ---- </span></span><br><span class="line"><span class="comment"># may came from duplicate records for same event from 2 dept</span></span><br><span class="line">address[STATE_ID == <span class="string">&apos;&apos;</span> &amp; STREETNAME == <span class="string">&apos;&apos;</span>, address_type := <span class="string">&apos;e&apos;</span>] </span><br></pre></td></tr></table></figure>
+<p>There are lots of usage of speical symobls like <code>/</code>, <code>@</code>, <code>&amp;</code>, <code>*</code> in input which will interfere with the Geocoder.</p>
+<pre><code>&gt; sample(address[LOC_TYPE == &apos;1&apos; &amp; str_detect(address$input_address, &quot;[/|@|&amp;]&quot;), input_address], 10)
+ [1] &quot;743 CHENANGO ST , BINGHAMTON/FENTON, NY 13901&quot;             &quot;123/127 tennyson , highland park, MI 48203&quot;               
+ [3] &quot;318 1/2 McMILLEN ST , Johnstown, PA 15902&quot;                 &quot;712 1/2 BURNSIDE DR , GARDEN CITY, KS 67846&quot;              
+ [5] &quot;m/m143 W Interstate 16 , Ellabell, GA 31308&quot;               &quot;12538 Greensbrook Forest DR , Houston / Sheldon, TX 77044&quot;
+ [7] &quot;F/O 1179 CASTLEHILL AVE , New York City, NY 10462&quot;         &quot;509 1/2 N Court , Ottumwa, IA 52501&quot;                      
+ [9] &quot;7945 Larson , Hereford/Palominas, AZ 85615&quot;                &quot;1022 1/2 N Langdon ST , MITCHELL, SD 57301&quot;    
+</code></pre><p>First I remove all the <code>1/2</code> since the Geocoder cannot recognize them, and removing them will not affect the Geocoding result accuracy.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(address$input_address, <span class="string">&quot;1/2&quot;</span>), </span><br><span class="line">        input_address := str_replace_all(input_address, <span class="string">&quot;1/2&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>Some used <code>*</code> to label intersections, which I will use different Geocoding scripts to process later.</p>
+<pre><code>&gt; head(address[str_detect(input_address, &quot;[a-zA-Z]\\*[a-zA-Z]&quot;), input_address])
+[1] &quot;16 MC*COOK PL , East Lyme, CT 06333&quot;             &quot;1236 WAL*MART PLZ , PHILLIPSBURG, NJ 08865&quot;     
+[3] &quot;0 GREENSPRING AV*JFX , BROOKLANDVILLE, MD 21022&quot; &quot;0 BELFAST RD*SHAWAN RD , COCKEYSVILLE, MD 21030&quot;
+[5] &quot;0 SHAWAN RD*WARREN RD , COCKEYSVILLE, MD 21030&quot;  &quot;0 SHAWAN RD*BELFAST RD , COCKEYSVILLE, MD 21030&quot;
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(input_address, <span class="string">&quot;[a-zA-Z]\\*[a-zA-Z]&quot;</span>), address_type := <span class="string">&apos;i_*&apos;</span>]</span><br></pre></td></tr></table></figure>
+<p>Similarly filter other special symbols.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[address_type == <span class="string">&apos;a&apos;</span> &amp; str_detect(address$input_address, <span class="string">&quot;[/|@|&amp;]&quot;</span>),</span><br><span class="line">        address_type := <span class="string">&apos;i_/@&amp;&apos;</span>]</span><br></pre></td></tr></table></figure>
+<p>Many addresses used milepost numbers, which is a miles count along highway. They are not street addresses and cannot be processed by the Geocoder. There are all kinds of usage to record this type of address.</p>
+<pre><code>&gt; head(str_subset(address$input_address, &quot;(?i)milepost&quot;))
+[1] &quot;452.2E NYS Thruway Milepost , Angola, NY 14006&quot; &quot;447.4W NYS Thruway Milepost , Angola, NY 14006&quot;
+[3] &quot;446W NYS Thruway Milepost , Angola, NY 14006&quot;   &quot;447.4 NYS Thruway Milepost , Angola, NY 14006&quot; 
+[5] &quot;444.1W NYS Thruway Milepost , Angola, NY 14006&quot; &quot;I-94 MILEPOST 68 , Eau Claire, WI 54701&quot;       
+
+&gt; head(str_subset(address$input_address, &quot;\\bmile\\b|\\bmiles\\b&quot;))
+[1] &quot;2.5 mile Schillinger RD , T8R3 NBPP, ME 00000&quot;        &quot;cr 103(2 miles west of 717) , breckenridge, TX 00000&quot;
+[3] &quot;Interstate 93 south mile mark , WINDHAM, NH 03087&quot;    &quot;183 lost mile rd. , parsonfield, ME 04047&quot;           
+[5] &quot;168 lost mile RD , w.newfield, ME 04095&quot;              &quot;20 mile stream rd , proctorsville, VT 05153&quot;   
+</code></pre><p>Note it&#x2019;s still possible to have some valid street address with <code>mile</code> as a word in address(my regular expression only check when <code>mile</code> is a whole word, not part of word), but it should be very rare and difficult to separate the valid addresses from the milepost usage. So I&#x2019;ll just ignore all of them.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(paste0(NUM_MILE, STREETNAME), <span class="string">&quot;\\bmile\\b|\\bmiles\\b&quot;</span>), address_type := <span class="string">&apos;m&apos;</span>]</span><br><span class="line">address[str_detect(address$input_address, <span class="string">&quot;(?i)milepost&quot;</span>), address_type := <span class="string">&apos;m&apos;</span>]</span><br></pre></td></tr></table></figure>
+<p>Another special format of address is grid style address. I decided to remove the grid number part and keep the rest of address. The Geocoder will get a rough location for that street or city, which is still helpful for my purpose. The Geocoding match score will separate this kind of rough match from the exact match of street addresses.</p>
+<blockquote>
+<p>Grid-style Complete Address Numbers (Example: &#x201C;N89W16758&#x201D;). In certain communities in and around southern Wisconsin, Complete Address Numbers include a map grid cell reference preceding the Address Number. In the examples above, &#x201C;N89W16758&#x201D; should be read as &#x201C;North 89, West 167, Address Number 58&#x201D;. &#x201C;W63N645&#x201D; should be read as &#x201C;West 63, North, Address Number 645.&#x201D; The north and west values specify a locally-defined map grid cell with which the address is located. Local knowledge is needed to know when the grid reference stops and the Address Number begins.<br>Page 37, <a href="https://www.fgdc.gov/standards/projects/FGDC-standards-projects/street-address/index_html" target="_blank" rel="external">United States Thoroughfare, Landmark, and Postal Address Data Standard</a></p>
+</blockquote>
+<p>Most are WI and MN addresses. Except the <code>E003</code> NY address, I&#x2019;m not sure what does that means. Since the Geocoder cannot handle it either, they can be removed.</p>
+<pre><code>&gt; sample(address[str_detect(address$input_address, &quot;^[NSWEnswe]\\d&quot;), input_address], 10)
+ [1] &quot;W26820 Shelly Lynn DR , Pewaukee, WI 53072&quot;      &quot;E14 GATE , St. Paul, MN 55111&quot;                  
+ [3] &quot;W5336 Fairview ROAD , Monticello, WI 53570&quot;      &quot;W22870 Marjean LA , Pewaukee, WI 53072&quot;         
+ [5] &quot;E003 , New York City, NY 10011&quot;                  &quot;W15085 Appleton AVE , Menomonee Falls, WI 53051&quot;
+ [7] &quot;N7324 Lake Knutson RD , Iola, WI 54945&quot;          &quot;N10729 Hwy 17 S. , Rhinelander, WI 54501&quot;       
+ [9] &quot;N2494 St. Hwy. 162 , La Crosse, WI 54601&quot;        &quot;N2639 Cty Hwy Z , Palmyra, WI 53156&quot;   
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(address$input_address, <span class="string">&quot;^[NSWEnswe]\\d&quot;</span>) &amp; address_type == <span class="string">&apos;a&apos;</span>, </span><br><span class="line">        address_type := <span class="string">&apos;ag&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;ag&apos;</span>, </span><br><span class="line">        input_address := str_replace(input_address, <span class="string">&quot;^[NSWEnswe]\\d\\w*\\s&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>Some addresses have double quotes in it. Paired double quotes can be handled by the csv and Geocoder, but single double quote will cause problem for csv file.</p>
+<pre><code>&gt; sample(address[str_detect(input_address, &apos;&quot;&apos;), input_address], 10)
+ [1] &quot;317 IND \&quot;C\&quot; line at 14th ST , New York City, NY 10011&quot; &quot;750 W \&quot;D\&quot; AVE , Kingman, KS 67068&quot;                    
+ [3] &quot;HWY \&quot;32\&quot; , SHEBOYGAN, WI 53083&quot;                        &quot;22796 \&quot;H\&quot; DR N , Marshall, MI 49068&quot;                  
+ [5] &quot;5745 CR 631 \&quot;C\&quot; ST , Bushnell, FL 33513&quot;               &quot;CTY \&quot;MM\&quot; , HOWARDS GROVE, WI 53083&quot;                   
+ [7] &quot;\&quot;BB\&quot; HWY , West Plains, MO 65775&quot;                      &quot;I-55 (MAIN TO HWY \&quot;M\&quot;) , Imperial, MO 63052&quot;          
+ [9] &quot;3400 Wy\&quot;East RD , Hood River, OR 97031&quot;                 &quot;6555 Hwy \&quot;D\&quot; , parma, MO 63870&quot;    
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># remove single double quote</span></span><br><span class="line">address[str_detect(input_address, <span class="string">&apos;(?m)(^[^&quot;]*)&quot;([^&quot;]*$)&apos;</span>) &amp; </span><br><span class="line">          str_detect(address_type, <span class="string">&quot;^a&quot;</span>), address_type := <span class="string">&apos;aq&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;aq&apos;</span>, </span><br><span class="line">        input_address := str_replace_all(input_address, <span class="string">&apos;(?m)(^[^&quot;]*)&quot;([^&quot;]*$)&apos;</span>, <span class="string">&quot;\\1\\2&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>Some addresses used (), which cause problems for the Geocoder. The stuff inside () can be removed.</p>
+<pre><code>&gt; sample(address[str_detect(address$input_address, &quot;\\(.*\\)&quot;), input_address], 10)
+ [1] &quot;hwy 56 (side of beersheba mt) , beersheba springs, TN 37305&quot;
+ [2] &quot;805 PARKWAY (DOWNTOWN) RD , Gatlinburg, TN 37738&quot;           
+ [3] &quot;3409 JAMESWAY DR SW , Bernalillo (County), NM 87105&quot;        
+ [4] &quot;96 Arroyo Hondo Road , Santa Fe (County), NM 87508&quot;         
+ [5] &quot;3555 Dobbins Bridge RD , Anderson (County), SC 29625&quot;       
+ [6] &quot;KARPER (12100-14999) RD , MERCERSBURG, PA 17236&quot;            
+ [7] &quot;15.5 I-81 (10001-16000) LN N , Chambersburg, PA 17201&quot;      
+ [8] &quot;30 Wintergreen DR , Beaufort (County), SC 29906&quot;            
+ [9] &quot;305 Rosecrest RD , Spartanburg (County), SC 29303&quot;          
+[10] &quot;1678 ROUTE 12 (Gales Ferry) , Gales Ferry, CT 06335&quot;   
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># remove paired ()</span></span><br><span class="line">address[str_detect(address$input_address, <span class="string">&quot;\\(.*\\)&quot;</span>), address_type := <span class="string">&apos;a()&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;a()&apos;</span>, </span><br><span class="line">        input_address := str_replace_all(input_address, <span class="string">&quot;\\(.*\\)&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>After this step, there are still some single ( cases.</p>
+<pre><code>&gt; sample(address[str_detect(input_address, &quot;\\(&quot;), input_address], 10)
+ [1] &quot;65 E Interstate 26 HWY , Columbus (Township o, NC 28722&quot;   
+ [2] &quot;4496 SYCAMORE GROVE (4300-4799 RD , Chambersburg, PA 17201&quot;
+ [3] &quot;AAA RD , Fort Hood (U.S. Army, TX 76544&quot;                   
+ [4] &quot;2010 Catherine Lake RD , Richlands (Township, NC 28574&quot;    
+ [5] &quot;285 Scott CIR NW , Calhoun (St. Address, GA 30701&quot;         
+ [6] &quot;Highway 411 NE , Calhoun (St. Address, GA 30701&quot;           
+ [7] &quot;2626 HILLTOP CT SW , Littlerock (RR name, WA 98556&quot;        
+ [8] &quot;144 Tyler Ct. , Richland (Township o, PA 15904&quot;            
+ [9] &quot;263 Farmington AVE , Farmington (Health C, CT 06030&quot;       
+[10] &quot;12957 Roberts RD , Hartford (Township o, OH 43013&quot;     
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(input_address, <span class="string">&quot;\\(&quot;</span>), address_type := <span class="string">&apos;a(&apos;</span>]</span><br><span class="line"><span class="comment"># other than the case that ( in beginning, all content from ( to , to be removed.</span></span><br><span class="line">address[str_detect(input_address, <span class="string">&quot;^\\(&quot;</span>), </span><br><span class="line">                        input_address := str_replace(input_address, <span class="string">&quot;^\\(&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br><span class="line">address[str_detect(input_address, <span class="string">&quot;\\(&quot;</span>), </span><br><span class="line">                        input_address := str_replace(input_address, <span class="string">&quot;\\(.*(,)&quot;</span>, <span class="string">&quot;\\1&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>Some used ; to add additional information, which will only cause trouble for the Geocoder.</p>
+<pre><code>&gt; sample(address[str_detect(input_address, &quot;;&quot;), input_address], 10)
+ [1] &quot;1816 MT WASHINGTON AV #1; WHIT , Colorado Springs, CO 80906&quot;
+ [2] &quot;3201 E PLATTE AV; WAL-MART STO , Colorado Springs, CO 00000&quot;
+ [3] &quot;1511 YUMA ST #2; CONOVER APART , Colorado Springs, CO 80909&quot;
+ [4] &quot;3550 AFTERNOON CR; MSGT ROY P , Colorado Springs, CO 80910&quot; 
+ [5] &quot;805 S CIRCLE DR #B2; APOLLO PA , Colorado Springs, CO 00000&quot;
+ [6] &quot;5590 POWERS CENTER PT; SEVEN E , Colorado Springs, CO 80920&quot;
+ [7] &quot;715 CHEYENNE MEADOWS RD; DIAMO , Colorado Springs, CO 80906&quot;
+ [8] &quot;3140 VAN TEYLINGEN DR #A; SIER , Colorado Springs, CO 00000&quot;
+ [9] &quot;Meadow Rd; rifle clu , Hampden, OO 04444&quot;                   
+[10] &quot;3301 E SKELLY DR;J , TULSA, OK 74105&quot;       
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(input_address, <span class="string">&quot;;&quot;</span>), address_type := <span class="string">&apos;a;&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;a;&apos;</span>, </span><br><span class="line">        input_address := str_replace(input_address, <span class="string">&quot;;.*?(,)&quot;</span>, <span class="string">&quot;\\1&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>Some have *.</p>
+<pre><code>&gt; sample(address[str_detect(address$input_address, &quot;\\*&quot;) &amp; address_type == &apos;a&apos;, input_address], 10)
+ [1] &quot;TAYLOR ST , *Holyoke, MA 01040&quot;            &quot;NORTHAMPTON ST , *Holyoke, MA 01040&quot;      
+ [3] &quot;1*5* W Coral RD , Stanton, MI 48888&quot;       &quot;Cr 727 *26 , angleton, TX 77515&quot;          
+ [5] &quot;378 APPLETON ST , *Holyoke, MA 01040&quot;      &quot;0 I195*I895 , ARBUTUS, MD 21227&quot;          
+ [7] &quot;1504 NORTHAMPTON ST , *Holyoke, MA 01040&quot;  &quot;50 RIVER TER , *Holyoke, MA 01040&quot;        
+ [9] &quot;BOOKER ST * CARVER ST , Palatka, FL 32177&quot; &quot;19 OCONNOR AVE , *HOLYOKE, MA 01040&quot;   
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(address$input_address, <span class="string">&quot;\\*&quot;</span>) &amp; address_type == <span class="string">&apos;a&apos;</span>, address_type := <span class="string">&apos;a*&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;a*&apos;</span>, input_address := str_replace_all(input_address, <span class="string">&quot;\\*&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>This looks like came from some program output.</p>
+<pre><code>&gt; head(address[str_detect(address_type, &quot;^a&quot;) &amp; str_detect(input_address, &quot;\\*&quot;), input_address])
+[1] &quot;5280 Bruns RD , **UNDEFINED, CA 00000&quot;         &quot;6500 Lindeman RD , **UNDEFINED, CA 00000&quot;     
+[3] &quot;5280 Bruns RD , **UNDEFINED, CA 00000&quot;         &quot;17501 Sr 4 , **UNDEFINED, CA 00000&quot;           
+[5] &quot;5993 Bethel Island RD , **UNDEFINED, CA 00000&quot; &quot;1 Quail Hill LN , **UNDEFINED, CA 00000&quot;   
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(address_type, <span class="string">&quot;^a&quot;</span>) &amp; str_detect(input_address, <span class="string">&quot;\\*&quot;</span>),</span><br><span class="line">        input_address := str_replace(input_address, <span class="string">&quot;\\*\\*UNDEFINED&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>Almost any special character that OK for human reading still cannot be handled by the Geocoder.</p>
+<pre><code>&gt; sample(address[str_detect(input_address, &quot;^#&quot;), input_address], 10)
+ [1] &quot;# 6 HIGH , Marks, MS 38646&quot;                          &quot;#560 CR56 , MAPLECREST, NY 12454&quot;                   
+ [3] &quot;#250blk Durgintown rd. , Hiram, ME 04041&quot;            &quot;#888 Durgintown Rd. , Hiram, ME 04041&quot;              
+ [5] &quot;#15 LITTLE KANAWHA RIVER RD , PARKERSBURG, WV 26101&quot; &quot;# 12 HOLLOW RD , WELLSTON, OH 45692&quot;                
+ [7] &quot;#10 I-24 , Paducah, KY 42003&quot;                        &quot;#10.5 mm St RD 264 , Yahtahey, NM 87375&quot;            
+ [9] &quot;#1 CANAL RD , SENECA, IL 61360&quot;                      &quot;#08 N Ola DR , Yahtahey, NM 87375&quot; 
+</code></pre><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">address[str_detect(input_address, <span class="string">&quot;^#&quot;</span>), address_type := <span class="string">&apos;a#&apos;</span>]</span><br><span class="line">address[address_type == <span class="string">&apos;a#&apos;</span>, input_address := str_replace_all(input_address, <span class="string">&quot;^#&quot;</span>, <span class="string">&quot;&quot;</span>)]</span><br></pre></td></tr></table></figure>
+<p>All these steps may look cumbersome. Actually I just check the Geocoding results on one year data raw input, find all the problems and errors, clean them by types. Then I apply same cleaning code to other years because they are very similar, and I got the Geocoding performance doubled! I think this cleaning is well worth the effort.</p>
+<h2 id="version-history"><a href="#Version-History" class="headerlink" title="Version History"></a>Version History</h2><ul>
+<li>2016-02-03 : First version.</li>
+<li>2016-05-11 : Added Summary.</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;This is my second post on topic of Data Cleaning. &lt;/li&gt;
+&lt;li&gt;Cleaning addresses format turned out to have a substantial positive impact on Geocoding performance.&lt;/li&gt;
+&lt;li&gt;Deep understandings of address format standard is needed to deal with all kinds of special cases.&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
+    
+    
+      <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
+    
+      <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
+    
+      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
+    
+      <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Data Cleaning Part 1 - NYC Taxi Trip Data, Looking For Stories Behind Errors</title>
+    <link href="http://dracodoc.github.io/2016/01/31/data-cleaning/"/>
+    <id>http://dracodoc.github.io/2016/01/31/data-cleaning/</id>
+    <published>2016-02-01T01:27:06.000Z</published>
+    <updated>2016-08-19T13:47:21.585Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>Data cleaning is a cumbersome but important task for Data Science project in reality.</li>
+<li>This is a discussion on my practice of data cleaning for NYC Taxi Trip data.</li>
+<li>There are lots of domain knowledge, common sense and business thinking involved.</li>
+</ul>
+<a id="more"></a>
+<h2 id="data-cleaning-the-unavoidable-time-consuming-cumbersome-nontrivial-task"><a href="#Data-Cleaning-the-unavoidable-time-consuming-cumbersome-nontrivial-task" class="headerlink" title="Data Cleaning, the unavoidable, time consuming, cumbersome nontrivial task"></a>Data Cleaning, the unavoidable, time consuming, cumbersome nontrivial task</h2><p>Data Science may sound fancy, but I saw many posts/blogs of data scientists complaining that much of their time were spending on data cleaning. From my own experience on several learning/volunteer projects, this step do require lots of time and much attention to details. However I often felt the abnormal or wrong data are actually more interesting. There must be some explanations behind the error, and that could be some interesting stories. Every time after I filtered some data with errors, I can have better understanding of the whole picture and estimate of the information content of the data set.</p>
+<h3 id="nyc-taxi-trip-data"><a href="#NYC-Taxi-Trip-Data" class="headerlink" title="NYC Taxi Trip Data"></a>NYC Taxi Trip Data</h3><p>One good example is the <a href="http://chriswhong.com/open-data/foil_nyc_taxi/" target="_blank" rel="external">the NYC Taxi Trip Data</a>. </p>
+<p><em>By the way, <a href="http://toddwschneider.com/posts/analyzing-1-1-billion-nyc-taxi-and-uber-trips-with-a-vengeance/" target="_blank" rel="external">this analysis and exploration</a> is pretty impressive. I think it&#x2019;s partly because the author is NYC native and already have lots of possible pattern ideas in mind. For same reason I like to explore my local area of any national data to gain more understandings from the data. Besides, it turned out that you don&#x2019;t even need a base map layer for the taxi pickup point map when you have enough data points. The pickup points themselves shaped all the streets and roads!</em></p>
+<p>First I prepared and merged the two data file, trip data and trip fare.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">library</span>(data.table)</span><br><span class="line"><span class="keyword">library</span>(stringr)</span><br><span class="line"><span class="keyword">library</span>(lubridate)</span><br><span class="line"><span class="keyword">library</span>(geosphere)</span><br><span class="line"><span class="keyword">library</span>(ggplot2)</span><br><span class="line"><span class="keyword">library</span>(ggmap)</span><br><span class="line"><span class="comment">## ------------------ read and check data ---------------------------------</span></span><br><span class="line">trip.data = fread(<span class="string">&quot;trip_data_3.csv&quot;</span>, sep = <span class="string">&apos;,&apos;</span>, header = <span class="literal">TRUE</span>, showProgress = <span class="literal">TRUE</span>)</span><br><span class="line">trip.fare = fread(<span class="string">&quot;trip_fare_3.csv&quot;</span>, sep = <span class="string">&apos;,&apos;</span>, header = <span class="literal">TRUE</span>, showProgress = <span class="literal">TRUE</span>)</span><br><span class="line">summary(trip.data)</span><br><span class="line">summary(trip.fare)</span><br><span class="line"><span class="comment">## ------------------ column format -----------------------</span></span><br><span class="line"><span class="comment">## all conversion were done on new copy first to make sure it was done right, </span></span><br><span class="line"><span class="comment">## then the original columns were overwrite in place to save memory</span></span><br><span class="line"><span class="comment"># remove leading space in column names from fread</span></span><br><span class="line">setnames(trip.data, str_trim(colnames(trip.data)))</span><br><span class="line">setnames(trip.fare, str_trim(colnames(trip.fare)))</span><br><span class="line"><span class="comment"># convert characters to factor to verify missing values, easier to observe </span></span><br><span class="line">trip.data[, medallion := as.factor(medallion)]</span><br><span class="line">trip.data[, hack_license := as.factor(hack_license)]</span><br><span class="line">trip.data[, vendor_id := as.factor(vendor_id)]</span><br><span class="line">trip.data[, store_and_fwd_flag := as.factor(store_and_fwd_flag)]</span><br><span class="line">trip.fare[, medallion := as.factor(medallion)]</span><br><span class="line">trip.fare[, hack_license := as.factor(hack_license)]</span><br><span class="line">trip.fare[, vendor_id := as.factor(vendor_id)]</span><br><span class="line">trip.fare[, payment_type := as.factor(payment_type)]</span><br><span class="line"><span class="comment"># date time conversion. </span></span><br><span class="line">trip.data[, pickup_datetime := fast_strptime(pickup_datetime,<span class="string">&quot;%Y-%m-%d %H:%M:%S&quot;</span>)]</span><br><span class="line">trip.data[, dropoff_datetime := fast_strptime(dropoff_datetime,<span class="string">&quot;%Y-%m-%d %H:%M:%S&quot;</span>)]</span><br><span class="line">trip.fare[, pickup_datetime := fast_strptime(pickup_datetime,<span class="string">&quot;%Y-%m-%d %H:%M:%S&quot;</span>)]</span><br><span class="line"><span class="comment">## ------------- join two data set by pickup_datetime, medallion, hack_license -------------</span></span><br><span class="line"><span class="comment"># after join by 3 columns, all vendor_id also matches: </span></span><br><span class="line"><span class="comment"># trip.all[vendor_id.x == vendor_id.y, .N] so add vendor_id to key too.</span></span><br><span class="line">setkey(trip.data, pickup_datetime, medallion, hack_license, vendor_id)</span><br><span class="line">setkey(trip.fare, pickup_datetime, medallion, hack_license, vendor_id)</span><br><span class="line"><span class="comment"># we can add transaction number to trip and fare so we can identify missed match more easily</span></span><br><span class="line">trip.data[, trip_no := .I]</span><br><span class="line">trip.fare[, fare_no := .I]</span><br><span class="line">trip.all = merge(trip.data, trip.fare, all = <span class="literal">TRUE</span>, suffixes = c(<span class="string">&quot;.x&quot;</span>, <span class="string">&quot;.y&quot;</span>))</span><br></pre></td></tr></table></figure>
+<p>Then I found many obvious data errors.</p>
+<h4 id="some-columns-have-obvious-wrong-values-like-zero-passenger-count"><a href="#Some-columns-have-obvious-wrong-values-like-zero-passenger-count" class="headerlink" title="Some columns have obvious wrong values, like zero passenger count."></a>Some columns have obvious wrong values, like zero passenger count.</h4><p><img src="zero_passenger.png" alt="zero passenger count"></p>
+<p>Though the other columns look perfectly normal. As long as you are not using passenger count information, I think these rows are still valid.</p>
+<h4 id="another-interesting-phenomenon-is-the-super-short-trip"><a href="#Another-interesting-phenomenon-is-the-super-short-trip" class="headerlink" title="Another interesting phenomenon is the super short trip:"></a>Another interesting phenomenon is the super short trip:</h4><figure class="highlight r"><table><tr><td class="code"><pre><span class="line">short = trip.all[trip_time_in_secs &lt;<span class="number">10</span>][order(total_amount)]  </span><br><span class="line">View(short)</span><br></pre></td></tr></table></figure>
+<p><img src="short_trip.png" alt="short trip"></p>
+<ul>
+<li><p>One possible explanation I can imagine is that maybe some passengers get on taxi then get off immediately, so the time and distance is near zero and they paid the minimal fare of $2.5. Many rows do have zero for pickup or drop off location or almost same location for pick up and drop off.</p>
+</li>
+<li><p>Then how is the longer trip distance possible? Especially when most pick up and drop off coordinates are either zero or same location. Even if the taxi was stuck in traffic so there is no location change and trip distance recorded by the taximeter, the less than 10 seconds trip time still cannot be explained. </p>
+</li>
+</ul>
+<p><img src="long_distance_in_short_time.png" alt="long distance in short time"></p>
+<ul>
+<li>There are also quite some big value trip fares for very short trips. Most of them have pick up and drop off coordinates at zero or at same locations.</li>
+</ul>
+<p><img src="fare_hist.png" alt="fare amount"></p>
+<p><img src="big_fare_in_short_trip.png" alt="big fare in short trip"></p>
+<p>I don&#x2019;t have good explanations for these phenomenon and I don&#x2019;t want to make too many assumptions since I&#x2019;m not really familiar with NYC taxi trips. I guess a NYC local probably can give some insights on them, and we can verify them with data.</p>
+<h4 id="average-driving-speed"><a href="#Average-driving-speed" class="headerlink" title="Average driving speed"></a>Average driving speed</h4><p>We can further verify the trip time/distance combination by checking the average driving speed. The near zero time or distance could cause too much variance in calculated driving speed. Considering the possible input error in time and distance, we can round up the time in seconds to minutes before calculating driving speed.</p>
+<p>First check on the records that have very short time and nontrivial trip distance:</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">distance.conflict = trip.all[trip_time_in_secs &lt; <span class="number">10</span> &amp; trip_distance &gt; <span class="number">0.5</span>][order(trip_distance)]</span><br></pre></td></tr></table></figure>
+<p>If the pick up and drop off coordinates are not empty, we can calculate the great-circle distance between the coordinates. The actual trip distance must be equal or bigger than this distance.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">distance.conflict.with.gps = distance.conflict[pickup_longitude != <span class="number">0</span> &amp; </span><br><span class="line">								pickup_latitude != <span class="number">0</span> &amp; </span><br><span class="line">								dropoff_longitude != <span class="number">0</span> &amp; </span><br><span class="line">								dropoff_latitude != <span class="number">0</span>]</span><br><span class="line">gps.mat = as.matrix(distance.conflict.with.gps[, </span><br><span class="line">		.(pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude)])</span><br><span class="line">distance.conflict.with.gps[, dis.by.gps.meter := distHaversine(gps.mat[, <span class="number">1</span>:<span class="number">2</span>],gps.mat[, <span class="number">3</span>:<span class="number">4</span>])][order(dis.by.gps.meter)]</span><br><span class="line">distance.conflict.with.gps[, dis.by.gps.mile := dis.by.gps.meter * <span class="number">0.000621371</span>]</span><br></pre></td></tr></table></figure>
+<p>If both the great-circle distance and trip distance are nontrivial, it&#x2019;s more likely the less than 10 seconds trip time are wrong.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">wrong.time = distance.conflict.with.gps[dis.by.gps.mile &gt;= <span class="number">0.5</span>]</span><br><span class="line">View(wrong.time[, .(trip_time_in_secs, trip_distance, fare_amount, dis.by.gps.mile)])</span><br></pre></td></tr></table></figure>
+<p><img src="dis_by_gps.png" alt="distance by gps"></p>
+<p>And there must be something wrong if the great-circle distance is much bigger than the trip distance. Note the data here is limited to the short trip time subset, but this type of error can happen in all records.</p>
+<p><img src="more_great_circle_distance.png" alt="more great circle distance"></p>
+<p>Either the taximeter had some errors in reporting trip distance, or the gps coordinates were wrong. Because all the trip time very short, I think it&#x2019;s more likely to be the problem with gps coordinates. And the time and distance measurement should be much simpler and reliable than the gps coordinates measurement.</p>
+<h4 id="gps-coordinates-distribution"><a href="#gps-coordinates-distribution" class="headerlink" title="gps coordinates distribution"></a>gps coordinates distribution</h4><p>We can further check the accuracy of the gps coordinates by matching with NYC boundary. The code below is a simplified method which take center of NYC area then add 100 miles in four directions as the boundary. More sophisticated way is to use a shapefile, but it will be much slower in checking data points. Since the taxi trip actually can have at least one end outside of NYC area, I don&#x2019;t think we need to be too strict on NYC area boundary.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">trip.valid.gps = trip.all[pickup_longitude != <span class="number">0</span> &amp; pickup_latitude != <span class="number">0</span> &amp; </span><br><span class="line">							dropoff_longitude != <span class="number">0</span> &amp; dropoff_latitude != <span class="number">0</span>]</span><br><span class="line">nyc.lat = <span class="number">40.719681</span>  <span class="comment"># picked &quot;center of NYC area&quot; from google map</span></span><br><span class="line">nyc.lon = -<span class="number">74.00536</span></span><br><span class="line">nyc.lat.max = nyc.lat + <span class="number">100</span>/<span class="number">69</span></span><br><span class="line">nyc.lat.min = nyc.lat - <span class="number">100</span>/<span class="number">69</span></span><br><span class="line">nyc.lon.max = nyc.lon + <span class="number">100</span>/<span class="number">52</span></span><br><span class="line">nyc.lon.min = nyc.lon - <span class="number">100</span>/<span class="number">52</span></span><br><span class="line">trip.valid.gps.nyc = trip.valid.gps[nyc.lon.max &gt; pickup_longitude  &amp; pickup_longitude  &gt; nyc.lon.min &amp;</span><br><span class="line">                                nyc.lon.max &gt; dropoff_longitude &amp; dropoff_longitude &gt; nyc.lon.min &amp;</span><br><span class="line">                                nyc.lat.max &gt; pickup_latitude  &amp; pickup_latitude  &gt; nyc.lat.min &amp;</span><br><span class="line">                                nyc.lat.max &gt; dropoff_latitude &amp; dropoff_latitude &gt; nyc.lat.min]</span><br><span class="line">View(trip.valid.gps[!trip.valid.gps.nyc][order(trip_distance)])</span><br><span class="line">mat.nyc = as.matrix(trip.valid.gps.nyc[, .(pickup_longitude, pickup_latitude, dropoff_longitude, dropoff_latitude)])</span><br><span class="line">dis = distHaversine(mat.nyc[, <span class="number">1</span>:<span class="number">2</span>],mat.nyc[, <span class="number">3</span>:<span class="number">4</span>]) / <span class="number">1639.344</span></span><br><span class="line">trip.valid.gps.nyc[, dis.by.gps := dis]</span><br></pre></td></tr></table></figure>
+<p><img src="off_gps_coordinates.png" alt="off gps coordinates"></p>
+<p>I found another verification on gps coordinates when I was checking the trips started from the JFK airport. Note I used two reference points in JFK airport to better filter all the trips that originated from inside the airport and the immediate neighborhood of JFK exit.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment"># the official loc of JFK is too far on east, we choose 2 point to better represent possible pickup areas.</span></span><br><span class="line">jfk.inside = data.frame(lon = -<span class="number">73.783074</span>, lat = <span class="number">40.64561</span>)</span><br><span class="line">jfk.exit = data.frame(lon = -<span class="number">73.798523</span>, lat = <span class="number">40.658439</span>)</span><br><span class="line">jfk.map = get_map(location = unlist(jfk.inside), zoom = <span class="number">13</span>, maptype = <span class="string">&apos;roadmap&apos;</span>)</span><br><span class="line"><span class="comment"># rides from JFK could end at out of NYC, but there are too many obvious wrong gps information in that part of data, we will just use the data that have gps location in NYC area this time. This area is actually rather big, a square area with 200 miles edge.</span></span><br><span class="line">trip.valid.gps.nyc[, dis.jfk.center.meter := distHaversine(mat.nyc[, <span class="number">1</span>:<span class="number">2</span>], jfk.inside)]</span><br><span class="line">trip.valid.gps.nyc[, dis.jfk.exit.meter := distHaversine(mat.nyc[, <span class="number">1</span>:<span class="number">2</span>], jfk.exit)]</span><br><span class="line"><span class="comment"># the actual distance threshold is adjusted by visual checking the map below, so that it includes most rides picked up from JFK, and excludes rides in neighborhood but not from JFK.</span></span><br><span class="line">near.jfk = trip.valid.gps.nyc[dis.jfk.center.meter &lt; <span class="number">2500</span> | dis.jfk.exit.meter &lt; <span class="number">1200</span>]</span><br><span class="line">ggmap(jfk.map) +geom_point(data = rbind(jfk.inside, jfk.exit), aes(x = lon, y = lat)) + geom_point(data = near.jfk, aes(x = pickup_longitude, y = pickup_latitude, colour = <span class="string">&apos;red&apos;</span>))</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><img src="JFK_trip.png" alt="JFK trip"></p>
+<p>Interestingly, there are some pick up points in the airplane runway or the bay. These are obvious errors, actually I think gps coorindates report in big city could have all kinds of error.</p>
+<h4 id="superman-taxi-driver"><a href="#Superman-taxi-driver" class="headerlink" title="Superman taxi driver"></a>Superman taxi driver</h4><p>I also found some interesting records in checking taxi driver revenue.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">trip.march = trip.all[month(dropoff_datetime) == <span class="number">3</span>]</span><br><span class="line">revenue = trip.march[, .(revenue.march = sum(total_amount)), by = hack_license]  </span><br><span class="line">summary(revenue$revenue.march)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Min. 1st Qu.  Median    Mean 3rd Qu.    Max. </span><br><span class="line">   2.6  4955.0  7220.0  6871.0  9032.0 43770.0</span><br></pre></td></tr></table></figure>
+<p>Who are these superman taxi driver that earned significantly more?</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">tail(revenue[order(revenue.march)])</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">                       hack_license revenue.march</span><br><span class="line">1: 3AAB94CA53FE93A64811F65690654649      21437.62</span><br><span class="line">2: 74CC809D28AE726DDB32249C044DA4F8      22113.14</span><br><span class="line">3: F153D0336BF48F93EC3913548164DDBD      22744.56</span><br><span class="line">4: D85749E8852FCC66A990E40605607B2F      23171.50</span><br><span class="line">5: 847349F8845A667D9AC7CDEDD1C873CB      23366.48</span><br><span class="line">6: CFCD208495D565EF66E7DFF9F98764DA      43771.85</span><br></pre></td></tr></table></figure>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">View(trip.all[hack_license == <span class="string">&apos;CFCD208495D565EF66E7DFF9F98764DA&apos;</span>])</span><br></pre></td></tr></table></figure>
+<p><img src="superman_driver.png" alt="superman driver"></p>
+<p>So this driver were using different medallion with same hack license, picked up 1412 rides in March, some rides even started before last end(No.17, 18, 22 etc). The simplest explanation is that these records are not from one single driver.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">rides = trip.march[, .N, by = hack_license]</span><br><span class="line">summary(rides)</span><br><span class="line">tail(rides[order(N)]) </span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">                       hack_license    N</span><br><span class="line">1: 74CC809D28AE726DDB32249C044DA4F8 1514</span><br><span class="line">2: 51C1BE97280A80EBFA8DAD34E1956CF6 1530</span><br><span class="line">3: 5C19018ED8557E5400F191D531411D89 1575</span><br><span class="line">4: 847349F8845A667D9AC7CDEDD1C873CB 1602</span><br><span class="line">5: F49FD0D84449AE7F72F3BC492CD6C754 1638</span><br><span class="line">6: D85749E8852FCC66A990E40605607B2F 1649</span><br></pre></td></tr></table></figure>
+<p>These hack license owner picked up more than 1500 rides in March, that&#x2019;s 50 per day. </p>
+<p>We can further check if there is any time overlap between drop off and next pickup, or if the pick up location was too far from last drop off location, but I think there is no need to do that before I have better theory.</p>
+<h2 id="summary"><a href="#Summary-1" class="headerlink" title="Summary"></a>Summary</h2><p>In this case I didn&#x2019;t dig too much yet because I&#x2019;m not really familiar with NYC taxi, but there are lots of interesting phenomenons already. We can know a lot about the quality of certain data fields from these errors.</p>
+<p>In my other project, data cleaning is not just about digging interesting stories. It actually helped with the data process a lot. See more details in my <a href="http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/">next post</a>.</p>
+<h2 id="version-history"><a href="#Version-History" class="headerlink" title="Version History"></a>Version History</h2><ul>
+<li>2016-01-31 : First version.</li>
+<li>2016-05-11 : Added Summary.</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Data cleaning is a cumbersome but important task for Data Science project in reality.&lt;/li&gt;
+&lt;li&gt;This is a discussion on my practice of data cleaning for NYC Taxi Trip data.&lt;/li&gt;
+&lt;li&gt;There are lots of domain knowledge, common sense and business thinking involved.&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
+    
+    
+      <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
+    
+      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
+    
+      <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
+    
+      <category term="NYC taxi data" scheme="http://dracodoc.github.io/tags/NYC-taxi-data/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder</title>
+    <link href="http://dracodoc.github.io/2015/11/19/Script-workflow/"/>
+    <id>http://dracodoc.github.io/2015/11/19/Script-workflow/</id>
+    <published>2015-11-19T20:05:00.000Z</published>
+    <updated>2016-08-19T13:49:04.331Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>I discussed all the problem I met, approaches I tried, and improvement I achieved in the Geocoding task.</li>
+<li>There are many subtle details, some open questions and areas can be improved.</li>
+<li>The final working script and complete workflow are hosted in <a href="https://github.com/dracodoc/Geocode" target="_blank" rel="external">github</a>.</li>
+</ul>
+<a id="more"></a>
+<h2 id="introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>This is the detailed discussion of my script and workflow for geocoding NFIRS data. See <a href="http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/">background of project</a> and <a href="http://dracodoc.github.io/2015/11/17/Geocoding/">the system setup</a> in my previous posts.</p>
+<p>So I have 18 million addresses like this, how can I geocode them into valid address, coordinates and map to census block?<br><img src="NFIRS_data_sample.png" alt="NFIRS data sample"></p>
+<h2 id="tiger-geocoder-geocode-function"><a href="#Tiger-Geocoder-Geocode-Function" class="headerlink" title="Tiger Geocoder Geocode Function"></a>Tiger Geocoder Geocode Function</h2><p>Tiger Geocoder extension have this <a href="http://postgis.net/docs/Geocode.html" target="_blank" rel="external"><code>geocode</code> function</a> to take in address string then output a set of possible locations and coordinates. A perfect formated accurate address could have an exact match in 61ms, but if there are misspelling or other non-perfect input, it could take much longer time.</p>
+<p>Since geocoding performance varies a lot depending on the case and I have 18 millions address to geocode, I need to take every possible measure to improve the performance and finish the task with less hours. I searched numerous discussions about improving performance and tried most of them.</p>
+<h2 id="preparing-addresses"><a href="#Preparing-Addresses" class="headerlink" title="Preparing Addresses"></a>Preparing Addresses</h2><p>First I need to prepare my address input. Technically NFIRS data have a column of <code>Location Type</code> to separate street addresses, intersections and other type of input. I filtered the addresses with the street address type then further removed many rows that obviously are still intersections.</p>
+<p>NFIRS designed many columns for different part of an address, like street prefix, suffix, apt number etc. I concatenate them into a string formated to meet the <code>geocode</code> function expectation. <strong>A good format with proper comma separation could make the geocode function&#x2019;s work much easier</strong>. One bonus of concatenating the address segments is that some misplaced input columns will be corrected, for example some rows have the street number in street name column.</p>
+<p>There are still numerous input errors, but I didn&#x2019;t plan to clean up too much first. Because I don&#x2019;t know what will cause problems before actually running the geocoding process . It will be probably easier to run one pass for one year&#x2019;s data first, then collect all the formatting errors, clean them up and feed them for second pass. After this round I can use the clean up procedures to process other years&#x2019; data before geocoding.</p>
+<p>Another tip I found about improving geocoding performance is to <strong>process one state at a time, maybe sort the address by zipcode</strong>. Because I want the postgresql server to cache everything needed for geocoding in RAM and avoid disk access as much as possible. With limited RAM it&#x2019;s better to only process similar address at a time. Split huge data file into smaller tasks also make it easier to find problem or deal with exceptions, of course you will need a good batch processing workflow to process more input files.</p>
+<p>Someone also mentioned that to <strong>standardize the address first, remove the invalid addresses</strong> since they take the most time to geocode. However I&#x2019;m not sure how can I verify the valid address without actual geocoding. Some addresses are obviously missing street numbers and cannot have an exact location, but I may still need the ballpark location for my analysis. They may not be able to be mapped to census block, but a census tract mapping could still be helpful. After the first pass on one year&#x2019;s data I will design a much more complete cleaning process, which could make the geocoding function&#x2019;s job a little bit easier.</p>
+<p><a href="http://postgis.net/docs/postgis_installation.html#tiger_pagc_address_standardizing" target="_blank" rel="external">The PostGIS documentation</a> did mention that the built-in address normalizer is not optimal and they have a better pagc address standardizer can be used. I tried to enable it in the linux setup but failed. It seemed that I need to reinstall postgresql since it is not included in the postgresql setup process of the ansible playbook. The newer version PostGIS 2.2.0 released in Oct, 2015 seemed to have <em>&#x201C;New high-speed native code address standardizer&#x201D;</em>, while the ansible playbook used <code>PostgreSQL 9.3.10</code> and <code>PostGIS 2.1.2 r12389</code>.  This is a direction I&#x2019;ll explore later.</p>
+<h2 id="test-geocoding-function"><a href="#Test-Geocoding-Function" class="headerlink" title="Test Geocoding Function"></a>Test Geocoding Function</h2><p>Based on the example given in <code>geocode</code> function documentation, I wrote my version of SQL command to geocode address like this:</p>
+<pre><code>SELECT g.rating,
+        pprint_addy(g.addy),
+        ST_X(g.geomout)::numeric(8,5) AS lon,
+        ST_Y(g.geomout)::numeric(8,5) AS lat,
+        g.geomout
+FROM geocode(&apos;2198 Florida Ave NW, Washington, DC 20008&apos;, 1) AS g;
+</code></pre><ul>
+<li>the <code>1</code> parameter in geocode function limit the output to single address with best rating, since we don&#x2019;t have any other method to compare all the output.</li>
+<li>rating is needed because I need to know the match score for result. 0 is for perfect match, and 100 is for very rough match which I probably will not use.</li>
+<li><code>pprint_addy</code> give a pretty print of address in format that people familiar.</li>
+<li><code>geomout</code> is the point geometry of the match. I want to save this because it is a more precise representation and I may need it for census block mapping.</li>
+<li><code>lon</code> and <code>lat</code> are the coordinates round up to 5 digits after dot. The 6th digit will be in range of 1 m. Since most street address locations are interpolated and can be off a lot, there is no point to keep more digits.</li>
+</ul>
+<p>The next step is to make it work for many rows instead of just single input. I formated the addresses in R and wrote to csv file with this format:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">row_seq</th>
+<th style="text-align:left">input_address</th>
+<th style="text-align:center">zip</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">42203</td>
+<td style="text-align:left">7365 RACE RD , HARMENS, MD 00000</td>
+<td style="text-align:center">00000</td>
+</tr>
+<tr>
+<td style="text-align:left">53948</td>
+<td style="text-align:left">37 Parking Ramp , Washington, DC 20001</td>
+<td style="text-align:center">20001</td>
+</tr>
+<tr>
+<td style="text-align:left">229</td>
+<td style="text-align:left">1315 5TH ST NW , WASHINGTON, DC 20001</td>
+<td style="text-align:center">20001</td>
+</tr>
+<tr>
+<td style="text-align:left">688</td>
+<td style="text-align:left">1014 11TH ST NE , WASHINGTON, DC 20001</td>
+<td style="text-align:center">20001</td>
+</tr>
+<tr>
+<td style="text-align:left">2599</td>
+<td style="text-align:left">100 RANDOLPH PL NW , WASHINGTON, DC 20001</td>
+<td style="text-align:center">20001</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>row_seq</code> is the unique id I assigned to every row so I can link the output back to the original table. <code>zip</code> is needed because I want to sort the addresses by zipcode. Another bonus is that addresses with obvious wrong zipcode will be shown together in beginning or ending of the file. I used the pipe symbol <code>|</code> as the separator of csv because there could be quotes and commas in columns.</p>
+<p>Then I can read the csv into a table in postgresql database. The <code>geocode</code> function documentation provided an example to geocode addresses in batch mode, and most discussions in web seemed to be based on this example.</p>
+<pre><code>-- only update the first 3 addresses (323-704 ms
+-- there are caching and shared memory effects so first geocode you do is always slower)
+-- for large numbers of addresses you don&apos;t want to update all at once
+-- since the whole geocode must commit at once
+-- For this example we rejoin with LEFT JOIN
+-- and set to rating to -1 rating if no match
+-- to ensure we don&apos;t regeocode a bad address
+UPDATE addresses_to_geocode
+  SET ( rating, new_address, lon, lat)
+    = ( COALESCE((g.geo).rating,-1), pprint_addy((g.geo).addy),
+       ST_X((g.geo).geomout)::numeric(8,5), ST_Y((g.geo).geomout)::numeric(8,5) )
+FROM (SELECT addid
+        FROM addresses_to_geocode
+        WHERE rating IS NULL ORDER BY addid LIMIT 3) AS a
+    LEFT JOIN (SELECT addid, (geocode(address,1)) AS geo
+                FROM addresses_to_geocode AS ag
+                WHERE ag.rating IS NULL ORDER BY addid LIMIT 3) AS g ON a.addid = g.addid
+WHERE a.addid = addresses_to_geocode.addid;
+</code></pre><p>Since the geocoding process can be slow, it&#x2019;s suggested to process a small portion at a time. The address table was assigned an <code>addid</code> for each row as a index. The code always take <em>the first 3 rows not yet processed (rating column is null)</em> as the <em>sample</em> <code>a</code> to be geocoded.</p>
+<pre><code>SELECT addid
+    FROM addresses_to_geocode
+    WHERE rating IS NULL ORDER BY addid LIMIT 3) AS a
+</code></pre><p><img src="table1.png" alt="table 1"><br>The <em>result of geocoding</em> <code>g</code> is joined with the <code>addid</code> of the <em>sample</em> <code>a</code>.</p>
+<pre><code>LEFT JOIN (SELECT addid, (geocode(address,1)) AS geo
+            FROM addresses_to_geocode AS ag
+            WHERE ag.rating IS NULL ORDER BY addid LIMIT 3
+          ) AS g ON a.addid = g.addid
+</code></pre><p><img src="table2.png" alt="table 2"></p>
+<p>Then the <code>address table</code> was joined with <em>that joined table a-g</em> by <code>addid</code> and corresponding columns were updated. </p>
+<pre><code>UPDATE addresses_to_geocode
+  SET ( rating, new_address, lon, lat)
+    = ( COALESCE((g.geo).rating,-1), pprint_addy((g.geo).addy),
+       ST_X((g.geo).geomout)::numeric(8,5), ST_Y((g.geo).geomout)::numeric(8,5) )
+FROM 
+...
+WHERE a.addid = addresses_to_geocode.addid;
+</code></pre><p>The initial value of rating column is <code>NULL</code>. Valid geocoding match have a rating number range from 0 to around 100. Some input don&#x2019;t have valid <code>geocode</code> function return value, which make the rating column to be <code>NULL</code>. Then it was replaced with <code>-1</code> by the <code>COALESCE</code> function to be separated with the unprocessed rows, so that the next run can skip them. </p>
+<p>The join of <code>a</code> and <code>g</code> may seem redundant at first since <code>g</code> already included the <code>addid</code> column. However when some rows has no match and no value is returned by <code>geocode</code> function, <code>g</code> will only have rows with return values.<br><img src="table3.png" alt="table 3"><br>Joining <code>g</code> with address table will only update these rows by <code>addid</code>. <code>COALESCE</code> function will not take any effect since the empty row <code>addid</code> were not even included. Then the next run will select them again because they still satisfied the sample selection condition, which will mess up the control logic.</p>
+<p>Instead joining <code>a</code> and <code>g</code> will have all <code>addid</code> in sample, and the no match rows have <code>NULL</code> in rating column.<br><img src="table4.png" alt="table 4"><br>The next joining with address table will have the rating column updated correctly by <code>COALESCE</code> function.<br><img src="table5.png" alt="table 5"></p>
+<p>This programming pattern is new for me. I think it&#x2019;s because SQL don&#x2019;t have the fine grade control of the regular procedure languages, but we still need more control some times so we have this.</p>
+<h2 id="problem-with-ill-formated-address"><a href="#Problem-With-Ill-Formated-Address" class="headerlink" title="Problem With Ill Formated Address"></a>Problem With Ill Formated Address</h2><p>In my experiment with test data I found the example code above often had serious performance problems. It was very similar to another problem I observed: if I run this line with different table sizes, it should have similar performance since it is supposed to only process the first 3 rows.</p>
+<pre><code>SELECT geocode(address_string,1) 
+    FROM address_sample LIMIT 3;
+</code></pre><p>Actually it took much, much longer on a larger table. It seemed that it was geocoding the whole table first, then only return the first 3 rows. If I subset the table more explicitly this problem disappeared:</p>
+<pre><code>SELECT geocode(sample.address_string, 1) 
+    FROM (SELECT address_string 
+            FROM address_sample LIMIT 3
+         ) as sample;
+</code></pre><p>I modified the example code similarly. Instead of using <code>LIMIT</code> directly in the <code>WHERE</code> clause, </p>
+<pre><code>SELECT addid, (geocode(address,1)) AS geo
+    FROM addresses_to_geocode AS ag
+    WHERE ag.rating IS NULL ORDER BY addid LIMIT 3
+</code></pre><p>I explicitly select the sample rows then put it in the <code>FROM</code> clause, problem solved.</p>
+<pre><code>SELECT sample.addid, geocode(sample.input_address,1) AS geo
+    FROM (SELECT addid, input_address
+            FROM address_table WHERE rating IS NULL
+            ORDER BY addid LIMIT sample_size
+         ) AS sample
+</code></pre><p>Later I found this problem only occurs when the first row of table have invalid address for which the geocode function have no return value. These are the <code>explain analysis</code> results from pgAdmin SQL query tool:</p>
+<p>The example code runs on 100 row table on first time, with first row address invalid. The first step of <code>Seq Scan</code> take 284 s (this was on my home pc server running on regular hard drive with all states data, so the performance was bad) to return 99 rows of geocoding result(one row has no match).</p>
+<p><img src="1_explain_scan_v1.png" alt="1. example code returned 99 rows in seq scan "></p>
+<p><img src="2_explain_limit_v1.png" alt="2. example code limited results to 3 rows later"></p>
+<p>While my modified version only processed 3 rows in first step.<br><img src="3_explain_scan_v2.png" alt="3. modified version geocoded 3 rows only"></p>
+<p>After the first row has been processed and marked with <code>-1</code> in rating, the example code no longer have the problem<br><img src="4_explain_scan_v1_2nd_run.png" alt="4. example code no longer have problem with valid inputs"></p>
+<p>If I move the problematic row to the second row, there was no problem either. It seemed that the postgresql planner had some trouble only when the first row didn&#x2019;t have valid return value. The <code>geocode</code> function authors didn&#x2019;t find this bug probably because this is a special case, but it&#x2019;s very common in my data. Because I sorted the addresses by zipcode, many ill formated addresses with invalid zipcode always appear in the beginning of the file.</p>
+<h2 id="making-a-full-script"><a href="#Making-A-full-Script" class="headerlink" title="Making A full Script"></a>Making A full Script</h2><p>To have a better control of the whole process, I need some <a href="http://www.postgresql.org/docs/current/static/plpgsql-control-structures.html" target="_blank" rel="external">control structures</a> from PL/pgSQL - sql procedural Language.</p>
+<p>First I make the geocoding code as a <code>geocode_sample</code> function with the sample size for each run as parameter.</p>
+<pre><code>CREATE OR REPLACE FUNCTION geocode_sample(sample_size integer) 
+    RETURNS void AS $$
+BEGIN
+...
+END;
+$$ LANGUAGE plpgsql;
+</code></pre><p><code>Create or replace</code> make debugging and making changes easier because new version will replace existing version.</p>
+<p>Then this main control function <code>geocode_table</code> will calculate the number of rows for whole table, decide how many sample runs it needed to update the whole table, then run the <code>geocode_sample</code> function in a loop with that number. I don&#x2019;t want to use a conditional loop because if there is something wrong, the code could stuck at some point and have a endless loop. I&#x2019;d rather just run the code with calculated times then check the table to make sure all rows are processed correctly.</p>
+<pre><code>DROP FUNCTION IF EXISTS geocode_table();
+CREATE OR REPLACE FUNCTION geocode_table(
+    OUT table_size integer,
+    OUT remaining_rows integer) AS $func$
+DECLARE sample_size integer;
+BEGIN
+    SELECT reltuples::bigint INTO table_size
+                    FROM  pg_class
+                    WHERE oid = &apos;public.address_table&apos;::regclass;
+    sample_size := 1;
+    FOR i IN 1..(SELECT table_size / sample_size + 1) LOOP
+        PERFORM geocode_sample(sample_size);
+    END LOOP;
+    SELECT count(*) INTO remaining_rows 
+        FROM address_table WHERE rating IS NULL;
+END
+$func$ LANGUAGE plpgsql;
+</code></pre><ol>
+<li>I used <code>drop function if exists</code> here because the <code>Create or replace</code> doesn&#x2019;t work if the function return type was changed.</li>
+<li>It&#x2019;s widely acknowledged that calculating row count for a table by <code>count(*)</code> is not optimal. The method I used should be much quicker if the table statistics is up to date. I used to put a line of <code>VACUUM ANALYZE</code> after the table was constructed and csv data was imported, but in every run it reported that no update was needed. It probably because the default postgresql settings made sure the information is up to date right for my case.</li>
+<li>In the end I counted the rows not processed yet. The total row number and the remaining row number will be the return value of this function.</li>
+</ol>
+<p>The whole PL/pgSQL script is structured like this (<em>actual details inside functions are omitted to have a clear view of whole picture. See complete scripts and everything else in <a href="https://github.com/dracodoc/Geocode" target="_blank" rel="external">my github repo</a></em>):</p>
+<pre><code>DROP TABLE IF EXISTS address_table;
+CREATE TABLE address_table(
+    row_seq varchar(255),
+    input_address varchar(255),
+    zip varchar(255) 
+);
+-- aws version.
+COPY address_table FROM :input_file WITH DELIMITER &apos;|&apos; NULL &apos;NA&apos; CSV HEADER;
+-- pc version.
+-- COPY address_table FROM &apos;e:\\Data\\1.csv&apos; WITH DELIMITER &apos;,&apos; NULL &apos;NA&apos; CSV HEADER;
+
+ALTER TABLE address_table
+    ADD addid serial NOT NULL PRIMARY KEY,
+    ADD rating integer, 
+    ADD lon numeric,
+    ADD lat numeric,
+    ADD output_address text,
+    ADD geomout geometry,  -- a point geometry in NAD 83 long lat.
+
+--&lt;&lt; geocode function --
+CREATE OR REPLACE FUNCTION geocode_sample(sample_size integer) 
+    RETURNS void AS $$
+...
+END;
+$$ LANGUAGE plpgsql;
+-- geocode function &gt;&gt;--
+
+--&lt;&lt; main control --
+DROP FUNCTION IF EXISTS geocode_table();
+CREATE OR REPLACE FUNCTION geocode_table(
+    OUT table_size integer,
+    OUT remaining_rows integer) AS $func$
+...
+END
+$func$ LANGUAGE plpgsql;
+-- main control &gt;&gt;--
+
+SELECT * FROM geocode_table();
+</code></pre><ol>
+<li>First I dropped the address table if previously exists, created the table with columns in characters type because I don&#x2019;t want the leading zero in zipcode lost in converting to integer.</li>
+<li>I have two version of importing csv into table, one for testing in windows pc, another one for AWS linux instance. The SQL <code>copy</code> command need the postgresql server user to have permission for the input file, so you need to make sure the folder permission is correct. The linux version used a parameter for input file path.</li>
+<li>Then the necessary columns were added to table and the index was built.</li>
+<li>The last line run the main control function and print the return value of it in the end, which is the total row number and remaining row number of input table.</li>
+</ol>
+<h2 id="intersection-address"><a href="#Intersection-address" class="headerlink" title="Intersection address"></a>Intersection address</h2><p>Another type of input is intersections. Tiger Geocoder have a function <a href="http://postgis.net/docs/Geocode_Intersection.html" target="_blank" rel="external"><code>Geocode_Intersection</code></a> work like this:</p>
+<pre><code>SELECT pprint_addy(addy), st_astext(geomout), rating
+    FROM geocode_intersection( &apos;Haverford St&apos;,&apos;Germania St&apos;, &apos;MA&apos;, &apos;Boston&apos;, &apos;02130&apos;,1);
+</code></pre><p>It take two street names, state, city and zipcode then output multiple location candidates with ratings. The script of geocoding street addresses only need some minor changes on input table column format and function parameters to work on intersections. I&#x2019;ll just post the finished whole script for reference after all discussions.</p>
+<h2 id="map-to-census-block"><a href="#Map-to-Census-Block" class="headerlink" title="Map to Census Block"></a>Map to Census Block</h2><p>One important goal of my project is to map addresses to census block, then we can link the NFIRS data with other public data and produce much more powerful analysis, especially the <a href="http://www.census.gov/programs-surveys/ahs.html" target="_blank" rel="external">American Housing Survey(AHS)</a> and the <a href="https://www.census.gov/programs-surveys/acs/" target="_blank" rel="external">American Community Survey(ACS)</a>.</p>
+<p>There is a <a href="http://postgis.net/docs/Get_Tract.html" target="_blank" rel="external"><code>Get_Tract</code> function</a> in Tiger Geocoder which return the <em>census tract</em> id for a location. For <em>census block</em> mapping people seemed to be just using <a href="http://postgis.org/docs/ST_Contains.html" target="_blank" rel="external">ST_Contains</a> like <a href="http://gis.stackexchange.com/questions/137870/finding-census-block-for-given-address-using-tiger-geocoder" target="_blank" rel="external">this answer</a> in stackexchange:</p>
+<pre><code>SELECT tabblock_id AS Block,
+    substring(tabblock_id FROM 1 FOR 11) AS Blockgroup,
+    substring(tabblock_id FROM 1 FOR 9) AS Tract,
+    substring(tabblock_id FROM 1 FOR 5) AS County,
+    substring(tabblock_id FROM 1 FOR 2) AS STATE
+FROM tabblock
+WHERE ST_Contains(the_geom, ST_SetSRID(ST_Point(-71.101375, 42.31376), 4269))
+</code></pre><p>The national data loaded by Tiger Geocoder have a table <code>tabblock</code> which have the information of census blocks. <code>ST_Contains</code> will test the spatial relationship between two geometries, in our case it will be whether polygon or multi polygon of census block contains the point of interest. The <code>Where</code> clause select the only record that satisfy this condition for the point.</p>
+<p>The census block id is a 15 digits code constructed from state and county fips code, census tract id, blockgroup id and the census block number. The code example above actually are not ideal for me since it included all the prefix in each column. My code will work on the results from the geocoding script above:</p>
+<pre><code>UPDATE address_table
+    SET (tabblock_id, STATE, county, tractid)
+      = (COALESCE(ab.tabblock_id,&apos;FFFF&apos;),
+         substring(ab.tabblock_id FROM 1 FOR 2),
+         substring(ab.tabblock_id FROM 3 FOR 3),
+         substring(ab.tabblock_id FROM 1 FOR 11)
+        )
+FROM
+    (SELECT addid
+        FROM address_table
+        WHERE (geomout IS NOT NULL) AND (tabblock_id IS NULL)
+        ORDER BY addid LIMIT block_sample_size) AS a
+    LEFT JOIN (SELECT a.addid, b.tabblock_id
+                FROM address_table AS a, tabblock AS b
+                WHERE (geomout IS NOT NULL) AND (a.tabblock_id IS NULL)
+                    AND ST_Contains(b.the_geom, ST_SetSRID(ST_Point(a.lon, a.lat), 4269))
+                ORDER BY addid LIMIT block_sample_size) AS ab ON a.addid = ab.addid
+WHERE a.addid = address_table.addid;
+</code></pre><ul>
+<li>I didn&#x2019;t include the state fips as prefix in county fips since strictly speaking county fips is 3 digits, although you always need to use it with state fips together. I included the census tract because some location may have ambiguity but the census tract most likely will be same.</li>
+<li>This code is based on same principle of the geocoding code with a little bit change:<ul>
+<li>It need to work on top of geocoding results, so the sample for each run are the rows that have been geocoded (thus geomout column is not <code>NULL</code>), but not yet mapped to census block (<code>tabblock_id</code> is <code>NULL</code>), and sorted by <code>addid</code>, limited by sample size.</li>
+<li>Similar to geocode code, I need to join the sample <code>addid</code> with lookup result to make sure even the rows without return value are included in result. Then the <code>NULL</code> rating value of those rows will be replaced with an special value to mark the row as processed already but without match. This step is critical for the updating process to work properly.</li>
+</ul>
+</li>
+</ul>
+<p>In theory this mapping is much easier than geocoding since there is not much ambiguity. And every address should belong to some census block. Actually I found <a href="http://gis.stackexchange.com/questions/170217/find-census-block-for-street-intersection-with-tiger-geocoder" target="_blank" rel="external">many street intersections don&#x2019;t have matches</a>. I tested the same address in <a href="http://geocoding.geo.census.gov/geocoder/" target="_blank" rel="external">the offcial Census website</a> and it find the match! </p>
+<p>Here is the example data I used, the <code>geocode_intersection</code> function returned a street address and coordinates from two streets:</p>
+<pre><code>row_seq        | 2716
+street_1       |  FLORIDA AVE NW
+street_2       | MASSACHUSETTS AVE NW
+state          | DC
+city           | WASHINGTON
+zip            | 20008
+addid          | 21
+rating         | 3
+lon            | -77.04879
+lat            | 38.91150
+output_address | 2198 Florida Ave NW, Washington, DC 20008
+</code></pre><p>I used different test methods and found interesting results:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">input</th>
+<th style="text-align:left">method</th>
+<th style="text-align:left">result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">2 streets</td>
+<td style="text-align:left">geocode_intersection</td>
+<td style="text-align:left">(-77.04879, 38.91150)</td>
+</tr>
+<tr>
+<td style="text-align:left">geocode_intersection output address</td>
+<td style="text-align:left">geocode</td>
+<td style="text-align:left">(-77.04871, 38.91144)</td>
+</tr>
+<tr>
+<td style="text-align:left">geocode_intersection output address</td>
+<td style="text-align:left">Census website</td>
+<td style="text-align:left">(-77.048775,38.91151) GEOID: 110010055001010</td>
+</tr>
+<tr>
+<td style="text-align:left">geocode_intersection coordinates, 5 digits</td>
+<td style="text-align:left">Census website</td>
+<td style="text-align:left">census block GEOID: 110010041003022</td>
+</tr>
+<tr>
+<td style="text-align:left">geocode_intersection coordinates, 5 digits</td>
+<td style="text-align:left">Tiger Geocoder</td>
+<td style="text-align:left">census block GEOID: 110010041003022</td>
+</tr>
+<tr>
+<td style="text-align:left">geocode_intersection coordinates, 6 digits</td>
+<td style="text-align:left">Tiger Geocoder</td>
+<td style="text-align:left">census block: no match</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>If I feed the street address output from <code>geocode_intersection</code> back to <code>geocode</code> function, the coordinates output will have slight difference with the coordinates output from <code>geocode_intersection</code>. My theory is that <code>geocode_intersection</code> function first calculate the intersection point from the geometry information of two streets, then reverse geocode that coordinates into street address. The street number is usually interpolated so if you geocode that street address back to coordinates there could be difference. <strong>Update</strong>: <a href="http://gis.stackexchange.com/a/115666" target="_blank" rel="external">Some interesting background information about the street address locations and ranges</a>.</li>
+<li>The slight difference may result in different census block output, probably because these locations are on street intersections which are more than likely to be boundary of census blocks.</li>
+<li>Using the geometry or the coordinates output (6 digits after dot) from <code>geocode_intersection</code> for <code>ST_Contains</code> could have empty result, i.e. no census block have contain relationship of these points. I&#x2019;m not sure the reason of this, only observed that using coordinates with 5 digits after dot will find a match in most time. This is an open question need to consulting with the experts on this.</li>
+</ul>
+<h2 id="work-in-batch"><a href="#Work-In-Batch" class="headerlink" title="Work In Batch"></a>Work In Batch</h2><p>I was planning to geocode addresses by states to improve the performance, so I&#x2019;ll need to process lots of files. After some experimentations, I developed a batch workflow:</p>
+<ol>
+<li><p>The script discussed above can take a csv input, geocode addresses, map census block, update the table. I used this psql command line to execute the script. Note I have a .pgpass file in my user folder so I don&#x2019;t need to write database password in the command line, and I saved a copy of the console messages to log file. </p>
+<pre><code>psql -d census -U postgres -h localhost -w -v input_file=&quot;&apos;/home/ubuntu/geocode/address_input/address_sample.csv&apos;&quot; -f geocode_batch.sql 2&gt;&amp;1 | tee address.log
+</code></pre></li>
+<li><p>I need to save the result table to csv. The <code>Copy</code> in SQL require the postgresql user to have permission for output file, so I used the psql meta command <code>\Copy</code> instead. It can be written inside the PL/pgSQL script but I cannot make it to use parameter as output file name. So I have to write another psql command line:</p>
+<pre><code>psql -d census -U postgres -h localhost -w -c &apos;\copy address_table to /home/ubuntu/geocode/address_output/1.csv csv header&apos;
+</code></pre></li>
+<li><p>The above two lines will take care of one input file. If I put all input files into one folder, I can generate a shell script to process each input file with above command line. At first I tried to use shell script directly to read file names and loop with them, but it became very cumbersome and error prone because I want to generate <em>output file</em> name dynamically from <em>input file</em> names then transfer them as psql command line parameters. I ended up with a simple python script to generate the shell script I wanted. </p>
+<p> Before running the shell script I need to change the permission:</p>
+<pre><code>chmod +x ./batch.sh
+sh ./batch.sh  
+</code></pre></li>
+</ol>
+<h2 id="exception-handling-and-progress-report"><a href="#Exception-Handling-And-Progress-Report" class="headerlink" title="Exception Handling And Progress Report"></a>Exception Handling And Progress Report</h2><p>The NFIRS data have many ill formated addresses that could cause problem for <code>geocode</code> function. I decided that it&#x2019;s better to process one year&#x2019;s data first, then collect all the problem cases and design a cleaning procedure before processing other years&#x2019; data. </p>
+<p>This means the workflow should be able to skip on errors and mark the problems. The script above can handle the cases when there is no match returned from the <code>geocode</code> function, but any exception occurred in runtime will interrupt the script. Since the <code>geocode_sample</code> is called in a loop inside the main control function, the whole script is one single transaction. Once the transaction is interrupted, it will be rolled back and all the previous geocoding results are lost. See <a href="http://www.postgresql.org/docs/current/static/plpgsql-structure.html" target="_blank" rel="external">more about this</a>. </p>
+<p>However, <a href="http://www.postgresql.org/docs/current/static/plpgsql-control-structures.html#PLPGSQL-ERROR-TRAPPING" target="_blank" rel="external">adding an EXCEPTION clause</a> effectively forms a subtransaction that can be rolled back without affecting the outer transaction.</p>
+<p>Therefore I added this exception handling part in the <code>geocode_sample</code> function:</p>
+<pre><code>CREATE OR REPLACE FUNCTION geocode_sample(sample_size integer) 
+    RETURNS void AS $$
+DECLARE OUTPUT address_table%ROWTYPE;    
+BEGIN
+...
+
+EXCEPTION
+WHEN OTHERS THEN
+    SELECT * INTO OUTPUT 
+        FROM address_table 
+        WHERE rating IS NULL ORDER BY addid LIMIT 1;
+    RAISE NOTICE &apos;&lt;address error&gt; in samples started from: %&apos;, OUTPUT;
+    RAISE notice &apos;-- !!! % % !!!--&apos;, SQLERRM, SQLSTATE;
+    UPDATE address_table
+        SET rating = -2
+    FROM (SELECT addid
+            FROM address_table 
+            WHERE rating IS NULL ORDER BY addid LIMIT sample_size
+         ) AS sample
+    WHERE sample.addid = address_table.addid;
+END;
+$$ LANGUAGE plpgsql;
+</code></pre><p>This code will catch any exception, print the first row of current sample to notify the location of error, also print the original exception message. </p>
+<pre><code>psql:geocode_batch.sql:179: NOTICE:  &lt;address error&gt; in samples started from: (1501652,&quot; RIVER (AT BLOUNT CO) (140 , KNOXVILLE, TN 37922&quot;,37922,27556,,,,,,,,,)
+CONTEXT:  SQL statement &quot;SELECT geocode_sample(sample_size)&quot;
+PL/pgSQL function geocode_table() line 24 at PERFORM
+psql:geocode_batch.sql:179: NOTICE:  -- !!! invalid regular expression: parentheses () not balanced 2201B !!!--
+</code></pre><p>To make sure the script will continue work on the remaining rows, it also set the rating column of the current sample to be <code>-2</code>, thus they will be skipped in latter runs. </p>
+<p>One catch of this method is the whole sample will be skipped even only one row in it caused problem, then I may need to check them again after one pass. However I didn&#x2019;t find a better way to find the row caused the exception other than set up some marker for every row and keep updating it. Instead, I tested the performance with different sample size, i.e. how many rows will the <code>geocode_sample</code> function process in one run. It turned out sample size 1 didn&#x2019;t have obvious performance penalty, maybe because the extra cost of small sample is negligible compared to the geocoding function cost. With a sample size 1 the exception handling code will always mark the problematic row only, and the code is much simpler.</p>
+<p>Another important feature I want is progress report. If I split the NFIRS data by state, one state data often has tens of thousands of rows and take several hours to finish. I don&#x2019;t want to find error or problem until it finishes. So I added some progress report like this:</p>
+<pre><code>psql:geocode_batch.sql:178: NOTICE:  &gt; 2015-11-18 20:26:51+00 : Start on table of 10845
+psql:geocode_batch.sql:178: NOTICE:  &gt; time passed | address processed &lt;&lt;&lt;&lt; address left
+psql:geocode_batch.sql:178: NOTICE:  &gt; 00:00:54.3  |    100 &lt;&lt;&lt;&lt;    10745
+psql:geocode_batch.sql:178: NOTICE:  &gt; 00:00:21.7  |    200 &lt;&lt;&lt;&lt;    10645
+</code></pre><p>First it report the size of whole table, then the time taken for every 100 rows processed, and how many rows are left. It&#x2019;s pretty obvious in above example that the first 100 rows take more time. It&#x2019;s because many address with ill formated zipcode were sorted on top.</p>
+<p>Similarly, the mapping of census block have a progress report:</p>
+<pre><code>psql:geocode_batch.sql:178: NOTICE:  ==== start mapping census block ====
+psql:geocode_batch.sql:178: NOTICE:  # time passed | address to block &lt;&lt;&lt;&lt; address left
+psql:geocode_batch.sql:178: NOTICE:  # 00:00:02.6  |    1000    &lt;&lt;&lt;&lt;    9845
+psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;    8845
+</code></pre><h2 id="summary-and-open-questions"><a href="#Summary-And-Open-Questions" class="headerlink" title="Summary And Open Questions"></a>Summary And Open Questions</h2><p><strong>I put everything in <a href="https://github.com/dracodoc/Geocode" target="_blank" rel="external">this Github repository</a></strong>. </p>
+<p>My script has processed almost one year&#x2019;s data, but I&#x2019;m not really satisfied with the performance yet. When I tested the 44185 MD, DC addresses in the AWS free tier server with MD, DC database, the average time per row is about 60 ms, while the full server with all states have the average time of 342 ms. Some other states with more ill formated addresses have worse performance. </p>
+<p>I have updated the Tiger database index and tuned the postgresql configurations. I can try parallel but the cpu should not be the bottle neck here, and <a href="http://geeohspatial.blogspot.com/2013/12/a-simple-function-for-parallel-queries_18.html" target="_blank" rel="external">the hack I found to enable postgresql run parallel</a> is not easily manageable. Somebody also mentioned partitioning database, but I&#x2019;m not sure if this will help.</p>
+<p>And here are some open questions I will ask in PostGIS community, some of them may have the potential to further improve performance:</p>
+<ol>
+<li><p>Why is a server with 2 states data much faster than the server with all states data? I assume it&#x2019;s because the bad address that don&#x2019;t have a exact hit at first will cost much more time when the geocoder checked all states. With only 2 states this search is limited and stopped much early. This can be further verified by comparing the performance of two test cases in each server, one with exact match perfect address, another one with lots of invalid addresses.</p>
+<p> There is a <code>restrict_region</code> parameter in <code>geocode</code> function looks promising if it can limit the search range, since I have enough information or reason to believe the state information is correct. I wrote a query trying to use one state&#x2019;s geometry as the limiting parameter:</p>
+<pre><code>SELECT geocode(&apos;501 Fairmount DR , Annapolis, MD 20137&apos;, 1, the_geom) 
+    FROM tiger.state WHERE statefp = &apos;24&apos;;
+</code></pre><p> and compared the performance with the simple version</p>
+<pre><code>SELECT geocode(&apos;501 Fairmount DR , Annapolis, MD 20137&apos;,1);
+</code></pre><p> I didn&#x2019;t find performance gain with the parameter. Instead it lost the performance gain from caching, which usually came from running same query immediately again because all the needed data have been cached in RAM. </p>
+<p> Maybe my usage is not proper, or this parameter is not intended to work as I expected. However if the search range can be limited, the performance gain could be substantial.</p>
+</li>
+<li><p>Will normalizing address first improve the performance? I don&#x2019;t think it will help unless I can filter bad address and remove them from input totally, which may not be the case for my usage of NFIRS data. The new PostGIS 2.2.0 looks promising but the ansible playbook is not updated yet, and I haven&#x2019;t have the chance to setup the server again by myself.</p>
+<p> One possible improvement to my workflow is to try to separate bad formatted addresses with the good ones. I already separated some of them by sorting by zipcode, but there are some addresses with a valid zipcode are obviously incomplete. The most important reason of separate all input by state is to have the server cache all the data needed in RAM. If the server meet some bad formatted addresses in the middle of table and started to look up all states, the already loaded whole state cache could be messed up. Then the good addresses need the geocoder to read state data from hard drive again. If the cache update statistics could be summarized from the server log, this theory can be verified.</p>
+<p> I&#x2019;ve almost finished one year&#x2019;s data. After it finished I&#x2019;ll design more clean up procedures, and maybe move all suspicious addresses out to make sure the better shaped addresses geocoding are not interrupted.</p>
+</li>
+<li><p>Will replacing the default normalizing function with the <a href="http://postgis.net/docs/Address_Standardizer.html" target="_blank" rel="external">Address Standardizer</a> help? I didn&#x2019;t find the normalizing step too time consuming in my experiments. However if it can produce better formated address from bad input, that could help the geocoding process.</p>
+</li>
+<li>Why 6 digits coordinates of street intersections output often don&#x2019;t have matched census block, but coordinates round up to 5 digits have match in most of time?</li>
+</ol>
+<h2 id="version-history"><a href="#Version-History" class="headerlink" title="Version History"></a>Version History</h2><ul>
+<li>2015-11-19 : First version.</li>
+<li>2016-05-11 : Added Summary.</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;I discussed all the problem I met, approaches I tried, and improvement I achieved in the Geocoding task.&lt;/li&gt;
+&lt;li&gt;There are many subtle details, some open questions and areas can be improved.&lt;/li&gt;
+&lt;li&gt;The final working script and complete workflow are hosted in &lt;a href=&quot;https://github.com/dracodoc/Geocode&quot;&gt;github&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="Geocoding" scheme="http://dracodoc.github.io/categories/Geocoding/"/>
+    
+    
+      <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
+    
+      <category term="Tiger Geocoder" scheme="http://dracodoc.github.io/tags/Tiger-Geocoder/"/>
+    
+      <category term="PostGIS" scheme="http://dracodoc.github.io/tags/PostGIS/"/>
+    
+      <category term="postgresql" scheme="http://dracodoc.github.io/tags/postgresql/"/>
+    
+      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
+    
+      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Geocoding 18 million addresses with PostGIS Tiger Geocoder</title>
+    <link href="http://dracodoc.github.io/2015/11/17/Geocoding/"/>
+    <id>http://dracodoc.github.io/2015/11/17/Geocoding/</id>
+    <published>2015-11-17T16:36:10.000Z</published>
+    <updated>2016-08-19T13:46:40.772Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>This post discussed the background, approaches, windows and linux environment setup for my Geocoding task.</li>
+<li>See more details about the script and workflow in next post.</li>
+</ul>
+<a id="more"></a>
+<h2 id="background"><a href="#Background" class="headerlink" title="Background"></a>Background</h2><p>I found I want to geocode lots of addresses in my <a href="http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/">Red Cross Smoke Alarm Project</a>. The <a href="https://github.com/brooksandrew/arc_smoke_alarm/wiki/References-and-Data-Sources#public-data-sources" target="_blank" rel="external">NFIRS data</a> have 18 million addresses in 9 years data, and I would like to </p>
+<ul>
+<li>verify all the addresses because many inputs have quality problems.</li>
+<li>map street address to coordinates, so we can map and do more geospatial analysis.</li>
+<li>map street address to census block, then we can link NFIRS data to other public data like census data of <a href="https://www.census.gov/programs-surveys/acs/" target="_blank" rel="external">American Community Survey(ACS)</a> and <a href="http://www.census.gov/programs-surveys/ahs.html" target="_blank" rel="external">American Housing Survey(AHS)</a>).</li>
+</ul>
+<h2 id="possible-approaches"><a href="#Possible-Approaches" class="headerlink" title="Possible Approaches"></a>Possible Approaches</h2><p>I did some research on the possible options:</p>
+<ul>
+<li>Online service. Most free online API have limit, and paid service would be too expensive for my task. Surprisingly FCC have <a href="https://www.fcc.gov/developers/census-block-conversions-api" target="_blank" rel="external">an API</a> to map coordinates to census block which didn&#x2019;t mention limit, but it cannot geocode street address to coordinates.</li>
+<li><a href="http://www.tigergeocoder.com/" target="_blank" rel="external">This company</a> provide service in Amazon EC2 for a fee. They have <a href="https://github.com/bibanul/tiger-geocoder/wiki/Running-your-own-Geocoder-in-Amazon-EC2" target="_blank" rel="external">more information about their setup in github</a>. What I did is actually a similar approach but in a totally DIY way.</li>
+<li>Setup your own geocoder. <a href="http://postgis.net/docs/Extras.html#Tiger_Geocoder" target="_blank" rel="external">Tiger geocoder</a> is a PostGIS extension which use Census Tiger data to geocode addresses.</li>
+</ul>
+<p>PostGIS can work in both windows and linux, and Enigma.io has shared their <a href="https://github.com/enigma-io/ansible-tiger-geocoder-playbook" target="_blank" rel="external">automated Tiger Geocoder setup tool</a> for linux. However the Tiger database itself need 105G space and I don&#x2019;t have a linux box for that(Amazon AWS free tier service only allow for 30G storage), so I decided to install PostGIS in windows and experiment with everything first.</p>
+<h2 id="windows-setup"><a href="#Windows-Setup" class="headerlink" title="Windows Setup"></a>Windows Setup</h2><p>I need to install postgresql server, PostGIS extension and Tiger geocoder extension. <a href="http://www.bostongis.com/?content_name=postgis_tut01" target="_blank" rel="external">This</a> is a very detailed installation guide for PostGIS in windows. I&#x2019;ll just add some notes from my experience:</p>
+<ul>
+<li>It&#x2019;s best if you could install the database in SSD drive. My first setup was in SSD and only have two states data, the geocoding performance was pretty good. Then I need to download all the states so I have to move the database to regular hard drive according to <a href="https://wiki.postgresql.org/wiki/Change_the_default_PGDATA_directory_on_Windows" target="_blank" rel="external">this guide</a> (<em>note the data folder path value cannot have the trialling escape, otherwise the PostgreSQL Service will just fail</em>). After that the geocoding performance dropped considerably.</li>
+<li>The pgAdmin is easy to use. I used SQL Query, View Data (or view top 100 rows if the table is huge) a lot. The explain analyze function in the SQL Query tool is also very intuitive.</li>
+</ul>
+<p>With server and extension installed, I need to load Tiger data. The Tiger geocoder provided scripts generating functions for you to download Tiger data from Census ftp then set up the database. <a href="http://postgis.net/docs/Loader_Generate_Nation_Script.html" target="_blank" rel="external">The official documentation</a> didn&#x2019;t provide enough information for me, so I have to search and tweak a lot. At first I tried the commands from SQL query tool but it didn&#x2019;t show any result. Later I solved this problem with hints from <a href="http://gis.stackexchange.com/questions/81907/install-postgis-and-tiger-data-in-ubuntu-12-04" target="_blank" rel="external">this guide</a>, although it was written for Ubuntu.</p>
+<ul>
+<li>You need to install 7z.exe and wget windows version and record their path.</li>
+<li>Create a directory for download. Postgresql need to have permission for that folder. I just created the folder in same level with the postgresql database folder, and both of them have user group <code>Authenticated users</code> in full control. If you write a sql copy command to read csv file in some other folder that don&#x2019;t have this user permission, there could be a permission denied error.</li>
+<li><p>Start pgAdmin, connect to the GIS database you created in installation, run psql tool from pgAdmin, input <code>\a</code> <code>\t</code> to set up format first, and set output file by</p>
+<pre><code>\o nation_generator.bat
+</code></pre><p>then run </p>
+<pre><code>SELECT loader_generate_nation_script(&apos;windows&apos;); 
+</code></pre><p>to generate the script to load national tables. It will be a file with the name specified with <code>\o nation_generator.bat</code> before located in the same folder of <code>psql.exe</code>, which should be the postgresql bin folder.</p>
+</li>
+<li><p>Technically you can input the parameters specific to your system settings in the table <code>loader_variables</code> and <code>loader_platform</code> which are under <code>tiger</code> schema. However after I inputed the parameters, only the stage folder(i.e. where to download data to) was taken into generated script. My guess is the file path with spaces need be proper escaped and quoted. The script generating function is reading from database then write to file, hat means the file path will go through several different internal representations, which make the escaping and quoting more complicated. I just replaced the default parameters with mine in the generated script later. <strong>Update</strong>: I found <a href="http://gis.stackexchange.com/questions/116803/installing-tiger-geocoder" target="_blank" rel="external">this answer</a> later. I probably should use <code>SET</code> command instead of directly editing the table columns. Anyway, replacing the settings afterwards still works, and you need to double check it.</p>
+</li>
+<li>All the parameters are listed in the first section of generated script, and <code>cd your_stage_folder</code> will be used several times through the script. You need to edit the parameters in first section and make sure the stage folder is correct in all places.</li>
+<li><p>After the national data is loaded by running with the script, you can specify the states that you want to load. Actually the tiger database support 56 states/regions. You can find them by </p>
+<pre><code>select stusps, name from tiger.state order by stusps;
+</code></pre></li>
+<li><p>Start psql again, go through similar steps and run</p>
+<pre><code>SELECT loader_generate_script(ARRAY[&apos;VA&apos;,&apos;MD&apos;], &apos;windows&apos;);
+</code></pre><p>  Put the states abbreviations that you want in the array. Note if you copy the query results it will be quoted with double quote by default, but you need single quote in SQL. You can change the pgAdmin output setting in <code>Options - Query tool - Results grid</code>.</p>
+</li>
+<li><p>The generated script will have one section for each state, each section have parameters set in beginning. You need to replace the parameters and the <code>cd your_stage_folder</code> to correct values. Using an editor that support multi line search replace will make this much easier.</p>
+</li>
+<li>I don&#x2019;t want to load 56 states in one script. If anything went wrong it will be bothersome to start again from last point. I wanted to split the big script into 56 ones, one state each. I searched for a while and didn&#x2019;t find a software to do this, then I just wrote a python script.</li>
+<li><p>First add a marker in the script to separate states. I replaced all occurrences of</p>
+<pre><code>set TMPDIR=e:\data\gisdata\temp\\
+</code></pre><p>to </p>
+<pre><code>:: ---- end state ----
+set TMPDIR=e:\data\gisdata\temp\\
+</code></pre><p>then deleted the <code>:: ---- end state ----</code> marker in the first line. This make the marker appear in the end of each state section. Note the <code>::</code> is commenting symbol in dos bat so it will not interfere with the script.</p>
+<p>  Then I run this python script to split it by states.</p>
+</li>
+</ul>
+<figure class="highlight python"><figcaption><span>splitStates.py</span><a href="https://gist.github.com/dracodoc/f0eeeac91eb0d68c712c#file-splitstates-py" target="_blank" rel="external">Open in Github</a></figcaption><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">__author__ = <span class="string">&apos;draco&apos;</span></span><br><span class="line"><span class="comment"># split all states loader script into separate scripts by states.</span></span><br><span class="line"><span class="comment"># replace all the &quot;set TMPDIR=...&quot; line with &quot;:: ---- end state ----\nset TMPDIR=...&quot;</span></span><br><span class="line"><span class="comment"># then delete the first line of &quot;:: ---- end state ----\n&quot;</span></span><br><span class="line"><span class="comment"># modify the base file path and output file folder by your case.</span></span><br><span class="line"></span><br><span class="line">text_file = open(<span class="string">&quot;e:\\Data\\all_states.bat&quot;</span>,<span class="string">&quot;r&quot;</span>)</span><br><span class="line">lines = text_file.readlines()</span><br><span class="line">text_file.close()</span><br><span class="line"><span class="keyword">print</span> len(lines)</span><br><span class="line">sep = <span class="string">&quot;:: ---- end state ----\n&quot;</span></span><br><span class="line">file_no = <span class="number">1</span></span><br><span class="line">temp = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> lines[<span class="number">0</span>:]:</span><br><span class="line">    <span class="keyword">if</span> line != sep:</span><br><span class="line">        temp += line</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        state_file = open(<span class="string">&quot;e:\\Data\\&quot;</span> + str(file_no).zfill(<span class="number">2</span>) + <span class="string">&quot;.bat&quot;</span>, <span class="string">&apos;w&apos;</span>)</span><br><span class="line">        state_file.write(temp)</span><br><span class="line">        state_file.close()</span><br><span class="line">        temp = line</span><br><span class="line">        file_no += <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<h2 id="linux-setup"><a href="#Linux-Setup" class="headerlink" title="Linux Setup"></a>Linux Setup</h2><p>After I moved the postgresql database to regular hard drive because of storage limit, the geocoding performance was very low. Fortunately I got the generous support of DataKind on their AWS resources, so I can run the geocoding task in Amazon EC2 server. I want to test everything as comprehensive as possible before deploying an expensive EC2 instance, thus I decided to do everything with the Amazon EC2 free tier service first. The free tier only allow 30G storage, 1G RAM but I can test with 2 states first.</p>
+<p>I used the <a href="https://github.com/enigma-io/ansible-tiger-geocoder-playbook" target="_blank" rel="external">ansible playbook</a> from Enigma to setup the AWS EC2 instance. Here are some notes:</p>
+<ul>
+<li>Be careful when using AWS free tier service, anything not explicitly marked as <code>free tier</code> could cost money.</li>
+<li>For a test server with national tables and 2 states data, the free tier t2.micro instance actually is enough. You can normalizing addresses, mapping census block for all states and geocoding for those 2 states addresses. Actually my 2 states free server with 1G RAM is much faster than the t2.large 8G server with all states data loaded. I&#x2019;ll discuss this in more details in another post about the geocoding script.</li>
+<li>I used <a href="https://www.bitvise.com/ssh-client" target="_blank" rel="external">bitvise</a> as my ssh and sftp tool since it seemed to be an enhanced putty.</li>
+<li>I either use nano as the editor in AWS instance (for <a href="https://pricklytech.wordpress.com/2010/12/12/ubuntu-nano-error-reading-home-nano_history-permission-denied/" target="_blank" rel="external">error with nano history</a>), or just download the file to be edited with sftp, edit then upload (sometimes I may need to convert the script with <code>dos2unix</code>). It&#x2019;s much easier to edit multiple places with sublime.</li>
+</ul>
+<p>After lots of experimentation I have my batch geocoding workflow ready, then I started to setup the full scale server with DataKind resources.</p>
+<ul>
+<li><p>Interestingly, <code>sudo</code> doesn&#x2019;t work in the t2.large instance. I searched and found it&#x2019;s because <a href="https://forums.aws.amazon.com/thread.jspa?threadID=104765" target="_blank" rel="external">the private ip is not in hosts</a>. The problem can be solved by adding the machine name into hosts file, however how can you edit hots file without <code>sudo</code>? Finally I <a href="http://askubuntu.com/questions/91598/how-do-i-login-as-root" target="_blank" rel="external">used this</a> to solve this problem.</p>
+<pre><code>sudo passwd root
+su root
+nano /etc/hosts
+su ubuntu
+</code></pre></li>
+<li><p>The command of running ansible playbook from the Enigma repo have <code>\</code> to extend one line into multiple lines. My first try didn&#x2019;t copy the new line after each <code>\</code> correctly (because I was using a firefox extension to automatically copy on select) and the command cannot run, but the error message was very misleading so I didn&#x2019;t realize it&#x2019;s because of this. </p>
+</li>
+<li>Although the Tiger database will take 105G at last, the downloading and provisioning need more spaces for temporary files. My first attempt with 120G storage was filled up in the provisioning, so I have to start again with 180G. </li>
+<li><code>Gnu Screen</code> let you use same terminal window to switch between tasks or even split windows, so that you can leave the process running but detached from the screen. It&#x2019;s essential to run and control the time consuming tasks. Here is a <a href="http://www.pixelbeat.org/lkdb/screen.html" target="_blank" rel="external">cheat sheet</a> and <a href="http://aperiodic.net/screen/quick_reference" target="_blank" rel="external">quick list</a>.</li>
+<li>I enabled the color prompt of bash by removing comment of <code>#force_color_prompt=yes</code> in <code>~/.bashrc</code>. When you need to scroll through long history of command line or reading many lines of output, a colored prompt could separate the command and the output well.</li>
+<li><p>You may need to use psql a lot, so I placed a <a href="http://www.postgresql.org/docs/9.4/static/libpq-pgpass.html" target="_blank" rel="external">.pgpass</a> file in my user folder (change its permission with <code>chmod 0600 ~/.pgpass</code>). I also set several other options in <code>.psqlrc</code> file in user folder, including color prompt, timing on, vertical output etc.</p>
+<pre><code>\timing
+\x auto
+\set COMP_KEYWORD_CASE upper
+\set PROMPT1 &apos;%[%033[1;33;40m%]%n@%/%R%[%033[0m%]%# &apos;
+</code></pre></li>
+<li><p>I was not satisfied with the geocoding performance so I experimented with tuning postgresql configurations. <a href="http://www.linux.com/learn/tutorials/394523-configuring-postgresql-for-pretty-good-performance" target="_blank" rel="external">This post</a> and <a href="http://workshops.boundlessgeo.com/postgis-intro/tuning.html#section-21-tuning-postgresql-for-spatial" target="_blank" rel="external">this guide</a> helped me most. The average time needed for geocoding one address in a 200 records sample dropped from 320 ms to 100 ms.</p>
+</li>
+</ul>
+<h2 id="geocoding-script-and-work-flow-setup"><a href="#Geocoding-Script-And-Work-Flow-Setup" class="headerlink" title="Geocoding Script And Work Flow Setup"></a>Geocoding Script And Work Flow Setup</h2><p>I&#x2019;ll discuss the geocoding script and my work flow for batch geocoding in <a href="http://dracodoc.github.io/2015/11/19/Script-workflow/">next post</a>.</p>
+<h2 id="version-history"><a href="#Version-History" class="headerlink" title="Version History"></a>Version History</h2><ul>
+<li>2015-11-17 : First version.</li>
+<li>2016-05-11 : Added Summary.</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;This post discussed the background, approaches, windows and linux environment setup for my Geocoding task.&lt;/li&gt;
+&lt;li&gt;See more details about the script and workflow in next post.&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="Geocoding" scheme="http://dracodoc.github.io/categories/Geocoding/"/>
+    
+    
+      <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
+    
+      <category term="Tiger Geocoder" scheme="http://dracodoc.github.io/tags/Tiger-Geocoder/"/>
+    
+      <category term="PostGIS" scheme="http://dracodoc.github.io/tags/PostGIS/"/>
+    
+      <category term="postgresql" scheme="http://dracodoc.github.io/tags/postgresql/"/>
+    
+      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
+    
+      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Red Cross Smoke Alarm Project</title>
+    <link href="http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/"/>
+    <id>http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/</id>
+    <published>2015-11-11T14:02:10.000Z</published>
+    <updated>2016-08-19T13:48:32.625Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>This is a write-up for my volunteer Data Science project for the American Red Cross.</li>
+<li>The project used public data to help Red Cross directing limited resources to homes that more vulnerable to fire risk and loss.</li>
+<li>My work in the project:<ul>
+<li>Discovered the hidden information in NFIRS dataset, obtained and analyzed 10G NFIRS data.</li>
+<li>Major contribution on model design, implemented NFIRS related predictors, and built interactive visualizations.</li>
+<li>Geocoded 18 millions address in NFIRS data with AWS server, Postgresql, PostGIS.</li>
+</ul>
+</li>
+</ul>
+<a id="more"></a>
+<h2 id="introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>In May, 2015 I went to a <a href="http://www.meetup.com/DataKind-DC/events/220650281/" target="_blank" rel="external">MeetUp</a> organized by <a href="http://www.datakind.org/" target="_blank" rel="external">DataKind</a>, where Volunteers came from all kinds of background joined together to help non-profit organizations with Data Science. I joined a project <a href="https://hackpad.com/American-Red-Cross-DJuXtxOtqvw#:h=The-Effectiveness-of-Smoke-Ala" target="_blank" rel="external"><em>The Effectiveness of Smoke Alarm Installs and Home Fire</em></a> for the American Red Cross. <a href="http://www.redcross.org/news/press-release/Red-Cross-Campaign-to-Reduce-Home-Fire-Deaths-and-Injuries-in-US" target="_blank" rel="external">The Red Cross Smoke Alarm Home Visits</a> is already a <a href="http://nfpatoday.blog.nfpa.org/2015/08/more-than-100000-smoke-alarms-installed-and-15-lives-saved-less-than-one-year-into-red-cross-campaig.html" target="_blank" rel="external">very successful</a> campaign, but they were looking forward to the power of data and data science to further improve the project.</p>
+<p><img src="data-coverage-by-ZCTA-and-counties-2.png" alt="The choropleth map of Red Cross Smoke Alarm Home Visits per county in 10 months"><br><em>The choropleth map of Red Cross Smoke Alarm Home Visits per county in 10 months</em></p>
+<h2 id="project-goal"><a href="#Project-Goal" class="headerlink" title="Project Goal"></a>Project Goal</h2><p>Given limited resources and the ambitious project goal, the American Red Cross want to have a priority list for regions backed with data and analysis. The ranking could came from multiple factors, like <strong>the possibility of don&#x2019;t have smoke alarm installed</strong>, <strong>the risk of catching fire</strong>, <strong>the possible casualty and losses</strong>, maybe even taking the constraints of each Red Cross chapter into consideration. </p>
+<h2 id="similar-work-from-engimaio"><a href="#Similar-work-from-Engima-io" class="headerlink" title="Similar work from Engima.io"></a>Similar work from Engima.io</h2><p>There was a similar project in New Orleans &#x2013; <a href="http://blog.enigma.io/open-data-and-public-safety/" target="_blank" rel="external">Smoke Alarm Outreach Program</a>. </p>
+<p>They first targeted the areas of <strong>least likely to have smoke alarm installed</strong>. The <a href="http://www.census.gov/programs-surveys/ahs.html" target="_blank" rel="external">American Housing Survey(AHS)</a> provided some data on this in county level, and the <a href="https://www.census.gov/programs-surveys/acs/" target="_blank" rel="external">American Community Survey(ACS)</a> have more detailed results about many other questions in census block group level. Using the shared questions in these two survey, they were able to build a model to predict smoke alarm presence in block group level, thus same number of home visits could cover more homes without smoke alarms.</p>
+<p>Then they studied the areas of <strong>most likely to suffer structure fire fatalities</strong>. According to <a href="http://www.nfpa.org/research/reports-and-statistics/fire-safety-equipment/smoke-alarms-in-us-home-fires" target="_blank" rel="external">NFPA research</a>, very young and very old are most susceptible to fire fatalities. Thus they calculated the fire risk per housing unit according to New Orleans historical data, then added age adjustment based on census population data. With these two factors combined, they ranked the high priority regions for smoke alarm outreach program.</p>
+<p>After this New Orleans program, Enigma.io further <a href="http://blog.enigma.io/risk-model-for-residences-without-smoke-alarms/" target="_blank" rel="external">expanded the acs/ahs method to national level</a>, and produced a visualization website showing risk of lacking smoke alarms on map. <strong>They don&#x2019;t have fire risk data in national level</strong>, but provided an API to upload local fire risk data into the model.</p>
+<h2 id="more-data-sources"><a href="#More-Data-Sources" class="headerlink" title="More Data Sources"></a>More Data Sources</h2><p>The American Red Cross project is a national level campaign in much larger scale compared to New Orleans project. Red Cross provided the data of their smoke alarm home visits in 10 months and the data of Red Cross disaster response to us for our analysis. </p>
+<p><img src="data-coverage-by-ZCTA-and-counties-5.png" alt="The American Red Cross Diaster response for fire per county"><br><em>The American Red Cross Diaster response for fire per county</em></p>
+<p>They also got several years <a href="http://www.usfa.fema.gov/data/nfirs/" target="_blank" rel="external">National Fire Incident Reporting System</a> (NFIRS) data, listed every fire incident&#x2019;s time and address. These were the starting point for us to work on.</p>
+<p>I found the NFIRS data promising since it is the most complete public data set of fire incidents on national level. After lots of time spending on documents and search, I found this data set is very rich in information, although the problems and challenges are huge too.</p>
+<p><img src="data-coverage-by-ZCTA-and-counties-8.png" alt="The Fire Incidents reported by NFIRS per county in 2010"><br><em>The Fire Incidents reported by NFIRS per county in 2010</em></p>
+<p><img src="data-coverage-by-ZCTA-and-counties-9.png" alt="The Fire Incidents reported by NFIRS per ZCTA of Maryland in 2010"><br><em>The Fire Incidents reported by NFIRS per ZCTA of Maryland in 2010</em></p>
+<p>First, the original NFIRS data included many aspects of fire incident, including time, location, fire type, cause of fire, whether there was fire detectors, whether the detectors alerted occupants, the casualty and property losses etc, the list could go on and on. The dataset we got from Red Cross is a compiled version with every address geocoded and verified, which are very useful. However I want to dig more information from the source.</p>
+<p><a href="http://www.usfa.fema.gov/data/statistics/order_download_data.html" target="_blank" rel="external">The U.S. Fire Administration website</a> said you can order cd-rom from them for NFIRS data. However I searched and found some direct download links from FEMA. I downloaded all the data I found, from 1999 to 2011. Unfortunately, later I found the data of 2002 ~ 2009 only have about half the states. I guess it&#x2019;s because the data are excel files and each worksheet in excel can only hold 1 million rows, so the other half states were missing. Fortunately I contacted USFA and they sent the cd-roms of 2005 ~ 2013 to me, now we have 9 years complete and more recent data!</p>
+<h2 id="problems-and-challenges"><a href="#Problems-and-Challenges" class="headerlink" title="Problems and Challenges"></a>Problems and Challenges</h2><p>Using NFIRS data is not easy. Their website stressed again and again that you should not just count the incidents, because NFIRS participation is not mandatory at the national level. With about 2/3 of all fire departments participating, it only included about 75% of all reported fires. To make things worse, there is no definitive list of all fire departments and the participating departments. There are some very limited fire department census data, and some fire department data for each year which are not up to date for all the changes in fire departments. How to adjust for this coverage bias is a big challenge.</p>
+<p>Another widespread problem is the data quality. There are many columns not filled, data recorded in wrong column and obvious input errors (some years&#x2019; data even excluded Puerto Rico entirely because of data quality problems). </p>
+<p>Besides, the fire detectors defined by NFIRS including other type of alarms beside smoke alarm. Although there are further break down of detector types, but the valid entries only take 10 ~ 20 % in all home fires records.</p>
+<p>In the research on all these problems, I found many analysis methods will need to have the fire incident address geocoded, i.e. verify the address, get the coordinates and map to census block. This is the basis of linking NFIRS data with other data, or doing any geospatial analysis.</p>
+<h2 id="geocoding-18-million-addresses"><a href="#Geocoding-18-million-addresses" class="headerlink" title="Geocoding 18 million addresses"></a>Geocoding 18 million addresses</h2><p>The NFIRS data have 20 million incidents each year. The public data only includes fire incidents, that&#x2019;s still 2 million each year and I have 9 years of data. Actually we should be only interested in home fires which is a part of all fire incidents, but I think the complete incidents location distribution can help to estimate the NFIRS data coverage, so I still want to geocode all incidents addresses. This geocoding task is impossible for any free online service and too expensive for any paid service. I have to setup a geocoding server by my own.</p>
+<p>The data and the software needed are all public and free, though it is definitely not a trivial task. Enigma.io open sourced their geocoding server setup as <a href="https://github.com/enigma-io/ansible-tiger-geocoder-playbook" target="_blank" rel="external">an ansible playbook</a>, but that&#x2019;s for Amazon EC2, local linux machine or linux virtual machine. I&#x2019;m using windows and afraid of the performance limit of virtual machine, so I still need to install everything and setup everything in windows. </p>
+<p>After some efforts I got the server running with just 2 states data to test. Then it&#x2019;s SQL time. With lots of learning, experiments I finally got a working script. The experiments were promising, however I have to move the database out of the SSD drive when I started to download full national data which amount to 100G. With all the data downloaded in regular hard drive, I found the geocoding performance deteriorated seriously, which make the geocoding task very time consuming. </p>
+<p>Fortunately I got the generous support of DataKind on their AWS resources, now I can run the geocoding task in Amazon EC2 server. I want to test everything as comprehensive as possible before deploying an expensive EC2 instance, so I decided to do everything with the Amazon EC2 free tier service first. The free tier only allow 30G storage, 1G RAM but I can test with 2 states first.</p>
+<p>Now I can use the ansible playbook from Engima. With some tweak I got it running with 2 states data. Surprisly the performance is much better than home pc, even with just 1G RAM. Though I&#x2019;m not sure if the geocoding peformance will drop again with full national data downloaded.</p>
+<p>I further improved my script to make it work with big input file and can work in batch mode. I found I have to use a mix of SQL, plpgsql, shell, python to get a fully batch mode work flow. I&#x2019;ll write about the geocoding server setup and share my script later. I probably searched hundreds of questions, read hundreds of documentation, and made stackoverflow my most frequent visit site. So it will be a very long post.</p>
+<p>My next step is to setup a full scale Amazon EC2 server to geocode all NFIRS data and other possible candidates. With all the address geocoded, we can do lots of things and link to many other data sources, it will be very promising.</p>
+<h2 id="update-interactively-visualizing-fire-incident-by-population-for-each-census-tract"><a href="#Update-Interactively-visualizing-fire-incident-by-population-for-each-census-tract" class="headerlink" title="Update: Interactively visualizing fire incident by population for each census tract"></a>Update: Interactively visualizing fire incident by population for each census tract</h2><p>Update: I have finished the Geocoding and built indicators based on the accurate location of NFIRS events. Here are some sample interactive visualization of the results. You can zoom in and click any census tract for more details.</p>
+<h4 id="reported-structured-fire-incidents-per-1000-people-for-each-census-tract-in-maryland"><a href="#Reported-structured-fire-incidents-per-1000-people-for-each-census-tract-in-Maryland" class="headerlink" title="Reported structured fire incidents per 1000 people for each census tract in Maryland"></a>Reported structured fire incidents per 1000 people for each census tract in Maryland</h4><p><strong>2009</strong></p>
+<iframe src="https://cdn.rawgit.com/home-fire-risk/smoke_alarm_models/master/model_2a_incidents_per_1k_people/Visualization/2009_MD.html" width="800" height="400" frameborder="0" allowfullscreen></iframe>
+<p><strong>2010</strong></p>
+<iframe src="https://cdn.rawgit.com/home-fire-risk/smoke_alarm_models/master/model_2a_incidents_per_1k_people/Visualization/2010_MD.html" width="800" height="400" frameborder="0" allowfullscreen></iframe>
+<p><strong>2011</strong></p>
+<iframe src="https://cdn.rawgit.com/home-fire-risk/smoke_alarm_models/master/model_2a_incidents_per_1k_people/Visualization/2011_MD.html" width="800" height="400" frameborder="0" allowfullscreen></iframe>
+<p><strong>2012</strong></p>
+<iframe src="https://cdn.rawgit.com/home-fire-risk/smoke_alarm_models/master/model_2a_incidents_per_1k_people/Visualization/2012_MD.html" width="800" height="400" frameborder="0" allowfullscreen></iframe>
+<p><strong>2013</strong></p>
+<iframe src="https://cdn.rawgit.com/home-fire-risk/smoke_alarm_models/master/model_2a_incidents_per_1k_people/Visualization/2013_MD.html" width="800" height="400" frameborder="0" allowfullscreen></iframe>
+<h2 id="version-history"><a href="#Version-History" class="headerlink" title="Version History"></a>Version History</h2><ul>
+<li>2015-11-11 : First version.</li>
+<li>2016-05-10 : Added Summary.</li>
+<li>2016-05-11 : Added visualization of fire incident per census tract.</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;This is a write-up for my volunteer Data Science project for the American Red Cross.&lt;/li&gt;
+&lt;li&gt;The project used public data to help Red Cross directing limited resources to homes that more vulnerable to fire risk and loss.&lt;/li&gt;
+&lt;li&gt;My work in the project:&lt;ul&gt;
+&lt;li&gt;Discovered the hidden information in NFIRS dataset, obtained and analyzed 10G NFIRS data.&lt;/li&gt;
+&lt;li&gt;Major contribution on model design, implemented NFIRS related predictors, and built interactive visualizations.&lt;/li&gt;
+&lt;li&gt;Geocoded 18 millions address in NFIRS data with AWS server, Postgresql, PostGIS.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="Data Science" scheme="http://dracodoc.github.io/categories/Data-Science/"/>
+    
+    
+      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
+    
+      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
+    
+      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
+    
+      <category term="Red Cross" scheme="http://dracodoc.github.io/tags/Red-Cross/"/>
+    
+      <category term="Smoke Alarm project" scheme="http://dracodoc.github.io/tags/Smoke-Alarm-project/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Exploring House Price Estimation And Imagining A Better Real Estate Website</title>
+    <link href="http://dracodoc.github.io/2015/10/23/house-price/"/>
+    <id>http://dracodoc.github.io/2015/10/23/house-price/</id>
+    <published>2015-10-23T18:23:53.000Z</published>
+    <updated>2016-08-19T13:53:27.004Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>This personal project was inspired by my own experience in housing market. I was wondering what I can achieve with public data and Data Science methods.</li>
+<li>Built upon extensive research of domain knowledge, my model is very simple yet powerful. It used the data with most information, followed the trends in space and time.</li>
+<li>The prediction accuracy is comparable to Zillow Zestimate, although I don&#x2019;t really think this accuracy number matters too much. The variation  is still too large which is in part due to the nature of house sale/bid process.</li>
+<li>Instead of trying to improve prediction accuracy numbers, I think it is more practical to list more reasonable comparable sales to user.</li>
+</ul>
+<a id="more"></a>
+<h2 id="introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>I was looking at local housing market some time ago and found it was difficult to judge how much a house worth or how much it will be sold at. Real State agents could have a very good estimate based on their experience, but it is really an overwhelming problem for first time home buyer or seller.</p>
+<ol>
+<li>There are many aspects about a house that could affect how much it worth to buyer. And every buyer has different preference and priorities about these aspects. </li>
+<li>Only a subset of all possible buyers will see the house listing and consider it seriously. The actual candidate buyer pool is small and very susceptible to random factors like timing and other details.</li>
+<li>The negotiations involve more random events and human decisions.</li>
+</ol>
+<p>Naturally I searched for house price estimation tool on line. The best and most complete one is Zillow.com&#x2019;s <a href="http://www.zillow.com/zestimate/" target="_blank" rel="external">Zestimate&#xAE;</a>. Using huge amount of data for more than 100 million homes and sophisticated algorithms to estimate house sale price.  <a href="http://www.zillow.com/zestimate/#acc" target="_blank" rel="external">Their performance</a>? Estimation within 20% of sale price in 81.4% of times. Take a $500,000 house as example, that means $100,000 error.</p>
+<!--more-->
+<p><img src="zestimate_national.png" alt="Zestimate National Performance"></p>
+<h2 id="the-formal-house-price-assessment-procedures"><a href="#The-formal-house-price-assessment-procedures" class="headerlink" title="The formal house price assessment procedures"></a>The formal house price assessment procedures</h2><p>Not satisfied with this kind of accuracy, I did some research on house price evaluation principles. I found two formal house price assessment procedures provided some insight:</p>
+<ol>
+<li>Home owner insurance companies have a complex model to estimate cost of rebuilding the same house. The model require customer to report lots of detailed information about the house features and conditions. Sometimes insurance company will also send a professional inspector. The home owner insurance estimate doesn&#x2019;t include the cost of land.</li>
+<li>To establish base for property tax, county government assess the value of house from time to time. <a href="http://www.dat.state.md.us/sdatweb/hog.html" target="_blank" rel="external">Maryland</a> utilized a combination of two methods to assess the fair market value of a house.<br> <em>Cost approach</em> is similar to insurance company that calculated the rebuild cost but added the land cost. <em>Sales approach</em> use the sale price of comparable properties.<br> It was said that they use <em>Cost approach</em> for house cost and <em>Sales approach</em> for land cost, maybe because the county have the information of land cost for real estate developers. Though I have seen lots of houses in same area have same land cost even their area vary a lot.</li>
+</ol>
+<p>I can&#x2019;t really use <em>Cost approach</em> since I don&#x2019;t have the insurance company model, and the public available information for individual house are very limited and often have many errors, far less and worse than the data that insurance company can get. </p>
+<p><em>Sales approach</em> looks more promising since fair market price actually included all the information of house build cost and market trends. It may sound good, but where are comparable sales? There are no identical properties, all the reference sales must have some difference in features, time, location etc. To calculate these differences into price, we are back facing the original assessment problem again.</p>
+<h2 id="my-analysis-of-house-price"><a href="#My-analysis-of-house-price" class="headerlink" title="My analysis of house price"></a>My analysis of house price</h2><p>After some research, exploring data with programs, and my own experience in negotiations, my understandings and assumptions of house price are as follows:</p>
+<p><em>House sale price is the result of negotiations between seller and buyer</em>. They make the decision based on their estimates on several things:</p>
+<ol>
+<li>His/her own perspective. How much does it worth in his/her view? This include both objective features and subjective preferences.</li>
+<li>His/her estimate of the opponent in negotiation. People will only make offer/counter offer at a level that they believe it&#x2019;s possible to be accepted, at least in final round of negotiation. Knowing more about the house condition and the opponent&#x2019;s situation can help a lot.</li>
+</ol>
+<p>There are many other factors contribute to the above two, including national and local market trends, other opinion sources like agent, the timing of everything etc. </p>
+<p>This may seem very subjective and impossible to predict. I don&#x2019;t expect public data or any model can predict each individual&#x2019;s personal preference, emotional factors, all the other random events. Even if a perfect prediction on sale price exists, once it was known it will immediately push the negotiations away from the prediction. </p>
+<p>The individual buyer/seller perspective may keep unknown, however the overall result of sales in general are more predictable because <strong>the comparable sales in market are very strong references that both side will use to establish their perspective</strong>. If there are some very comparable recent sales and they expect to have similar sales in near future(the time and location distribution are both important, sales happened long time ago are not really comparable anymore), they knew they must align their expectations with these reference points. </p>
+<ul>
+<li>If the reference price is higher, seller can always expect similar high price and continue to wait for other buyer. </li>
+<li>If the reference price is lower, buyer can always move on and believe there will be a similar sale at lower price. </li>
+</ul>
+<p>The other side of negotiations also knew this and have to accept the market situations. </p>
+<p>Thus I can try to establish an estimate on <em>fair market value</em> based on comparable sales, which can be very helpful to home buyer and seller as a good base point, not exactly prediction of final sale price. </p>
+<h2 id="how-to-measure-prediction-accuracy"><a href="#How-to-measure-prediction-accuracy" class="headerlink" title="How to measure prediction accuracy"></a>How to measure prediction accuracy</h2><p>Now it&#x2019;s easier to understand why Zestimate accuracy is not that impressive, because there are too many random events of each sale cannot be predicted with publicly available data. Actually I think it will be better to just predict a <em>fair market value</em> and give a estimate of <code>variation range</code>. A specific value may look like more accurate, but the buyer/seller will not really trust it because of the big margin of error. A core value plus a range will provide more information and give buyer/seller better understanding about the house price. </p>
+<p>Zestimate did give a value range, and the range could be narrower when there are more information available for the house, for example house in metro area could have a 10% value range instead of national average of 20%. This is understandable since more comparable sales provided more &#x201C;anchors&#x201D; and the variation will be small according to our analysis above. </p>
+<p>The Zestimate accuracy for different regions also showed this effect, where Delaware is much easier to predict than Alaska. Although their houses in market are in same level, but Delaware houses must be much more dense so there will be more comparable sales for each house. </p>
+<p><img src="zestimate_AL_DE.png" alt="Zestimate accuracy in Alaska and Delaware"></p>
+<p>I also observed that there are very big accuracy differences among metro areas, even they all suppose to have sufficient information.</p>
+<p><img src="zestimate_metro.png" alt="Zestimate accruacy in Metro areas"></p>
+<p>My guess is that areas that are in fast changing phase or with more diversity will be more difficult to predict than areas in stable phase. Because of the diversity and fast changes, the actual comparable sales amount is not really big. If you divide that area into smaller sections to reduce diversity and variation, the scale of data points also dropped. Thus the 4.9 millions homes in NY may not provide more comparable sales information than the 681,000 homes in Las Vegas. </p>
+<p>Based on above findings, I adjusted my project goal from <em>estimate house sale price</em> to <em>estimate fair market value and variation range</em>. Note the <code>fair market value</code> in my definition is not really an objective intrinsic value. It reflected the information we can decode from the market, and the variation range cover all the factors we cannot account for. With more information &#x2014; mainly comparable sales &#x2014; we can have less unknown and reduce the variation range. Ideally if there are many comparable sales happened nearby and recently, these sales and the next house sale are more likely to fall in a pretty narrow range.</p>
+<h2 id="comparable-sales-in-details"><a href="#Comparable-sales-in-details" class="headerlink" title="Comparable sales in details"></a>Comparable sales in details</h2><p><strong>Comparison implies distance</strong>. If we look at the <code>comparable sales</code> in depth, there are at least 3 dimensions to define distance and similarity:</p>
+<ol>
+<li>House feature. This is obvious but not easy. Everybody have his/her own preference, and the importance of house feature needed to considered under context. If there are many acceptable options, buyer could be more picky about house. However if there is not much option available, even non-perfect house features may have to be ignored.</li>
+<li>Location. This is another obvious dimension but it also mean different for different people:<ol>
+<li>School district for family with needs.</li>
+<li>Commute and public transportation options and cost.</li>
+<li>Regional development which impact the house resale value in future.</li>
+<li>Some people also will consider the more detailed level of location like the specific location and environment in community.</li>
+</ol>
+</li>
+<li>Time. More recent sales are more relevant. Depend on seller/buyer&#x2019;s acceptable time span for house transaction, the length of relevant period could vary from days to months.</li>
+</ol>
+<p>All the sales should be measured in these 3 dimensions to compare their similarity. These dimensions are based on objective data but have different meanings to different people. We cannot calculate each individual&#x2019;s preference but we can segment people into some major groups in each dimension. For example</p>
+<ul>
+<li>School district may be top priority for some families, while young family without kids may consider transportation first.</li>
+<li>Investment property buyer will look at regional development and market condition.</li>
+</ul>
+<h2 id="imagine-a-better-real-estate-website-recommend-houses-for-home-buyer-list-comparable-sales-for-home-buyerseller"><a href="#Imagine-a-better-real-estate-website-recommend-houses-for-home-buyer-list-comparable-sales-for-home-buyer-seller" class="headerlink" title="Imagine a better real estate website: recommend houses for home buyer, list comparable sales for home buyer/seller"></a>Imagine a better real estate website: recommend houses for home buyer, list comparable sales for home buyer/seller</h2><p>In the analysis of <code>comparable sales</code> I found there are lots of information can be useful to home buyer/seller and cannot be consolidated into a single number. My project goal of <code>fair market value</code> and <code>variation range</code> also need more context to be really meaningful.</p>
+<p>I&#x2019;m no longer focusing on trying to produce a house price number with high accuracy any more. I think it&#x2019;s a impossible and meaningless mission. The data analysis and modeling in my imagination could provide great help to home buyer/seller by giving a full list and match scores instead of a single number:</p>
+<ol>
+<li>Collect data from home seller/buyer for their preference and groups.</li>
+<li><p>Based on available public data, filter houses for home buyer. I didn&#x2019;t say &#x201C;ideal house&#x201D; because it either non-exist or too expensive and out of budget, which equal to non-exist. I also don&#x2019;t think a single match score will represent all the dimensions of house. This could be <a href="https://en.wikipedia.org/wiki/Radar_chart" target="_blank" rel="external">a better visual tool</a> to show the buyer&#x2019;s expectation and the house&#x2019;s actual score in each dimension:</p>
+<p> <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/Spider_Chart2.jpg" alt="spider chart showing "></p>
+<p> The reason to make it more complicate than a single number is that people&#x2019;s preference can change in different context. They may adjust the weights of dimensions according to the limit of available options or any new information. Thus a multi dimensional comparison will be more adaptive and useful.</p>
+<p> I used some real estate websites a lot in my own experience as a customer and in my research. They sure can recommend &#x201C;similar houses&#x201D; for the property you have interest, but the recommendation quality often cannot meet my expectation. These websites also provide lots of filter conditions in house search, however the specific sqft value range or bedroom numbers are just the easiest data point to measure, not the best guides of how people compare houses.</p>
+</li>
+<li><p>List comparable sales for home buyer/seller. They will work as reference points for them to build a more accurate perspective and understanding of market. Because house sale involve multiple parties, they need to know not only the comparable sales in their own view, but also the comparable sales in the other party&#x2019;s view. Of course if the preference is not public, they can only either guess the group the other party belong to or use the most general big group to estimate. These expectations are the corner stones of negotiation, thus very important in shaping the final sale price.</p>
+</li>
+</ol>
+<p>I believe the negotiations and the house sale could be more efficient with more information and shared reference points, and this could lead to a better market.</p>
+<h2 id="back-to-data-and-analysis"><a href="#Back-to-data-and-analysis" class="headerlink" title="Back to data and analysis"></a>Back to data and analysis</h2><p>I haven&#x2019;t talk about much data yet in this post about <code>Data Science</code>. Actually I started to collect data in the very beginning in my research, but I want to have a better understanding about the problem, so I did more research, explored the data with R program, with just checking individual records by hand, try to understand the logic behind the results, built models and tested the prediction performance, then back to do more research about the problem. The theory above is the final product of a long series of research, exploring, thinking and experiments.</p>
+<p>I have much more ideas than my time for implementation, actually my current model is just one of the simplest form:</p>
+<blockquote>
+<p>For any house, based on its <em>tax assessment</em> value, apply the moving average <em>sales/tax assessment ratio</em> of <em>recent</em>, <em>nearby</em> house sales.</p>
+</blockquote>
+<p>The performance of this simple model is not bad at all:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th style="text-align:center">Zillow Zestimate</th>
+<th style="text-align:center">My Model</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>National, within 20%</td>
+<td style="text-align:center">78.3 %</td>
+<td style="text-align:center">NA</td>
+</tr>
+<tr>
+<td>Maryland, within 20%</td>
+<td style="text-align:center">76.8 %</td>
+<td style="text-align:center">NA</td>
+</tr>
+<tr>
+<td>My 3k dataset since 2014, within 20%</td>
+<td style="text-align:center">91.87 %</td>
+<td style="text-align:center">92.58%</td>
+</tr>
+<tr>
+<td>My 3k dataset since 2014, within 10%</td>
+<td style="text-align:center">76.47 %</td>
+<td style="text-align:center">65.82%</td>
+</tr>
+</tbody>
+</table>
+<p><em>The performance of my simple model and Zillow Zestimate on same dataset of 3000 homes. The estimation errors are divided by the sale price, this is the metric used by Zillow to measure Zestimate accuracy.</em></p>
+<p><em>The National and Maryland Zestimate accuracy number was taken on July, 2015. The specific Zestimate values on the dataset were downloaded from April to July. The most current Zestimate values and performance statistics may have been updated.</em></p>
+<h2 id="version-history"><a href="#Version-History" class="headerlink" title="Version History"></a>Version History</h2><ul>
+<li>2015-10-23 : First version.</li>
+<li>2016-05-10 : Added Summary.</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;This personal project was inspired by my own experience in housing market. I was wondering what I can achieve with public data and Data Science methods.&lt;/li&gt;
+&lt;li&gt;Built upon extensive research of domain knowledge, my model is very simple yet powerful. It used the data with most information, followed the trends in space and time.&lt;/li&gt;
+&lt;li&gt;The prediction accuracy is comparable to Zillow Zestimate, although I don’t really think this accuracy number matters too much. The variation  is still too large which is in part due to the nature of house sale/bid process.&lt;/li&gt;
+&lt;li&gt;Instead of trying to improve prediction accuracy numbers, I think it is more practical to list more reasonable comparable sales to user.&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="Data Science" scheme="http://dracodoc.github.io/categories/Data-Science/"/>
+    
+    
+      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
+    
+      <category term="House Price" scheme="http://dracodoc.github.io/tags/House-Price/"/>
+    
+      <category term="modeling" scheme="http://dracodoc.github.io/tags/modeling/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Simple Python performance timing by checkpoints</title>
+    <link href="http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/"/>
+    <id>http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/</id>
+    <published>2015-10-21T00:16:43.000Z</published>
+    <updated>2016-08-19T13:53:13.671Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>This is a simple python script that can measure python program running time in fine levels. </li>
+<li>It&#x2019;s simpler than a full profiler, easier to use than other currently available similar scripts.</li>
+</ul>
+<a id="more"></a>
+<h2 id="the-need-of-a-simple-timing-script"><a href="#The-need-of-a-simple-timing-script" class="headerlink" title="The need of a simple timing script"></a>The need of a simple timing script</h2><p>I have been revisiting Python recently and walked through <a href="https://developers.google.com/edu/python/" target="_blank" rel="external">Google&#x2019;s tutorial</a>. Interestingly my first solution to one of the exercise <strong><em>word count</em></strong> took a lot of time to analysis a 600K text.</p>
+<p>I wanted some profile tool to locate the bottle neck. There are lots of profiler tools but they seemed to be too &#x201C;heavy weighted&#x201D; for my simple purpose. <a href="http://www.huyng.com/posts/python-performance-analysis/" target="_blank" rel="external">This great Python profiler guide</a> introduced a simple <em>timing context manager</em> script to measure script execution. You will need to</p>
+<blockquote>
+<p>wrap blocks of code that you want to time with Python&#x2019;s <em>with</em> keyword and this <em>Timer</em> context manager. It will take care of starting the timer when your code block begins execution and stopping the timer when your code block ends.</p>
+</blockquote>
+<p>Like this</p>
+<pre><code>from timer import Timer
+from redis import Redis
+rdb = Redis()
+
+with Timer() as t:
+    rdb.lpush(&quot;foo&quot;, &quot;bar&quot;)
+print &quot;=&gt; elasped lpush: %s s&quot; % t.secs
+
+with Timer() as t:
+    rdb.lpop(&quot;foo&quot;)
+print &quot;=&gt; elasped lpop: %s s&quot; % t.secs
+</code></pre><p>I used this method and found out the problem in my script is that I used</p>
+<pre><code>if key in dict.keys() 
+</code></pre><p>which seems natural since I saw this before:</p>
+<pre><code>for key in sorted(dict.keys()):
+</code></pre><p>However, this is a linear look up in a list which didn&#x2019;t utilize the constant time access of HashMap. The right way is to use dict directly without keys().</p>
+<pre><code>if key in dict
+</code></pre><p>So the problem was solved but I still found the timing context manager not simple and intuitive enough. Adding timer means lots of edits and indents of original code, and moving checkpoints involves more editing and indenting.</p>
+<h2 id="my-version-of-an-even-simpler-timing-script"><a href="#My-version-of-an-even-simpler-timing-script" class="headerlink" title="My version of an even simpler timing script"></a>My version of an even simpler timing script</h2><p>Therefore, I wrote a simple script that have similar function of timing code blocks by checkpoints, also kept the usage effort minimal. </p>
+<ul>
+<li>import the script</li>
+<li>Place <code>times.start(digit)</code> in the place that you want the timer start. <code>digit</code> control the digits after the decimal point, default at 7.</li>
+<li>Use <code>times.seg_start(&quot;msg&quot;)</code> and <code>times.seg_stop(&quot;msg&quot;)</code> enclose a code block and print the time of start and stop. <code>msg</code> can be used to identify the code block in the output. </li>
+<li>You can also add single checkpoint <code>times.last_seg</code> anywhere, it will print the time elapsed since last checkpoint which could be of any type.</li>
+</ul>
+<p>Here is an example of using timing script in <strong><em>Wordcount</em></strong>. You can search and highlight <code>times</code> to see all the edits needed in script.</p>
+<figure class="highlight py"><figcaption><span>wordcount.py</span><a href="/downloads/code/wordcount.py">view raw</a></figcaption><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python -tt</span></span><br><span class="line"><span class="comment"># Copyright 2010 Google Inc.</span></span><br><span class="line"><span class="comment"># Licensed under the Apache License, Version 2.0</span></span><br><span class="line"><span class="comment"># http://www.apache.org/licenses/LICENSE-2.0</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Google&apos;s Python Class</span></span><br><span class="line"><span class="comment"># http://code.google.com/edu/languages/google-python-class/</span></span><br><span class="line"></span><br><span class="line"><span class="string">&quot;&quot;&quot;Wordcount exercise</span><br><span class="line">Google&apos;s Python class</span><br><span class="line">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> basic.util <span class="keyword">import</span> times</span><br><span class="line"></span><br><span class="line"><span class="comment">###</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># This basic command line argument parsing code is provided and</span></span><br><span class="line"><span class="comment"># calls the print_words() and print_top() functions which you must define.</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">count_words</span><span class="params">(filename)</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;helper method for the other 2, return dict&quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># read file into words</span></span><br><span class="line">    times.seg_start(<span class="string">&apos;count words start&apos;</span>)</span><br><span class="line">    f = open(filename, <span class="string">&apos;rU&apos;</span>)</span><br><span class="line">    word_count = {}</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> f:</span><br><span class="line">        words = line.split()</span><br><span class="line">        <span class="keyword">for</span> word <span class="keyword">in</span> words:</span><br><span class="line">            word = word.lower()</span><br><span class="line">            <span class="keyword">if</span> word <span class="keyword">in</span> word_count:    <span class="comment"># 0.069 for 640k</span></span><br><span class="line">            <span class="comment">#if word_count.get(word): # 0.03s for 250k text, 0.084 for 640k</span></span><br><span class="line">                word_count[word] += <span class="number">1</span></span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                word_count[word] = <span class="number">1</span></span><br><span class="line">    times.seg_stop(<span class="string">&apos;count words stop&apos;</span>)</span><br><span class="line">    <span class="keyword">return</span> word_count</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_words</span><span class="params">(filename)</span>:</span></span><br><span class="line">    <span class="string">&quot;count words&quot;</span></span><br><span class="line">    <span class="comment">#sort dict and print</span></span><br><span class="line">    word_count = count_words(filename)</span><br><span class="line">    <span class="keyword">for</span> word <span class="keyword">in</span> sorted(word_count.keys()):</span><br><span class="line">        <span class="keyword">print</span> word, word_count[word]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">print_top</span><span class="params">(filename)</span>:</span></span><br><span class="line">    word_count = count_words(filename)</span><br><span class="line">    word_count_pairs = word_count.items()</span><br><span class="line">    times.seg_start(<span class="string">&apos;sorting start&apos;</span>)</span><br><span class="line">    word_count_pairs = sorted(word_count_pairs, key = <span class="keyword">lambda</span> pair: pair[<span class="number">-1</span>], reverse=<span class="keyword">True</span>)</span><br><span class="line">    times.seg_stop(<span class="string">&apos;sorting stop&apos;</span>)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        <span class="keyword">print</span> word_count_pairs[i][<span class="number">0</span>], word_count_pairs[i][<span class="number">1</span>]</span><br><span class="line">    times.last_seg()</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">  <span class="keyword">if</span> len(sys.argv) != <span class="number">3</span>:</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&apos;usage: ./wordcount.py {--count | --topcount} file&apos;</span></span><br><span class="line">    sys.exit(<span class="number">1</span>)</span><br><span class="line">  times.start(<span class="number">5</span>)</span><br><span class="line">  option = sys.argv[<span class="number">1</span>]</span><br><span class="line">  filename = sys.argv[<span class="number">2</span>]</span><br><span class="line">  <span class="keyword">if</span> option == <span class="string">&apos;--count&apos;</span>:</span><br><span class="line">    print_words(filename)</span><br><span class="line">  <span class="keyword">elif</span> option == <span class="string">&apos;--topcount&apos;</span>:</span><br><span class="line">    print_top(filename)</span><br><span class="line">  <span class="keyword">else</span>:</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&apos;unknown option: &apos;</span> + option</span><br><span class="line">    sys.exit(<span class="number">1</span>)</span><br><span class="line">  times.end()</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&apos;__main__&apos;</span>:</span><br><span class="line">  main()</span><br></pre></td></tr></table></figure>
+<p>I put some efforts in the print indenting to make the output aligned:</p>
+<figure class="highlight plain"><figcaption><span>output</span></figcaption><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">==&gt;| Timer start | set to 5 digits after decimal point</span><br><span class="line">=&gt; &lt;&lt; | 0          count words start</span><br><span class="line">      | 0.06900 s  count words stop  &gt;&gt;</span><br><span class="line">=&gt; &lt;&lt; | 0          sorting start</span><br><span class="line">      | 0.00800 s  sorting stop  &gt;&gt;</span><br><span class="line">the 5027</span><br><span class="line">to 3353</span><br><span class="line">and 2831</span><br><span class="line">=&gt; | 0.00100 s since last point</span><br><span class="line">=&gt; | 0.00300 s since last point. Timer end.</span><br><span class="line">| 0.08600 s Total time elapsed |</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>Here is the script. You can also download it from the link in right top corner of code block.</p>
+<figure class="highlight python"><figcaption><span>times.py</span><a href="https://github.com/dracodoc/misc_utils/blob/master/times.py" target="_blank" rel="external">Open in Github</a></figcaption><table><tr><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">__author__ = <span class="string">&apos;dracodoc&apos;</span></span><br><span class="line"><span class="comment"># measure script time duration in segments. http://dracodoc.github.io/</span></span><br><span class="line"><span class="comment"># the clock value list: start, segments, end</span></span><br><span class="line"><span class="comment"># usage: import times, put times.start, seg_start, end etc in line.</span></span><br><span class="line">T = []</span><br><span class="line">Digit = [<span class="number">7</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">start</span><span class="params">(digit=<span class="number">7</span>)</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;Timer start. digit control the number width to align&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">del</span> T[:]  <span class="comment"># clean up first</span></span><br><span class="line">    Digit[<span class="number">0</span>] = digit</span><br><span class="line">    T.append(time.time())</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&apos;==&gt;| Timer start | set to&apos;</span>, Digit[<span class="number">0</span>], <span class="string">&apos;digits after decimal point&apos;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">last_seg</span><span class="params">(s=<span class="string">&apos;since last point&apos;</span>)</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;calculate the duration between last point till this one&quot;&quot;&quot;</span></span><br><span class="line">    T.append(time.time())</span><br><span class="line">    duration = T[<span class="number">-1</span>] - T[<span class="number">-2</span>]</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&quot;=&gt; | %.*f s&quot;</span> % (Digit[<span class="number">0</span>], duration), s</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">seg_start</span><span class="params">(s=<span class="string">&apos;start...&apos;</span>)</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;set a segment start, always used with seg_stop in pairs&quot;&quot;&quot;</span></span><br><span class="line">    T.append(time.time())</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&quot;=&gt; &lt;&lt; | 0&quot;</span>, <span class="string">&apos; &apos;</span> * (Digit[<span class="number">0</span>] + <span class="number">3</span>), s</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">seg_stop</span><span class="params">(s=<span class="string">&apos;...stop&apos;</span>)</span>:</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;set a segment end, always used with seg_start in pairs&quot;&quot;&quot;</span></span><br><span class="line">    T.append(time.time())</span><br><span class="line">    duration = T[<span class="number">-1</span>] - T[<span class="number">-2</span>]</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&quot;      | %.*f s &quot;</span> % (Digit[<span class="number">0</span>], duration), s, <span class="string">&apos; &gt;&gt;&apos;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">end</span><span class="params">(s=<span class="string">&apos;since last point. Timer end.&apos;</span>)</span>:</span></span><br><span class="line">    T.append(time.time())</span><br><span class="line">    duration = T[<span class="number">-1</span>] - T[<span class="number">-2</span>]</span><br><span class="line">    total = T[<span class="number">-1</span>] - T[<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&quot;=&gt; | %.*f s&quot;</span> % (Digit[<span class="number">0</span>], duration), s</span><br><span class="line">    <span class="keyword">print</span> <span class="string">&quot;==&gt;| %.*f s&quot;</span> % (Digit[<span class="number">0</span>], total), <span class="string">&apos;Total time elapsed&apos;</span></span><br></pre></td></tr></table></figure>
+<p>Of course sometimes you want more features like execution frequency and memory analysis, then you can always use more powerful profiler like <a href="https://github.com/rkern/line_profiler" target="_blank" rel="external">line_profiler</a> and <a href="https://github.com/fabianp/memory_profiler" target="_blank" rel="external">memory profiler</a>. The profiler guide I mentioned earlier have detailed introductions on them. </p>
+<p>That being said, I still found my simple timing script is often useful enough and easy to use with minimal overhead.</p>
+<h2 id="version-history"><a href="#Version-History" class="headerlink" title="Version History"></a>Version History</h2><ul>
+<li>2015-01-15 : <a href="https://dracodoc.wordpress.com/2015/01/15/a-python-script-inline-timer/" target="_blank" rel="external">The first version of this article on wordpress</a></li>
+<li>2015-10-20 : Some edits when I moved my blog to github pages.</li>
+<li>2016-05-10 : Added Summary.</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;This is a simple python script that can measure python program running time in fine levels. &lt;/li&gt;
+&lt;li&gt;It’s simpler than a full profiler, easier to use than other currently available similar scripts.&lt;/li&gt;
+&lt;/ul&gt;
+    
+    </summary>
+    
+      <category term="Python" scheme="http://dracodoc.github.io/categories/Python/"/>
+    
+    
+      <category term="Python" scheme="http://dracodoc.github.io/tags/Python/"/>
+    
+      <category term="Programming" scheme="http://dracodoc.github.io/tags/Programming/"/>
+    
+  </entry>
+  
+</feed>

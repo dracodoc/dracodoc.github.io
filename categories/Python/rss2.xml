@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"
+     xmlns:atom="http://www.w3.org/2005/Atom"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/">
+    <channel>
+        <title></title>
+        <link>http://dracodoc.github.io/</link>
+        <atom:link href="/categories/Python/rss2.xml" rel="self" type="application/rss+xml"/>
+        
+        <description></description>
+        <pubDate>Fri, 19 Aug 2016 13:53:13 GMT</pubDate>
+        <generator>http://hexo.io/</generator>
+        
+        <item>
+            <title>Simple Python performance timing by checkpoints</title>
+            <link>http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/</link>
+            <guid>http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/</guid>
+            <pubDate>Wed, 21 Oct 2015 00:16:43 GMT</pubDate>
+            <description>
+                
+                &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;This is a simple python script that can measure python program running time in fine levels. &lt;/li&gt;
+&lt;li&gt;It’s simpler than a full profiler, easier to use than other currently available similar scripts.&lt;/li&gt;
+&lt;/ul&gt;
+                
+            </description>
+            
+            <comments>http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/#disqus_thread</comments>
+        </item>
+        
+    </channel>
+</rss>

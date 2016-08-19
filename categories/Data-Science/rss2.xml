@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"
+     xmlns:atom="http://www.w3.org/2005/Atom"
+     xmlns:content="http://purl.org/rss/1.0/modules/content/">
+    <channel>
+        <title></title>
+        <link>http://dracodoc.github.io/</link>
+        <atom:link href="/categories/Data-Science/rss2.xml" rel="self" type="application/rss+xml"/>
+        
+        <description></description>
+        <pubDate>Fri, 19 Aug 2016 13:48:32 GMT</pubDate>
+        <generator>http://hexo.io/</generator>
+        
+        <item>
+            <title>Red Cross Smoke Alarm Project</title>
+            <link>http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/</link>
+            <guid>http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/</guid>
+            <pubDate>Wed, 11 Nov 2015 14:02:10 GMT</pubDate>
+            <description>
+                
+                &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;This is a write-up for my volunteer Data Science project for the American Red Cross.&lt;/li&gt;
+&lt;li&gt;The project used public data to help Red Cross directing limited resources to homes that more vulnerable to fire risk and loss.&lt;/li&gt;
+&lt;li&gt;My work in the project:&lt;ul&gt;
+&lt;li&gt;Discovered the hidden information in NFIRS dataset, obtained and analyzed 10G NFIRS data.&lt;/li&gt;
+&lt;li&gt;Major contribution on model design, implemented NFIRS related predictors, and built interactive visualizations.&lt;/li&gt;
+&lt;li&gt;Geocoded 18 millions address in NFIRS data with AWS server, Postgresql, PostGIS.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+                
+            </description>
+            
+            <comments>http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/#disqus_thread</comments>
+        </item>
+        
+        <item>
+            <title>Exploring House Price Estimation And Imagining A Better Real Estate Website</title>
+            <link>http://dracodoc.github.io/2015/10/23/house-price/</link>
+            <guid>http://dracodoc.github.io/2015/10/23/house-price/</guid>
+            <pubDate>Fri, 23 Oct 2015 18:23:53 GMT</pubDate>
+            <description>
+                
+                &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;This personal project was inspired by my own experience in housing market. I was wondering what I can achieve with public data and Data Science methods.&lt;/li&gt;
+&lt;li&gt;Built upon extensive research of domain knowledge, my model is very simple yet powerful. It used the data with most information, followed the trends in space and time.&lt;/li&gt;
+&lt;li&gt;The prediction accuracy is comparable to Zillow Zestimate, although I don’t really think this accuracy number matters too much. The variation  is still too large which is in part due to the nature of house sale/bid process.&lt;/li&gt;
+&lt;li&gt;Instead of trying to improve prediction accuracy numbers, I think it is more practical to list more reasonable comparable sales to user.&lt;/li&gt;
+&lt;/ul&gt;
+                
+            </description>
+            
+            <comments>http://dracodoc.github.io/2015/10/23/house-price/#disqus_thread</comments>
+        </item>
+        
+    </channel>
+</rss>
