@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://dracodoc.github.io/2015/11/19/Script-workflow/</loc>
+    
+    <lastmod>2016-08-19T19:39:10.803Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/</loc>
+    
+    <lastmod>2016-08-19T19:09:47.192Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</loc>
     
     <lastmod>2016-08-19T13:55:46.098Z</lastmod>
@@ -12,20 +26,6 @@
     <loc>http://dracodoc.github.io/2015/10/23/house-price/</loc>
     
     <lastmod>2016-08-19T13:53:27.004Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/</loc>
-    
-    <lastmod>2016-08-19T13:53:13.671Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://dracodoc.github.io/2015/11/19/Script-workflow/</loc>
-    
-    <lastmod>2016-08-19T13:49:04.331Z</lastmod>
     
   </url>
   

@@ -1,28 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
-  <title>From Learning and Evolution to Data Science</title>
+<search>
   
-  <link href="http://dracodoc.github.io/atom.xml" rel="self"/>
   
-  <link href="http://dracodoc.github.io/"/>
-  <updated>2016-08-19T13:55:46.098Z</updated>
-  <id>http://dracodoc.github.io/</id>
-  
-  <author>
-    <name>dracodoc</name>
     
-  </author>
-  
-  <generator uri="http://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title>Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning</title>
-    <link href="http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/"/>
-    <id>http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</id>
-    <published>2016-02-03T21:17:59.000Z</published>
-    <updated>2016-08-19T13:55:46.098Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+    <entry>
+      <title><![CDATA[Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning]]></title>
+      <url>http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</url>
+      <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>This is my second post on topic of Data Cleaning. </li>
 <li>Cleaning addresses format turned out to have a substantial positive impact on Geocoding performance.</li>
 <li>Deep understandings of address format standard is needed to deal with all kinds of special cases.</li>
@@ -224,38 +208,12 @@
 <li>2016-05-11 : Added Summary.</li>
 </ul>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;This is my second post on topic of Data Cleaning. &lt;/li&gt;
-&lt;li&gt;Cleaning addresses format turned out to have a substantial positive impact on Geocoding performance.&lt;/li&gt;
-&lt;li&gt;Deep understandings of address format standard is needed to deal with all kinds of special cases.&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
-    
-    
-      <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
-    
-      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
-    
-      <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
-    
-      <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Data Cleaning Part 1 - NYC Taxi Trip Data, Looking For Stories Behind Errors</title>
-    <link href="http://dracodoc.github.io/2016/01/31/data-cleaning/"/>
-    <id>http://dracodoc.github.io/2016/01/31/data-cleaning/</id>
-    <published>2016-02-01T01:27:06.000Z</published>
-    <updated>2016-08-19T13:47:21.585Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+    <entry>
+      <title><![CDATA[Data Cleaning Part 1 - NYC Taxi Trip Data, Looking For Stories Behind Errors]]></title>
+      <url>http://dracodoc.github.io/2016/01/31/data-cleaning/</url>
+      <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>Data cleaning is a cumbersome but important task for Data Science project in reality.</li>
 <li>This is a discussion on my practice of data cleaning for NYC Taxi Trip data.</li>
 <li>There are lots of domain knowledge, common sense and business thinking involved.</li>
@@ -322,38 +280,12 @@
 <li>2016-05-11 : Added Summary.</li>
 </ul>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;Data cleaning is a cumbersome but important task for Data Science project in reality.&lt;/li&gt;
-&lt;li&gt;This is a discussion on my practice of data cleaning for NYC Taxi Trip data.&lt;/li&gt;
-&lt;li&gt;There are lots of domain knowledge, common sense and business thinking involved.&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
-    
-    
-      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
-    
-      <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
-    
-      <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
-    
-      <category term="NYC taxi data" scheme="http://dracodoc.github.io/tags/NYC-taxi-data/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder</title>
-    <link href="http://dracodoc.github.io/2015/11/19/Script-workflow/"/>
-    <id>http://dracodoc.github.io/2015/11/19/Script-workflow/</id>
-    <published>2015-11-19T20:05:00.000Z</published>
-    <updated>2016-08-19T19:39:10.803Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+    <entry>
+      <title><![CDATA[Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder]]></title>
+      <url>http://dracodoc.github.io/2015/11/19/Script-workflow/</url>
+      <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>I discussed all the problem I met, approaches I tried, and improvement I achieved in the Geocoding task.</li>
 <li>There are many subtle details, some open questions and areas can be improved.</li>
 <li>The final working script and complete workflow are hosted in <a href="https://github.com/dracodoc/Geocode" target="_blank" rel="external">github</a>.</li>
@@ -604,42 +536,12 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
 <li>2016-08-19 : Syntax highlighting.</li>
 </ul>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;I discussed all the problem I met, approaches I tried, and improvement I achieved in the Geocoding task.&lt;/li&gt;
-&lt;li&gt;There are many subtle details, some open questions and areas can be improved.&lt;/li&gt;
-&lt;li&gt;The final working script and complete workflow are hosted in &lt;a href=&quot;https://github.com/dracodoc/Geocode&quot;&gt;github&lt;/a&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="Geocoding" scheme="http://dracodoc.github.io/categories/Geocoding/"/>
-    
-    
-      <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
-    
-      <category term="Tiger Geocoder" scheme="http://dracodoc.github.io/tags/Tiger-Geocoder/"/>
-    
-      <category term="PostGIS" scheme="http://dracodoc.github.io/tags/PostGIS/"/>
-    
-      <category term="postgresql" scheme="http://dracodoc.github.io/tags/postgresql/"/>
-    
-      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
-    
-      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Geocoding 18 million addresses with PostGIS Tiger Geocoder</title>
-    <link href="http://dracodoc.github.io/2015/11/17/Geocoding/"/>
-    <id>http://dracodoc.github.io/2015/11/17/Geocoding/</id>
-    <published>2015-11-17T16:36:10.000Z</published>
-    <updated>2016-08-19T13:46:40.772Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+    <entry>
+      <title><![CDATA[Geocoding 18 million addresses with PostGIS Tiger Geocoder]]></title>
+      <url>http://dracodoc.github.io/2015/11/17/Geocoding/</url>
+      <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>This post discussed the background, approaches, windows and linux environment setup for my Geocoding task.</li>
 <li>See more details about the script and workflow in next post.</li>
 </ul>
@@ -731,41 +633,12 @@ su ubuntu
 <li>2016-05-11 : Added Summary.</li>
 </ul>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;This post discussed the background, approaches, windows and linux environment setup for my Geocoding task.&lt;/li&gt;
-&lt;li&gt;See more details about the script and workflow in next post.&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="Geocoding" scheme="http://dracodoc.github.io/categories/Geocoding/"/>
-    
-    
-      <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
-    
-      <category term="Tiger Geocoder" scheme="http://dracodoc.github.io/tags/Tiger-Geocoder/"/>
-    
-      <category term="PostGIS" scheme="http://dracodoc.github.io/tags/PostGIS/"/>
-    
-      <category term="postgresql" scheme="http://dracodoc.github.io/tags/postgresql/"/>
-    
-      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
-    
-      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Red Cross Smoke Alarm Project</title>
-    <link href="http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/"/>
-    <id>http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/</id>
-    <published>2015-11-11T14:02:10.000Z</published>
-    <updated>2016-08-19T13:48:32.625Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+    <entry>
+      <title><![CDATA[Red Cross Smoke Alarm Project]]></title>
+      <url>http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/</url>
+      <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>This is a write-up for my volunteer Data Science project for the American Red Cross.</li>
 <li>The project used public data to help Red Cross directing limited resources to homes that more vulnerable to fire risk and loss.</li>
 <li>My work in the project:<ul>
@@ -819,45 +692,12 @@ su ubuntu
 <li>2016-05-11 : Added visualization of fire incident per census tract.</li>
 </ul>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;This is a write-up for my volunteer Data Science project for the American Red Cross.&lt;/li&gt;
-&lt;li&gt;The project used public data to help Red Cross directing limited resources to homes that more vulnerable to fire risk and loss.&lt;/li&gt;
-&lt;li&gt;My work in the project:&lt;ul&gt;
-&lt;li&gt;Discovered the hidden information in NFIRS dataset, obtained and analyzed 10G NFIRS data.&lt;/li&gt;
-&lt;li&gt;Major contribution on model design, implemented NFIRS related predictors, and built interactive visualizations.&lt;/li&gt;
-&lt;li&gt;Geocoded 18 millions address in NFIRS data with AWS server, Postgresql, PostGIS.&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="Data Science" scheme="http://dracodoc.github.io/categories/Data-Science/"/>
-    
-    
-      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
-    
-      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
-    
-      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
-    
-      <category term="Red Cross" scheme="http://dracodoc.github.io/tags/Red-Cross/"/>
-    
-      <category term="Smoke Alarm project" scheme="http://dracodoc.github.io/tags/Smoke-Alarm-project/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Exploring House Price Estimation And Imagining A Better Real Estate Website</title>
-    <link href="http://dracodoc.github.io/2015/10/23/house-price/"/>
-    <id>http://dracodoc.github.io/2015/10/23/house-price/</id>
-    <published>2015-10-23T18:23:53.000Z</published>
-    <updated>2016-08-19T13:53:27.004Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+    <entry>
+      <title><![CDATA[Exploring House Price Estimation And Imagining A Better Real Estate Website]]></title>
+      <url>http://dracodoc.github.io/2015/10/23/house-price/</url>
+      <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>This personal project was inspired by my own experience in housing market. I was wondering what I can achieve with public data and Data Science methods.</li>
 <li>Built upon extensive research of domain knowledge, my model is very simple yet powerful. It used the data with most information, followed the trends in space and time.</li>
 <li>The prediction accuracy is comparable to Zillow Zestimate, although I don&#x2019;t really think this accuracy number matters too much. The variation  is still too large which is in part due to the nature of house sale/bid process.</li>
@@ -977,37 +817,12 @@ su ubuntu
 <li>2016-05-10 : Added Summary.</li>
 </ul>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;This personal project was inspired by my own experience in housing market. I was wondering what I can achieve with public data and Data Science methods.&lt;/li&gt;
-&lt;li&gt;Built upon extensive research of domain knowledge, my model is very simple yet powerful. It used the data with most information, followed the trends in space and time.&lt;/li&gt;
-&lt;li&gt;The prediction accuracy is comparable to Zillow Zestimate, although I don’t really think this accuracy number matters too much. The variation  is still too large which is in part due to the nature of house sale/bid process.&lt;/li&gt;
-&lt;li&gt;Instead of trying to improve prediction accuracy numbers, I think it is more practical to list more reasonable comparable sales to user.&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="Data Science" scheme="http://dracodoc.github.io/categories/Data-Science/"/>
-    
-    
-      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
-    
-      <category term="House Price" scheme="http://dracodoc.github.io/tags/House-Price/"/>
-    
-      <category term="modeling" scheme="http://dracodoc.github.io/tags/modeling/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Simple Python performance timing by checkpoints</title>
-    <link href="http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/"/>
-    <id>http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/</id>
-    <published>2015-10-21T00:16:43.000Z</published>
-    <updated>2016-08-19T19:09:47.192Z</updated>
-    
-    <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+    <entry>
+      <title><![CDATA[Simple Python performance timing by checkpoints]]></title>
+      <url>http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/</url>
+      <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>This is a simple python script that can measure python program running time in fine levels. </li>
 <li>It&#x2019;s simpler than a full profiler, easier to use than other currently available similar scripts.</li>
 </ul>
@@ -1042,23 +857,8 @@ su ubuntu
 <li>2016-08-19 : Syntax highlighting for all code chunks</li>
 </ul>
 ]]></content>
+    </entry>
     
-    <summary type="html">
-    
-      &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;This is a simple python script that can measure python program running time in fine levels. &lt;/li&gt;
-&lt;li&gt;It’s simpler than a full profiler, easier to use than other currently available similar scripts.&lt;/li&gt;
-&lt;/ul&gt;
-    
-    </summary>
-    
-      <category term="Python" scheme="http://dracodoc.github.io/categories/Python/"/>
-    
-    
-      <category term="Python" scheme="http://dracodoc.github.io/tags/Python/"/>
-    
-      <category term="Programming" scheme="http://dracodoc.github.io/tags/Programming/"/>
-    
-  </entry>
   
-</feed>
+  
+</search>

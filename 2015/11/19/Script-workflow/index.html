@@ -1,5 +1,11 @@
 <!doctype html>
-<html class="theme-next ">
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
 <head>
   <meta charset="UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
@@ -21,18 +27,45 @@
 
 
 
-  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css"/>
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
 
 
 
 
-  <link href="//fonts.googleapis.com/css?family=Lato:300,400,700,400italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
 
 
 
 <link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
 
-<link href="/css/main.css?v=0.4.5.2" rel="stylesheet" type="text/css" />
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
   <meta name="keywords" content="Geocoding,Tiger Geocoder,PostGIS,postgresql,DataKind,NFIRS," />
@@ -46,7 +79,7 @@
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=0.4.5.2" />
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
 
 
 
@@ -75,7 +108,7 @@ The final">
 <meta property="og:image" content="http://dracodoc.github.io/2_explain_limit_v1.png">
 <meta property="og:image" content="http://dracodoc.github.io/3_explain_scan_v2.png">
 <meta property="og:image" content="http://dracodoc.github.io/4_explain_scan_v1_2nd_run.png">
-<meta property="og:updated_time" content="2016-08-19T13:49:04.331Z">
+<meta property="og:updated_time" content="2016-08-19T19:39:10.803Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder">
 <meta name="twitter:description" content="Summary
@@ -87,27 +120,29 @@ The final">
 
 
 <script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
   var CONFIG = {
     scheme: 'Mist',
-    sidebar: 'always',
-    motion: false
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: 'Author'
+    }
   };
 </script>
+
+
+
+
+  <link rel="canonical" href="http://dracodoc.github.io/2015/11/19/Script-workflow/"/>
 
   <title> Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder | From Learning and Evolution to Data Science </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="en">
 
-  <!--[if lte IE 8]>
-  <div style=' clear: both; height: 59px; padding:0 0 0 15px; position: relative;margin:0 auto;'>
-    <a href="http://windows.microsoft.com/en-US/internet-explorer/products/ie/home?ocid=ie6_countdown_bannercode">
-      <img src="http://7u2nvr.com1.z0.glb.clouddn.com/picouterie.jpg" border="0" height="42" width="820"
-           alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today or use other browser ,like chrome firefox safari."
-           style='margin-left:auto;margin-right:auto;display: block;'/>
-    </a>
-  </div>
-<![endif]-->
   
 
 
@@ -115,7 +150,16 @@ The final">
 
 
 
-  <div class="container one-column page-post-detail">
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -144,13 +188,23 @@ The final">
   
 
   
-    <ul id="menu" class="menu ">
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
       
         
         <li class="menu-item menu-item-categories">
           <a href="/categories" rel="section">
             
-              <i class="menu-item-icon fa fa-th fa-fw"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
             
             Categories
           </a>
@@ -160,7 +214,7 @@ The final">
         <li class="menu-item menu-item-about">
           <a href="/about" rel="section">
             
-              <i class="menu-item-icon fa fa-question-circle fa-fw"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
             
             About
           </a>
@@ -170,7 +224,7 @@ The final">
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
             
-              <i class="menu-item-icon fa fa-archive fa-fw"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
             
             Archives
           </a>
@@ -180,7 +234,7 @@ The final">
         <li class="menu-item menu-item-tags">
           <a href="/tags" rel="section">
             
-              <i class="menu-item-icon fa fa-tags fa-fw"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
             
             Tags
           </a>
@@ -188,10 +242,32 @@ The final">
       
 
       
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
       
     </ul>
   
 
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
   
 </nav>
 
@@ -200,8 +276,9 @@ The final">
 
     <main id="main" class="main">
       <div class="main-inner">
-        <div id="content" class="content">
-          
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
 
   <div id="posts" class="posts-expand">
     
@@ -232,7 +309,10 @@ The final">
 
         <div class="post-meta">
           <span class="post-time">
-            Posted on
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">Posted on</span>
             <time itemprop="dateCreated" datetime="2015-11-19T15:05:00-05:00" content="2015-11-19">
               2015-11-19
             </time>
@@ -240,7 +320,11 @@ The final">
 
           
             <span class="post-category" >
-              &nbsp; | &nbsp; In
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
                   <a href="/categories/Geocoding/" itemprop="url" rel="index">
@@ -258,28 +342,32 @@ The final">
           
             
               <span class="post-comments-count">
-              &nbsp; | &nbsp;
-              <a href="/2015/11/19/Script-workflow/#comments" itemprop="discussionUrl">
-                <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/11/19/Script-workflow/" itemprop="commentsCount"></span>
-              </a>
-            </span>
+                &nbsp; | &nbsp;
+                <a href="/2015/11/19/Script-workflow/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2015/11/19/Script-workflow/" itemprop="commentsCount"></span>
+                </a>
+              </span>
             
           
 
           
 
+          
+          
+
+          
         </div>
       </header>
     
 
 
-    <div class="post-body">
+    <div class="post-body" itemprop="articleBody">
 
       
       
 
       
-        <span itemprop="articleBody"><h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+        <h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>I discussed all the problem I met, approaches I tried, and improvement I achieved in the Geocoding task.</li>
 <li>There are many subtle details, some open questions and areas can be improved.</li>
 <li>The final working script and complete workflow are hosted in <a href="https://github.com/dracodoc/Geocode" target="_blank" rel="external">github</a>.</li>
@@ -296,13 +384,8 @@ The final">
 <p>Someone also mentioned that to <strong>standardize the address first, remove the invalid addresses</strong> since they take the most time to geocode. However I&#x2019;m not sure how can I verify the valid address without actual geocoding. Some addresses are obviously missing street numbers and cannot have an exact location, but I may still need the ballpark location for my analysis. They may not be able to be mapped to census block, but a census tract mapping could still be helpful. After the first pass on one year&#x2019;s data I will design a much more complete cleaning process, which could make the geocoding function&#x2019;s job a little bit easier.</p>
 <p><a href="http://postgis.net/docs/postgis_installation.html#tiger_pagc_address_standardizing" target="_blank" rel="external">The PostGIS documentation</a> did mention that the built-in address normalizer is not optimal and they have a better pagc address standardizer can be used. I tried to enable it in the linux setup but failed. It seemed that I need to reinstall postgresql since it is not included in the postgresql setup process of the ansible playbook. The newer version PostGIS 2.2.0 released in Oct, 2015 seemed to have <em>&#x201C;New high-speed native code address standardizer&#x201D;</em>, while the ansible playbook used <code>PostgreSQL 9.3.10</code> and <code>PostGIS 2.1.2 r12389</code>.  This is a direction I&#x2019;ll explore later.</p>
 <h2 id="test-geocoding-function"><a href="#Test-Geocoding-Function" class="headerlink" title="Test Geocoding Function"></a>Test Geocoding Function</h2><p>Based on the example given in <code>geocode</code> function documentation, I wrote my version of SQL command to geocode address like this:</p>
-<pre><code>SELECT g.rating,
-        pprint_addy(g.addy),
-        ST_X(g.geomout)::numeric(8,5) AS lon,
-        ST_Y(g.geomout)::numeric(8,5) AS lat,
-        g.geomout
-FROM geocode(&apos;2198 Florida Ave NW, Washington, DC 20008&apos;, 1) AS g;
-</code></pre><ul>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> g.rating,</span><br><span class="line">        pprint_addy(g.addy),</span><br><span class="line">        ST_X(g.geomout)::<span class="built_in">numeric</span>(<span class="number">8</span>,<span class="number">5</span>) <span class="keyword">AS</span> lon,</span><br><span class="line">        ST_Y(g.geomout)::<span class="built_in">numeric</span>(<span class="number">8</span>,<span class="number">5</span>) <span class="keyword">AS</span> lat,</span><br><span class="line">        g.geomout</span><br><span class="line"><span class="keyword">FROM</span> geocode(<span class="string">&apos;2198 Florida Ave NW, Washington, DC 20008&apos;</span>, <span class="number">1</span>) <span class="keyword">AS</span> g;</span><br></pre></td></tr></table></figure>
+<ul>
 <li>the <code>1</code> parameter in geocode function limit the output to single address with best rating, since we don&#x2019;t have any other method to compare all the output.</li>
 <li>rating is needed because I need to know the match score for result. 0 is for perfect match, and 100 is for very rough match which I probably will not use.</li>
 <li><code>pprint_addy</code> give a pretty print of address in format that people familiar.</li>
@@ -348,65 +431,27 @@ FROM geocode(&apos;2198 Florida Ave NW, Washington, DC 20008&apos;, 1) AS g;
 </table>
 <p>The <code>row_seq</code> is the unique id I assigned to every row so I can link the output back to the original table. <code>zip</code> is needed because I want to sort the addresses by zipcode. Another bonus is that addresses with obvious wrong zipcode will be shown together in beginning or ending of the file. I used the pipe symbol <code>|</code> as the separator of csv because there could be quotes and commas in columns.</p>
 <p>Then I can read the csv into a table in postgresql database. The <code>geocode</code> function documentation provided an example to geocode addresses in batch mode, and most discussions in web seemed to be based on this example.</p>
-<pre><code>-- only update the first 3 addresses (323-704 ms
--- there are caching and shared memory effects so first geocode you do is always slower)
--- for large numbers of addresses you don&apos;t want to update all at once
--- since the whole geocode must commit at once
--- For this example we rejoin with LEFT JOIN
--- and set to rating to -1 rating if no match
--- to ensure we don&apos;t regeocode a bad address
-UPDATE addresses_to_geocode
-  SET ( rating, new_address, lon, lat)
-    = ( COALESCE((g.geo).rating,-1), pprint_addy((g.geo).addy),
-       ST_X((g.geo).geomout)::numeric(8,5), ST_Y((g.geo).geomout)::numeric(8,5) )
-FROM (SELECT addid
-        FROM addresses_to_geocode
-        WHERE rating IS NULL ORDER BY addid LIMIT 3) AS a
-    LEFT JOIN (SELECT addid, (geocode(address,1)) AS geo
-                FROM addresses_to_geocode AS ag
-                WHERE ag.rating IS NULL ORDER BY addid LIMIT 3) AS g ON a.addid = g.addid
-WHERE a.addid = addresses_to_geocode.addid;
-</code></pre><p>Since the geocoding process can be slow, it&#x2019;s suggested to process a small portion at a time. The address table was assigned an <code>addid</code> for each row as a index. The code always take <em>the first 3 rows not yet processed (rating column is null)</em> as the <em>sample</em> <code>a</code> to be geocoded.</p>
-<pre><code>SELECT addid
-    FROM addresses_to_geocode
-    WHERE rating IS NULL ORDER BY addid LIMIT 3) AS a
-</code></pre><p><img src="table1.png" alt="table 1"><br>The <em>result of geocoding</em> <code>g</code> is joined with the <code>addid</code> of the <em>sample</em> <code>a</code>.</p>
-<pre><code>LEFT JOIN (SELECT addid, (geocode(address,1)) AS geo
-            FROM addresses_to_geocode AS ag
-            WHERE ag.rating IS NULL ORDER BY addid LIMIT 3
-          ) AS g ON a.addid = g.addid
-</code></pre><p><img src="table2.png" alt="table 2"></p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="comment">-- only update the first 3 addresses (323-704 ms</span></span><br><span class="line"><span class="comment">-- there are caching and shared memory effects so first geocode you do is always slower)</span></span><br><span class="line"><span class="comment">-- for large numbers of addresses you don&apos;t want to update all at once</span></span><br><span class="line"><span class="comment">-- since the whole geocode must commit at once</span></span><br><span class="line"><span class="comment">-- For this example we rejoin with LEFT JOIN</span></span><br><span class="line"><span class="comment">-- and set to rating to -1 rating if no match</span></span><br><span class="line"><span class="comment">-- to ensure we don&apos;t regeocode a bad address</span></span><br><span class="line"><span class="keyword">UPDATE</span> addresses_to_geocode</span><br><span class="line">  <span class="keyword">SET</span> ( rating, new_address, lon, lat)</span><br><span class="line">    = ( <span class="keyword">COALESCE</span>((g.geo).rating,<span class="number">-1</span>), pprint_addy((g.geo).addy),</span><br><span class="line">       ST_X((g.geo).geomout)::<span class="built_in">numeric</span>(<span class="number">8</span>,<span class="number">5</span>), ST_Y((g.geo).geomout)::<span class="built_in">numeric</span>(<span class="number">8</span>,<span class="number">5</span>) )</span><br><span class="line"><span class="keyword">FROM</span> (<span class="keyword">SELECT</span> addid</span><br><span class="line">        <span class="keyword">FROM</span> addresses_to_geocode</span><br><span class="line">        <span class="keyword">WHERE</span> rating <span class="keyword">IS</span> <span class="literal">NULL</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> addid <span class="keyword">LIMIT</span> <span class="number">3</span>) <span class="keyword">AS</span> a</span><br><span class="line">    <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> (<span class="keyword">SELECT</span> addid, (geocode(address,<span class="number">1</span>)) <span class="keyword">AS</span> geo</span><br><span class="line">                <span class="keyword">FROM</span> addresses_to_geocode <span class="keyword">AS</span> ag</span><br><span class="line">                <span class="keyword">WHERE</span> ag.rating <span class="keyword">IS</span> <span class="literal">NULL</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> addid <span class="keyword">LIMIT</span> <span class="number">3</span>) <span class="keyword">AS</span> g <span class="keyword">ON</span> a.addid = g.addid</span><br><span class="line"><span class="keyword">WHERE</span> a.addid = addresses_to_geocode.addid;</span><br></pre></td></tr></table></figure>
+<p>Since the geocoding process can be slow, it&#x2019;s suggested to process a small portion at a time. The address table was assigned an <code>addid</code> for each row as a index. The code always take <em>the first 3 rows not yet processed (rating column is null)</em> as the <em>sample</em> <code>a</code> to be geocoded.</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> addid</span><br><span class="line">    <span class="keyword">FROM</span> addresses_to_geocode</span><br><span class="line">    <span class="keyword">WHERE</span> rating <span class="keyword">IS</span> <span class="literal">NULL</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> addid <span class="keyword">LIMIT</span> <span class="number">3</span>) <span class="keyword">AS</span> a</span><br></pre></td></tr></table></figure>
+<p><img src="table1.png" alt="table 1"><br>The <em>result of geocoding</em> <code>g</code> is joined with the <code>addid</code> of the <em>sample</em> <code>a</code>.</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">LEFT JOIN (<span class="keyword">SELECT</span> addid, (geocode(address,<span class="number">1</span>)) <span class="keyword">AS</span> geo</span><br><span class="line">            <span class="keyword">FROM</span> addresses_to_geocode <span class="keyword">AS</span> ag</span><br><span class="line">            <span class="keyword">WHERE</span> ag.rating <span class="keyword">IS</span> <span class="literal">NULL</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> addid <span class="keyword">LIMIT</span> <span class="number">3</span></span><br><span class="line">          ) <span class="keyword">AS</span> g <span class="keyword">ON</span> a.addid = g.addid</span><br></pre></td></tr></table></figure>
+<p><img src="table2.png" alt="table 2"></p>
 <p>Then the <code>address table</code> was joined with <em>that joined table a-g</em> by <code>addid</code> and corresponding columns were updated. </p>
-<pre><code>UPDATE addresses_to_geocode
-  SET ( rating, new_address, lon, lat)
-    = ( COALESCE((g.geo).rating,-1), pprint_addy((g.geo).addy),
-       ST_X((g.geo).geomout)::numeric(8,5), ST_Y((g.geo).geomout)::numeric(8,5) )
-FROM 
-...
-WHERE a.addid = addresses_to_geocode.addid;
-</code></pre><p>The initial value of rating column is <code>NULL</code>. Valid geocoding match have a rating number range from 0 to around 100. Some input don&#x2019;t have valid <code>geocode</code> function return value, which make the rating column to be <code>NULL</code>. Then it was replaced with <code>-1</code> by the <code>COALESCE</code> function to be separated with the unprocessed rows, so that the next run can skip them. </p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> addresses_to_geocode</span><br><span class="line">  <span class="keyword">SET</span> ( rating, new_address, lon, lat)</span><br><span class="line">    = ( <span class="keyword">COALESCE</span>((g.geo).rating,<span class="number">-1</span>), pprint_addy((g.geo).addy),</span><br><span class="line">       ST_X((g.geo).geomout)::<span class="built_in">numeric</span>(<span class="number">8</span>,<span class="number">5</span>), ST_Y((g.geo).geomout)::<span class="built_in">numeric</span>(<span class="number">8</span>,<span class="number">5</span>) )</span><br><span class="line"><span class="keyword">FROM</span> </span><br><span class="line">...</span><br><span class="line"><span class="keyword">WHERE</span> a.addid = addresses_to_geocode.addid;</span><br></pre></td></tr></table></figure>
+<p>The initial value of rating column is <code>NULL</code>. Valid geocoding match have a rating number range from 0 to around 100. Some input don&#x2019;t have valid <code>geocode</code> function return value, which make the rating column to be <code>NULL</code>. Then it was replaced with <code>-1</code> by the <code>COALESCE</code> function to be separated with the unprocessed rows, so that the next run can skip them. </p>
 <p>The join of <code>a</code> and <code>g</code> may seem redundant at first since <code>g</code> already included the <code>addid</code> column. However when some rows has no match and no value is returned by <code>geocode</code> function, <code>g</code> will only have rows with return values.<br><img src="table3.png" alt="table 3"><br>Joining <code>g</code> with address table will only update these rows by <code>addid</code>. <code>COALESCE</code> function will not take any effect since the empty row <code>addid</code> were not even included. Then the next run will select them again because they still satisfied the sample selection condition, which will mess up the control logic.</p>
 <p>Instead joining <code>a</code> and <code>g</code> will have all <code>addid</code> in sample, and the no match rows have <code>NULL</code> in rating column.<br><img src="table4.png" alt="table 4"><br>The next joining with address table will have the rating column updated correctly by <code>COALESCE</code> function.<br><img src="table5.png" alt="table 5"></p>
 <p>This programming pattern is new for me. I think it&#x2019;s because SQL don&#x2019;t have the fine grade control of the regular procedure languages, but we still need more control some times so we have this.</p>
 <h2 id="problem-with-ill-formated-address"><a href="#Problem-With-Ill-Formated-Address" class="headerlink" title="Problem With Ill Formated Address"></a>Problem With Ill Formated Address</h2><p>In my experiment with test data I found the example code above often had serious performance problems. It was very similar to another problem I observed: if I run this line with different table sizes, it should have similar performance since it is supposed to only process the first 3 rows.</p>
-<pre><code>SELECT geocode(address_string,1) 
-    FROM address_sample LIMIT 3;
-</code></pre><p>Actually it took much, much longer on a larger table. It seemed that it was geocoding the whole table first, then only return the first 3 rows. If I subset the table more explicitly this problem disappeared:</p>
-<pre><code>SELECT geocode(sample.address_string, 1) 
-    FROM (SELECT address_string 
-            FROM address_sample LIMIT 3
-         ) as sample;
-</code></pre><p>I modified the example code similarly. Instead of using <code>LIMIT</code> directly in the <code>WHERE</code> clause, </p>
-<pre><code>SELECT addid, (geocode(address,1)) AS geo
-    FROM addresses_to_geocode AS ag
-    WHERE ag.rating IS NULL ORDER BY addid LIMIT 3
-</code></pre><p>I explicitly select the sample rows then put it in the <code>FROM</code> clause, problem solved.</p>
-<pre><code>SELECT sample.addid, geocode(sample.input_address,1) AS geo
-    FROM (SELECT addid, input_address
-            FROM address_table WHERE rating IS NULL
-            ORDER BY addid LIMIT sample_size
-         ) AS sample
-</code></pre><p>Later I found this problem only occurs when the first row of table have invalid address for which the geocode function have no return value. These are the <code>explain analysis</code> results from pgAdmin SQL query tool:</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> geocode(address_string,<span class="number">1</span>) </span><br><span class="line">    <span class="keyword">FROM</span> address_sample <span class="keyword">LIMIT</span> <span class="number">3</span>;</span><br></pre></td></tr></table></figure>
+<p>Actually it took much, much longer on a larger table. It seemed that it was geocoding the whole table first, then only return the first 3 rows. If I subset the table more explicitly this problem disappeared:</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> geocode(sample.address_string, <span class="number">1</span>) </span><br><span class="line">    <span class="keyword">FROM</span> (<span class="keyword">SELECT</span> address_string </span><br><span class="line">            <span class="keyword">FROM</span> address_sample <span class="keyword">LIMIT</span> <span class="number">3</span></span><br><span class="line">         ) <span class="keyword">as</span> <span class="keyword">sample</span>;</span><br></pre></td></tr></table></figure>
+<p>I modified the example code similarly. Instead of using <code>LIMIT</code> directly in the <code>WHERE</code> clause, </p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> addid, (geocode(address,<span class="number">1</span>)) <span class="keyword">AS</span> geo</span><br><span class="line">    <span class="keyword">FROM</span> addresses_to_geocode <span class="keyword">AS</span> ag</span><br><span class="line">    <span class="keyword">WHERE</span> ag.rating <span class="keyword">IS</span> <span class="literal">NULL</span> <span class="keyword">ORDER</span> <span class="keyword">BY</span> addid <span class="keyword">LIMIT</span> <span class="number">3</span></span><br></pre></td></tr></table></figure>
+<p>I explicitly select the sample rows then put it in the <code>FROM</code> clause, problem solved.</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> sample.addid, geocode(sample.input_address,<span class="number">1</span>) <span class="keyword">AS</span> geo</span><br><span class="line">    <span class="keyword">FROM</span> (<span class="keyword">SELECT</span> addid, input_address</span><br><span class="line">            <span class="keyword">FROM</span> address_table <span class="keyword">WHERE</span> rating <span class="keyword">IS</span> <span class="literal">NULL</span></span><br><span class="line">            <span class="keyword">ORDER</span> <span class="keyword">BY</span> addid <span class="keyword">LIMIT</span> sample_size</span><br><span class="line">         ) <span class="keyword">AS</span> <span class="keyword">sample</span></span><br></pre></td></tr></table></figure>
+<p>Later I found this problem only occurs when the first row of table have invalid address for which the geocode function have no return value. These are the <code>explain analysis</code> results from pgAdmin SQL query tool:</p>
 <p>The example code runs on 100 row table on first time, with first row address invalid. The first step of <code>Seq Scan</code> take 284 s (this was on my home pc server running on regular hard drive with all states data, so the performance was bad) to return 99 rows of geocoding result(one row has no match).</p>
 <p><img src="1_explain_scan_v1.png" alt="1. example code returned 99 rows in seq scan "></p>
 <p><img src="2_explain_limit_v1.png" alt="2. example code limited results to 3 rows later"></p>
@@ -415,115 +460,33 @@ WHERE a.addid = addresses_to_geocode.addid;
 <p>If I move the problematic row to the second row, there was no problem either. It seemed that the postgresql planner had some trouble only when the first row didn&#x2019;t have valid return value. The <code>geocode</code> function authors didn&#x2019;t find this bug probably because this is a special case, but it&#x2019;s very common in my data. Because I sorted the addresses by zipcode, many ill formated addresses with invalid zipcode always appear in the beginning of the file.</p>
 <h2 id="making-a-full-script"><a href="#Making-A-full-Script" class="headerlink" title="Making A full Script"></a>Making A full Script</h2><p>To have a better control of the whole process, I need some <a href="http://www.postgresql.org/docs/current/static/plpgsql-control-structures.html" target="_blank" rel="external">control structures</a> from PL/pgSQL - sql procedural Language.</p>
 <p>First I make the geocoding code as a <code>geocode_sample</code> function with the sample size for each run as parameter.</p>
-<pre><code>CREATE OR REPLACE FUNCTION geocode_sample(sample_size integer) 
-    RETURNS void AS $$
-BEGIN
-...
-END;
-$$ LANGUAGE plpgsql;
-</code></pre><p><code>Create or replace</code> make debugging and making changes easier because new version will replace existing version.</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">CREATE</span> <span class="keyword">OR</span> <span class="keyword">REPLACE</span> <span class="keyword">FUNCTION</span> geocode_sample(sample_size <span class="built_in">integer</span>) </span><br><span class="line">    <span class="keyword">RETURNS</span> <span class="built_in">void</span> <span class="keyword">AS</span> $$</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">...</span><br><span class="line"><span class="keyword">END</span>;</span><br><span class="line">$$ LANGUAGE plpgsql;</span><br></pre></td></tr></table></figure>
+<p><code>Create or replace</code> make debugging and making changes easier because new version will replace existing version.</p>
 <p>Then this main control function <code>geocode_table</code> will calculate the number of rows for whole table, decide how many sample runs it needed to update the whole table, then run the <code>geocode_sample</code> function in a loop with that number. I don&#x2019;t want to use a conditional loop because if there is something wrong, the code could stuck at some point and have a endless loop. I&#x2019;d rather just run the code with calculated times then check the table to make sure all rows are processed correctly.</p>
-<pre><code>DROP FUNCTION IF EXISTS geocode_table();
-CREATE OR REPLACE FUNCTION geocode_table(
-    OUT table_size integer,
-    OUT remaining_rows integer) AS $func$
-DECLARE sample_size integer;
-BEGIN
-    SELECT reltuples::bigint INTO table_size
-                    FROM  pg_class
-                    WHERE oid = &apos;public.address_table&apos;::regclass;
-    sample_size := 1;
-    FOR i IN 1..(SELECT table_size / sample_size + 1) LOOP
-        PERFORM geocode_sample(sample_size);
-    END LOOP;
-    SELECT count(*) INTO remaining_rows 
-        FROM address_table WHERE rating IS NULL;
-END
-$func$ LANGUAGE plpgsql;
-</code></pre><ol>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">FUNCTION</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> geocode_table();</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">OR</span> <span class="keyword">REPLACE</span> <span class="keyword">FUNCTION</span> geocode_table(</span><br><span class="line">    <span class="keyword">OUT</span> table_size <span class="built_in">integer</span>,</span><br><span class="line">    <span class="keyword">OUT</span> remaining_rows <span class="built_in">integer</span>) <span class="keyword">AS</span> $func$</span><br><span class="line"><span class="keyword">DECLARE</span> sample_size <span class="built_in">integer</span>;</span><br><span class="line"><span class="keyword">BEGIN</span></span><br><span class="line">    <span class="keyword">SELECT</span> reltuples::<span class="built_in">bigint</span> <span class="keyword">INTO</span> table_size</span><br><span class="line">                    <span class="keyword">FROM</span>  pg_class</span><br><span class="line">                    <span class="keyword">WHERE</span> <span class="keyword">oid</span> = <span class="string">&apos;public.address_table&apos;</span>::regclass;</span><br><span class="line">    sample_size := 1;</span><br><span class="line">    FOR i IN 1..(<span class="keyword">SELECT</span> table_size / sample_size + <span class="number">1</span>) <span class="keyword">LOOP</span></span><br><span class="line">        PERFORM geocode_sample(sample_size);</span><br><span class="line">    <span class="keyword">END</span> <span class="keyword">LOOP</span>;</span><br><span class="line">    <span class="keyword">SELECT</span> <span class="keyword">count</span>(*) <span class="keyword">INTO</span> remaining_rows </span><br><span class="line">        <span class="keyword">FROM</span> address_table <span class="keyword">WHERE</span> rating <span class="keyword">IS</span> <span class="literal">NULL</span>;</span><br><span class="line"><span class="keyword">END</span></span><br><span class="line">$func$ <span class="keyword">LANGUAGE</span> plpgsql;</span><br></pre></td></tr></table></figure>
+<ol>
 <li>I used <code>drop function if exists</code> here because the <code>Create or replace</code> doesn&#x2019;t work if the function return type was changed.</li>
 <li>It&#x2019;s widely acknowledged that calculating row count for a table by <code>count(*)</code> is not optimal. The method I used should be much quicker if the table statistics is up to date. I used to put a line of <code>VACUUM ANALYZE</code> after the table was constructed and csv data was imported, but in every run it reported that no update was needed. It probably because the default postgresql settings made sure the information is up to date right for my case.</li>
 <li>In the end I counted the rows not processed yet. The total row number and the remaining row number will be the return value of this function.</li>
 </ol>
 <p>The whole PL/pgSQL script is structured like this (<em>actual details inside functions are omitted to have a clear view of whole picture. See complete scripts and everything else in <a href="https://github.com/dracodoc/Geocode" target="_blank" rel="external">my github repo</a></em>):</p>
-<pre><code>DROP TABLE IF EXISTS address_table;
-CREATE TABLE address_table(
-    row_seq varchar(255),
-    input_address varchar(255),
-    zip varchar(255) 
-);
--- aws version.
-COPY address_table FROM :input_file WITH DELIMITER &apos;|&apos; NULL &apos;NA&apos; CSV HEADER;
--- pc version.
--- COPY address_table FROM &apos;e:\\Data\\1.csv&apos; WITH DELIMITER &apos;,&apos; NULL &apos;NA&apos; CSV HEADER;
-
-ALTER TABLE address_table
-    ADD addid serial NOT NULL PRIMARY KEY,
-    ADD rating integer, 
-    ADD lon numeric,
-    ADD lat numeric,
-    ADD output_address text,
-    ADD geomout geometry,  -- a point geometry in NAD 83 long lat.
-
---&lt;&lt; geocode function --
-CREATE OR REPLACE FUNCTION geocode_sample(sample_size integer) 
-    RETURNS void AS $$
-...
-END;
-$$ LANGUAGE plpgsql;
--- geocode function &gt;&gt;--
-
---&lt;&lt; main control --
-DROP FUNCTION IF EXISTS geocode_table();
-CREATE OR REPLACE FUNCTION geocode_table(
-    OUT table_size integer,
-    OUT remaining_rows integer) AS $func$
-...
-END
-$func$ LANGUAGE plpgsql;
--- main control &gt;&gt;--
-
-SELECT * FROM geocode_table();
-</code></pre><ol>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">DROP</span> <span class="keyword">TABLE</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> address_table;</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">TABLE</span> address_table(</span><br><span class="line">    row_seq <span class="built_in">varchar</span>(<span class="number">255</span>),</span><br><span class="line">    input_address <span class="built_in">varchar</span>(<span class="number">255</span>),</span><br><span class="line">    zip <span class="built_in">varchar</span>(<span class="number">255</span>) </span><br><span class="line">);</span><br><span class="line"><span class="comment">-- aws version.</span></span><br><span class="line">COPY address_table FROM :input_file WITH DELIMITER &apos;|&apos; NULL &apos;NA&apos; CSV HEADER;</span><br><span class="line"><span class="comment">-- pc version.</span></span><br><span class="line"><span class="comment">-- COPY address_table FROM &apos;e:\\Data\\1.csv&apos; WITH DELIMITER &apos;,&apos; NULL &apos;NA&apos; CSV HEADER;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">ALTER</span> <span class="keyword">TABLE</span> address_table</span><br><span class="line">    <span class="keyword">ADD</span> addid <span class="built_in">serial</span> <span class="keyword">NOT</span> <span class="literal">NULL</span> PRIMARY <span class="keyword">KEY</span>,</span><br><span class="line">    <span class="keyword">ADD</span> rating <span class="built_in">integer</span>, </span><br><span class="line">    <span class="keyword">ADD</span> lon <span class="built_in">numeric</span>,</span><br><span class="line">    <span class="keyword">ADD</span> lat <span class="built_in">numeric</span>,</span><br><span class="line">    <span class="keyword">ADD</span> output_address <span class="built_in">text</span>,</span><br><span class="line">    <span class="keyword">ADD</span> geomout geometry,  <span class="comment">-- a point geometry in NAD 83 long lat.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">--&lt;&lt; geocode function --</span></span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">OR</span> <span class="keyword">REPLACE</span> <span class="keyword">FUNCTION</span> geocode_sample(sample_size <span class="built_in">integer</span>) </span><br><span class="line">    <span class="keyword">RETURNS</span> <span class="built_in">void</span> <span class="keyword">AS</span> $$</span><br><span class="line">...</span><br><span class="line"><span class="keyword">END</span>;</span><br><span class="line">$$ LANGUAGE plpgsql;</span><br><span class="line"><span class="comment">-- geocode function &gt;&gt;--</span></span><br><span class="line"></span><br><span class="line"><span class="comment">--&lt;&lt; main control --</span></span><br><span class="line"><span class="keyword">DROP</span> <span class="keyword">FUNCTION</span> <span class="keyword">IF</span> <span class="keyword">EXISTS</span> geocode_table();</span><br><span class="line"><span class="keyword">CREATE</span> <span class="keyword">OR</span> <span class="keyword">REPLACE</span> <span class="keyword">FUNCTION</span> geocode_table(</span><br><span class="line">    <span class="keyword">OUT</span> table_size <span class="built_in">integer</span>,</span><br><span class="line">    <span class="keyword">OUT</span> remaining_rows <span class="built_in">integer</span>) <span class="keyword">AS</span> $func$</span><br><span class="line">...</span><br><span class="line"><span class="keyword">END</span></span><br><span class="line">$func$ <span class="keyword">LANGUAGE</span> plpgsql;</span><br><span class="line"><span class="comment">-- main control &gt;&gt;--</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">FROM</span> geocode_table();</span><br></pre></td></tr></table></figure>
+<ol>
 <li>First I dropped the address table if previously exists, created the table with columns in characters type because I don&#x2019;t want the leading zero in zipcode lost in converting to integer.</li>
 <li>I have two version of importing csv into table, one for testing in windows pc, another one for AWS linux instance. The SQL <code>copy</code> command need the postgresql server user to have permission for the input file, so you need to make sure the folder permission is correct. The linux version used a parameter for input file path.</li>
 <li>Then the necessary columns were added to table and the index was built.</li>
 <li>The last line run the main control function and print the return value of it in the end, which is the total row number and remaining row number of input table.</li>
 </ol>
 <h2 id="intersection-address"><a href="#Intersection-address" class="headerlink" title="Intersection address"></a>Intersection address</h2><p>Another type of input is intersections. Tiger Geocoder have a function <a href="http://postgis.net/docs/Geocode_Intersection.html" target="_blank" rel="external"><code>Geocode_Intersection</code></a> work like this:</p>
-<pre><code>SELECT pprint_addy(addy), st_astext(geomout), rating
-    FROM geocode_intersection( &apos;Haverford St&apos;,&apos;Germania St&apos;, &apos;MA&apos;, &apos;Boston&apos;, &apos;02130&apos;,1);
-</code></pre><p>It take two street names, state, city and zipcode then output multiple location candidates with ratings. The script of geocoding street addresses only need some minor changes on input table column format and function parameters to work on intersections. I&#x2019;ll just post the finished whole script for reference after all discussions.</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> pprint_addy(addy), st_astext(geomout), rating</span><br><span class="line">    <span class="keyword">FROM</span> geocode_intersection( <span class="string">&apos;Haverford St&apos;</span>,<span class="string">&apos;Germania St&apos;</span>, <span class="string">&apos;MA&apos;</span>, <span class="string">&apos;Boston&apos;</span>, <span class="string">&apos;02130&apos;</span>,<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p>It take two street names, state, city and zipcode then output multiple location candidates with ratings. The script of geocoding street addresses only need some minor changes on input table column format and function parameters to work on intersections. I&#x2019;ll just post the finished whole script for reference after all discussions.</p>
 <h2 id="map-to-census-block"><a href="#Map-to-Census-Block" class="headerlink" title="Map to Census Block"></a>Map to Census Block</h2><p>One important goal of my project is to map addresses to census block, then we can link the NFIRS data with other public data and produce much more powerful analysis, especially the <a href="http://www.census.gov/programs-surveys/ahs.html" target="_blank" rel="external">American Housing Survey(AHS)</a> and the <a href="https://www.census.gov/programs-surveys/acs/" target="_blank" rel="external">American Community Survey(ACS)</a>.</p>
 <p>There is a <a href="http://postgis.net/docs/Get_Tract.html" target="_blank" rel="external"><code>Get_Tract</code> function</a> in Tiger Geocoder which return the <em>census tract</em> id for a location. For <em>census block</em> mapping people seemed to be just using <a href="http://postgis.org/docs/ST_Contains.html" target="_blank" rel="external">ST_Contains</a> like <a href="http://gis.stackexchange.com/questions/137870/finding-census-block-for-given-address-using-tiger-geocoder" target="_blank" rel="external">this answer</a> in stackexchange:</p>
-<pre><code>SELECT tabblock_id AS Block,
-    substring(tabblock_id FROM 1 FOR 11) AS Blockgroup,
-    substring(tabblock_id FROM 1 FOR 9) AS Tract,
-    substring(tabblock_id FROM 1 FOR 5) AS County,
-    substring(tabblock_id FROM 1 FOR 2) AS STATE
-FROM tabblock
-WHERE ST_Contains(the_geom, ST_SetSRID(ST_Point(-71.101375, 42.31376), 4269))
-</code></pre><p>The national data loaded by Tiger Geocoder have a table <code>tabblock</code> which have the information of census blocks. <code>ST_Contains</code> will test the spatial relationship between two geometries, in our case it will be whether polygon or multi polygon of census block contains the point of interest. The <code>Where</code> clause select the only record that satisfy this condition for the point.</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> tabblock_id <span class="keyword">AS</span> <span class="keyword">Block</span>,</span><br><span class="line">    <span class="keyword">substring</span>(tabblock_id <span class="keyword">FROM</span> <span class="number">1</span> <span class="keyword">FOR</span> <span class="number">11</span>) <span class="keyword">AS</span> Blockgroup,</span><br><span class="line">    <span class="keyword">substring</span>(tabblock_id <span class="keyword">FROM</span> <span class="number">1</span> <span class="keyword">FOR</span> <span class="number">9</span>) <span class="keyword">AS</span> Tract,</span><br><span class="line">    <span class="keyword">substring</span>(tabblock_id <span class="keyword">FROM</span> <span class="number">1</span> <span class="keyword">FOR</span> <span class="number">5</span>) <span class="keyword">AS</span> County,</span><br><span class="line">    <span class="keyword">substring</span>(tabblock_id <span class="keyword">FROM</span> <span class="number">1</span> <span class="keyword">FOR</span> <span class="number">2</span>) <span class="keyword">AS</span> STATE</span><br><span class="line"><span class="keyword">FROM</span> tabblock</span><br><span class="line"><span class="keyword">WHERE</span> ST_Contains(the_geom, ST_SetSRID(ST_Point(<span class="number">-71.101375</span>, <span class="number">42.31376</span>), <span class="number">4269</span>))</span><br></pre></td></tr></table></figure>
+<p>The national data loaded by Tiger Geocoder have a table <code>tabblock</code> which have the information of census blocks. <code>ST_Contains</code> will test the spatial relationship between two geometries, in our case it will be whether polygon or multi polygon of census block contains the point of interest. The <code>Where</code> clause select the only record that satisfy this condition for the point.</p>
 <p>The census block id is a 15 digits code constructed from state and county fips code, census tract id, blockgroup id and the census block number. The code example above actually are not ideal for me since it included all the prefix in each column. My code will work on the results from the geocoding script above:</p>
-<pre><code>UPDATE address_table
-    SET (tabblock_id, STATE, county, tractid)
-      = (COALESCE(ab.tabblock_id,&apos;FFFF&apos;),
-         substring(ab.tabblock_id FROM 1 FOR 2),
-         substring(ab.tabblock_id FROM 3 FOR 3),
-         substring(ab.tabblock_id FROM 1 FOR 11)
-        )
-FROM
-    (SELECT addid
-        FROM address_table
-        WHERE (geomout IS NOT NULL) AND (tabblock_id IS NULL)
-        ORDER BY addid LIMIT block_sample_size) AS a
-    LEFT JOIN (SELECT a.addid, b.tabblock_id
-                FROM address_table AS a, tabblock AS b
-                WHERE (geomout IS NOT NULL) AND (a.tabblock_id IS NULL)
-                    AND ST_Contains(b.the_geom, ST_SetSRID(ST_Point(a.lon, a.lat), 4269))
-                ORDER BY addid LIMIT block_sample_size) AS ab ON a.addid = ab.addid
-WHERE a.addid = address_table.addid;
-</code></pre><ul>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">UPDATE</span> address_table</span><br><span class="line">    <span class="keyword">SET</span> (tabblock_id, STATE, county, tractid)</span><br><span class="line">      = (<span class="keyword">COALESCE</span>(ab.tabblock_id,<span class="string">&apos;FFFF&apos;</span>),</span><br><span class="line">         <span class="keyword">substring</span>(ab.tabblock_id <span class="keyword">FROM</span> <span class="number">1</span> <span class="keyword">FOR</span> <span class="number">2</span>),</span><br><span class="line">         <span class="keyword">substring</span>(ab.tabblock_id <span class="keyword">FROM</span> <span class="number">3</span> <span class="keyword">FOR</span> <span class="number">3</span>),</span><br><span class="line">         <span class="keyword">substring</span>(ab.tabblock_id <span class="keyword">FROM</span> <span class="number">1</span> <span class="keyword">FOR</span> <span class="number">11</span>)</span><br><span class="line">        )</span><br><span class="line"><span class="keyword">FROM</span></span><br><span class="line">    (<span class="keyword">SELECT</span> addid</span><br><span class="line">        <span class="keyword">FROM</span> address_table</span><br><span class="line">        <span class="keyword">WHERE</span> (geomout <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>) <span class="keyword">AND</span> (tabblock_id <span class="keyword">IS</span> <span class="literal">NULL</span>)</span><br><span class="line">        <span class="keyword">ORDER</span> <span class="keyword">BY</span> addid <span class="keyword">LIMIT</span> block_sample_size) <span class="keyword">AS</span> a</span><br><span class="line">    <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> (<span class="keyword">SELECT</span> a.addid, b.tabblock_id</span><br><span class="line">                <span class="keyword">FROM</span> address_table <span class="keyword">AS</span> a, tabblock <span class="keyword">AS</span> b</span><br><span class="line">                <span class="keyword">WHERE</span> (geomout <span class="keyword">IS</span> <span class="keyword">NOT</span> <span class="literal">NULL</span>) <span class="keyword">AND</span> (a.tabblock_id <span class="keyword">IS</span> <span class="literal">NULL</span>)</span><br><span class="line">                    <span class="keyword">AND</span> ST_Contains(b.the_geom, ST_SetSRID(ST_Point(a.lon, a.lat), <span class="number">4269</span>))</span><br><span class="line">                <span class="keyword">ORDER</span> <span class="keyword">BY</span> addid <span class="keyword">LIMIT</span> block_sample_size) <span class="keyword">AS</span> ab <span class="keyword">ON</span> a.addid = ab.addid</span><br><span class="line"><span class="keyword">WHERE</span> a.addid = address_table.addid;</span><br></pre></td></tr></table></figure>
+<ul>
 <li>I didn&#x2019;t include the state fips as prefix in county fips since strictly speaking county fips is 3 digits, although you always need to use it with state fips together. I included the census tract because some location may have ambiguity but the census tract most likely will be same.</li>
 <li>This code is based on same principle of the geocoding code with a little bit change:<ul>
 <li>It need to work on top of geocoding results, so the sample for each run are the rows that have been geocoded (thus geomout column is not <code>NULL</code>), but not yet mapped to census block (<code>tabblock_id</code> is <code>NULL</code>), and sorted by <code>addid</code>, limited by sample size.</li>
@@ -609,29 +572,8 @@ sh ./batch.sh
 <p>This means the workflow should be able to skip on errors and mark the problems. The script above can handle the cases when there is no match returned from the <code>geocode</code> function, but any exception occurred in runtime will interrupt the script. Since the <code>geocode_sample</code> is called in a loop inside the main control function, the whole script is one single transaction. Once the transaction is interrupted, it will be rolled back and all the previous geocoding results are lost. See <a href="http://www.postgresql.org/docs/current/static/plpgsql-structure.html" target="_blank" rel="external">more about this</a>. </p>
 <p>However, <a href="http://www.postgresql.org/docs/current/static/plpgsql-control-structures.html#PLPGSQL-ERROR-TRAPPING" target="_blank" rel="external">adding an EXCEPTION clause</a> effectively forms a subtransaction that can be rolled back without affecting the outer transaction.</p>
 <p>Therefore I added this exception handling part in the <code>geocode_sample</code> function:</p>
-<pre><code>CREATE OR REPLACE FUNCTION geocode_sample(sample_size integer) 
-    RETURNS void AS $$
-DECLARE OUTPUT address_table%ROWTYPE;    
-BEGIN
-...
-
-EXCEPTION
-WHEN OTHERS THEN
-    SELECT * INTO OUTPUT 
-        FROM address_table 
-        WHERE rating IS NULL ORDER BY addid LIMIT 1;
-    RAISE NOTICE &apos;&lt;address error&gt; in samples started from: %&apos;, OUTPUT;
-    RAISE notice &apos;-- !!! % % !!!--&apos;, SQLERRM, SQLSTATE;
-    UPDATE address_table
-        SET rating = -2
-    FROM (SELECT addid
-            FROM address_table 
-            WHERE rating IS NULL ORDER BY addid LIMIT sample_size
-         ) AS sample
-    WHERE sample.addid = address_table.addid;
-END;
-$$ LANGUAGE plpgsql;
-</code></pre><p>This code will catch any exception, print the first row of current sample to notify the location of error, also print the original exception message. </p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">CREATE OR REPLACE FUNCTION geocode_sample(sample_size integer) </span><br><span class="line">    RETURNS void AS $$</span><br><span class="line">DECLARE OUTPUT address_table%ROWTYPE;    </span><br><span class="line">BEGIN</span><br><span class="line">...</span><br><span class="line">EXCEPTION</span><br><span class="line">WHEN OTHERS THEN</span><br><span class="line">    SELECT * INTO OUTPUT </span><br><span class="line">        FROM address_table </span><br><span class="line">        WHERE rating IS NULL ORDER BY addid LIMIT 1;</span><br><span class="line">    RAISE NOTICE &apos;&lt;address error&gt; in samples started from: %&apos;, OUTPUT;</span><br><span class="line">    RAISE notice &apos;-- !!! % % !!!--&apos;, SQLERRM, SQLSTATE;</span><br><span class="line">    UPDATE address_table</span><br><span class="line">        SET rating = -2</span><br><span class="line">    FROM (SELECT addid</span><br><span class="line">            FROM address_table </span><br><span class="line">            WHERE rating IS NULL ORDER BY addid LIMIT sample_size</span><br><span class="line">         ) AS sample</span><br><span class="line">    WHERE sample.addid = address_table.addid;</span><br><span class="line">END;</span><br><span class="line">$$ LANGUAGE plpgsql;</span><br></pre></td></tr></table></figure>
+<p>This code will catch any exception, print the first row of current sample to notify the location of error, also print the original exception message. </p>
 <pre><code>psql:geocode_batch.sql:179: NOTICE:  &lt;address error&gt; in samples started from: (1501652,&quot; RIVER (AT BLOUNT CO) (140 , KNOXVILLE, TN 37922&quot;,37922,27556,,,,,,,,,)
 CONTEXT:  SQL statement &quot;SELECT geocode_sample(sample_size)&quot;
 PL/pgSQL function geocode_table() line 24 at PERFORM
@@ -656,11 +598,10 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
 <ol>
 <li><p>Why is a server with 2 states data much faster than the server with all states data? I assume it&#x2019;s because the bad address that don&#x2019;t have a exact hit at first will cost much more time when the geocoder checked all states. With only 2 states this search is limited and stopped much early. This can be further verified by comparing the performance of two test cases in each server, one with exact match perfect address, another one with lots of invalid addresses.</p>
 <p> There is a <code>restrict_region</code> parameter in <code>geocode</code> function looks promising if it can limit the search range, since I have enough information or reason to believe the state information is correct. I wrote a query trying to use one state&#x2019;s geometry as the limiting parameter:</p>
-<pre><code>SELECT geocode(&apos;501 Fairmount DR , Annapolis, MD 20137&apos;, 1, the_geom) 
-    FROM tiger.state WHERE statefp = &apos;24&apos;;
-</code></pre><p> and compared the performance with the simple version</p>
-<pre><code>SELECT geocode(&apos;501 Fairmount DR , Annapolis, MD 20137&apos;,1);
-</code></pre><p> I didn&#x2019;t find performance gain with the parameter. Instead it lost the performance gain from caching, which usually came from running same query immediately again because all the needed data have been cached in RAM. </p>
+ <figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> geocode(<span class="string">&apos;501 Fairmount DR , Annapolis, MD 20137&apos;</span>, <span class="number">1</span>, the_geom) </span><br><span class="line">    <span class="keyword">FROM</span> tiger.state <span class="keyword">WHERE</span> statefp = <span class="string">&apos;24&apos;</span>;</span><br></pre></td></tr></table></figure>
+<p> and compared the performance with the simple version</p>
+ <figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> geocode(<span class="string">&apos;501 Fairmount DR , Annapolis, MD 20137&apos;</span>,<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p> I didn&#x2019;t find performance gain with the parameter. Instead it lost the performance gain from caching, which usually came from running same query immediately again because all the needed data have been cached in RAM. </p>
 <p> Maybe my usage is not proper, or this parameter is not intended to work as I expected. However if the search range can be limited, the performance gain could be substantial.</p>
 </li>
 <li><p>Will normalizing address first improve the performance? I don&#x2019;t think it will help unless I can filter bad address and remove them from input totally, which may not be the case for my usage of NFIRS data. The new PostGIS 2.2.0 looks promising but the ansible playbook is not updated yet, and I haven&#x2019;t have the chance to setup the server again by myself.</p>
@@ -674,8 +615,23 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
 <h2 id="version-history"><a href="#Version-History" class="headerlink" title="Version History"></a>Version History</h2><ul>
 <li>2015-11-19 : First version.</li>
 <li>2016-05-11 : Added Summary.</li>
+<li>2016-08-19 : Syntax highlighting.</li>
 </ul>
-</span>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
       
     </div>
 
@@ -731,25 +687,26 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
   </div>
 
 
-        </div>
+          </div>
+          
 
-        
 
-
-        
+          
   <div class="comments" id="comments">
     
       <div id="disqus_thread">
-        <noscript>Please enable JavaScript to view the <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
       </div>
     
   </div>
 
 
-      </div>
-
-      
+        </div>
         
+          
   
   <div class="sidebar-toggle">
     <div class="sidebar-toggle-line-wrap">
@@ -767,7 +724,7 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
       
         <ul class="sidebar-nav motion-element">
           <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            Table Of Contents
+            Table of Contents
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview">
             Overview
@@ -777,10 +734,12 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
 
       <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" src="/images/default_avatar.jpg" alt="dracodoc" itemprop="image"/>
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="dracodoc" />
           <p class="site-author-name" itemprop="name">dracodoc</p>
+          <p class="site-description motion-element" itemprop="description">This is about my exploration of Data Science, came from research background of AI, artificial learning and evolution.</p>
         </div>
-        <p class="site-description motion-element" itemprop="description">This is about my exploration of Data Science, came from research background of AI, artificial learning and evolution.</p>
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
@@ -789,19 +748,23 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
             </a>
           </div>
 
-          <div class="site-state-item site-state-categories">
-            <a href="/categories">
-              <span class="site-state-item-count">4</span>
-              <span class="site-state-item-name">categories</span>
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">categories</span>
               </a>
-          </div>
+            </div>
+          
 
-          <div class="site-state-item site-state-tags">
-            <a href="/tags">
-              <span class="site-state-item-count">16</span>
-              <span class="site-state-item-name">tags</span>
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">tags</span>
               </a>
-          </div>
+            </div>
+          
 
         </nav>
 
@@ -821,17 +784,27 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
         
         
 
-        <div class="links-of-author motion-element">
-          
-        </div>
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.R-bloggers.com" title="R-bloggers" target="_blank">R-bloggers</a>
+                </li>
+              
+            </ul>
+          </div>
+        
 
       </section>
 
       
         <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc-indicator-top post-toc-indicator">
-            <i class="fa fa-angle-double-up"></i>
-          </div>
           <div class="post-toc">
             
               
@@ -840,9 +813,6 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
               <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#summary"><span class="nav-number">1.</span> <span class="nav-text">Summary</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#tiger-geocoder-geocode-function"><span class="nav-number">3.</span> <span class="nav-text">Tiger Geocoder Geocode Function</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#preparing-addresses"><span class="nav-number">4.</span> <span class="nav-text">Preparing Addresses</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#test-geocoding-function"><span class="nav-number">5.</span> <span class="nav-text">Test Geocoding Function</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#problem-with-ill-formated-address"><span class="nav-number">6.</span> <span class="nav-text">Problem With Ill Formated Address</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#making-a-full-script"><span class="nav-number">7.</span> <span class="nav-text">Making A full Script</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#intersection-address"><span class="nav-number">8.</span> <span class="nav-text">Intersection address</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#map-to-census-block"><span class="nav-number">9.</span> <span class="nav-text">Map to Census Block</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#work-in-batch"><span class="nav-number">10.</span> <span class="nav-text">Work In Batch</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exception-handling-and-progress-report"><span class="nav-number">11.</span> <span class="nav-text">Exception Handling And Progress Report</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#summary-and-open-questions"><span class="nav-number">12.</span> <span class="nav-text">Summary And Open Questions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#version-history"><span class="nav-number">13.</span> <span class="nav-text">Version History</span></a></li></ol></div>
             
           </div>
-          <div class="post-toc-indicator-bottom post-toc-indicator">
-            <i class="fa fa-angle-double-down"></i>
-          </div>
         </section>
       
 
@@ -850,23 +820,24 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
   </aside>
 
 
-      
+        
+      </div>
     </main>
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
         <div class="copyright" >
   
-  &copy; 
+  &copy;  2015 - 
   <span itemprop="copyrightYear">2016</span>
   <span class="with-love">
-    <i class="icon-next-heart fa fa-heart"></i>
+    <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">dracodoc</span>
 </div>
 
 <div class="powered-by">
-  Powered by <a class="theme-link" href="http://hexo.io">Hexo</a>
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
 </div>
 
 <div class="theme-info">
@@ -876,29 +847,91 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
   </a>
 </div>
 
+        
 
-
+        
       </div>
     </footer>
 
-    <div class="back-to-top"></div>
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
   </div>
 
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
   <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
 
   
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
   
 
   
-    
-    
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
 
   
 
     <script type="text/javascript">
       var disqus_shortname = 'dracodocgithub';
       var disqus_identifier = '2015/11/19/Script-workflow/';
-      var disqus_title = 'Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder';
+      var disqus_title = "Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder";
       var disqus_url = 'http://dracodoc.github.io/2015/11/19/Script-workflow/';
 
       function run_disqus_script(disqus_script){
@@ -917,192 +950,144 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
   
 
 
-  
 
-  
-  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js"></script>
-  <script type="text/javascript" src="/js/fancy-box.js?v=0.4.5.2"></script>
-
-
-  <script type="text/javascript" src="/js/helpers.js?v=0.4.5.2"></script>
-  <script type="text/javascript" src="/vendors/velocity/velocity.min.js"></script>
-<script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js"></script>
-
-<script type="text/javascript" src="/js/motion.js?v=0.4.5.2" id="motion.global"></script>
-
-
-  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
-  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
 
   
   
-<script type="text/javascript" src="/js/bootstrap.scrollspy.js?v=0.4.5.2" id="bootstrap.scrollspy.custom"></script>
-
-
-<script type="text/javascript" id="sidebar.toc.highlight">
-  $(document).ready(function () {
-    var tocSelector = '.post-toc';
-    var $tocSelector = $(tocSelector);
-    var activeCurrentSelector = '.active-current';
-
-    $tocSelector
-      .on('activate.bs.scrollspy', function () {
-        var $currentActiveElement = $(tocSelector + ' .active').last();
-
-        removeCurrentActiveClass();
-        $currentActiveElement.addClass('active-current');
-
-        $tocSelector[0].scrollTop = $currentActiveElement.position().top;
-      })
-      .on('clear.bs.scrollspy', function () {
-        removeCurrentActiveClass();
-      });
-
-    function removeCurrentActiveClass () {
-      $(tocSelector + ' ' + activeCurrentSelector)
-        .removeClass(activeCurrentSelector.substring(1));
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
     }
+    var path = "/" + search_path;
+    // monitor main search box;
 
-    function processTOC () {
-      getTOCMaxHeight();
-      toggleTOCOverflowIndicators();
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
     }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
 
-    function getTOCMaxHeight () {
-      var height = $('.sidebar').height() -
-                   $tocSelector.position().top -
-                   $('.post-toc-indicator-bottom').height();
-
-      $tocSelector.css('height', height);
-
-      return height;
-    }
-
-    function toggleTOCOverflowIndicators () {
-      tocOverflowIndicator(
-        '.post-toc-indicator-top',
-        $tocSelector.scrollTop() > 0 ? 'show' : 'hide'
-      );
-
-      tocOverflowIndicator(
-        '.post-toc-indicator-bottom',
-        $tocSelector.scrollTop() >= $tocSelector.find('ol').height() - $tocSelector.height() ? 'hide' : 'show'
-      )
-    }
-
-    $(document).on('sidebar.motion.complete', function () {
-      processTOC();
-    });
-
-    $('body').scrollspy({ target: tocSelector });
-    $(window).on('resize', function () {
-      if ( $('.sidebar').hasClass('sidebar-active') ) {
-        processTOC();
-      }
-    });
-
-    onScroll($tocSelector);
-
-    function onScroll (element) {
-      element.on('mousewheel DOMMouseScroll', function (event) {
-          var oe = event.originalEvent;
-          var delta = oe.wheelDelta || -oe.detail;
-
-          this.scrollTop += ( delta < 0 ? 1 : -1 ) * 30;
-          event.preventDefault();
-
-          toggleTOCOverflowIndicators();
-      });
-    }
-
-    function tocOverflowIndicator (indicator, action) {
-      var $indicator = $(indicator);
-      var opacity = action === 'show' ? 1 : 0;
-      $indicator.velocity ?
-        $indicator.velocity('stop').velocity({
-          opacity: opacity
-        }, { duration: 100 }) :
-        $indicator.stop().animate({
-          opacity: opacity
-        }, 100);
-    }
-
-  });
-</script>
-
-<script type="text/javascript" id="sidebar.nav">
-  $(document).ready(function () {
-    var html = $('html');
-    var TAB_ANIMATE_DURATION = 200;
-    var hasVelocity = $.isFunction(html.velocity);
-
-    $('.sidebar-nav li').on('click', function () {
-      var item = $(this);
-      var activeTabClassName = 'sidebar-nav-active';
-      var activePanelClassName = 'sidebar-panel-active';
-      if (item.hasClass(activeTabClassName)) {
-        return;
-      }
-
-      var currentTarget = $('.' + activePanelClassName);
-      var target = $('.' + item.data('target'));
-
-      hasVelocity ?
-        currentTarget.velocity('transition.slideUpOut', TAB_ANIMATE_DURATION, function () {
-          target
-            .velocity('stop')
-            .velocity('transition.slideDownIn', TAB_ANIMATE_DURATION)
-            .addClass(activePanelClassName);
-        }) :
-        currentTarget.animate({ opacity: 0 }, TAB_ANIMATE_DURATION, function () {
-          currentTarget.hide();
-          target
-            .stop()
-            .css({'opacity': 0, 'display': 'block'})
-            .animate({ opacity: 1 }, TAB_ANIMATE_DURATION, function () {
-              currentTarget.removeClass(activePanelClassName);
-              target.addClass(activePanelClassName);
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
             });
-        });
-
-      item.siblings().removeClass(activeTabClassName);
-      item.addClass(activeTabClassName);
-    });
-
-    $('.post-toc a').on('click', function (e) {
-      e.preventDefault();
-      var targetSelector = escapeSelector(this.getAttribute('href'));
-      var offset = $(targetSelector).offset().top;
-      hasVelocity ?
-        html.velocity('stop').velocity('scroll', {
-          offset: offset  + 'px',
-          mobileHA: false
-        }) :
-        $('html, body').stop().animate({
-          scrollTop: offset
-        }, 500);
-    });
-
-    // Expand sidebar on post detail page by default, when post has a toc.
-    motionMiddleWares.sidebar = function () {
-      var $tocContent = $('.post-toc-content');
-      if (CONFIG.sidebar === 'post' || CONFIG.sidebar === 'always') {
-        if ($tocContent.length > 0 && $tocContent.html().trim().length > 0) {
-          displaySidebar();
+            proceedsearch();
         }
-      }
-    };
-  });
-</script>
+    });}
 
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
 
+    });
 
-  <script type="text/javascript" src="/js/bootstrap.js"></script>
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
 
   
-  
 
   
+
   
 
 </body>
