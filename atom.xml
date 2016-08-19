@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Artificial Learning and Evolution inspired by Nature</title>
+  <title>From Learning and Evolution to Data Science</title>
   
   <link href="http://dracodoc.github.io/atom.xml" rel="self"/>
   
@@ -240,9 +240,9 @@
     
       <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
     
-      <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
-    
       <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
+    
+      <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
     
       <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
     
@@ -336,9 +336,9 @@
       <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
     
     
-      <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
-    
       <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
+    
+      <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
     
       <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
     
