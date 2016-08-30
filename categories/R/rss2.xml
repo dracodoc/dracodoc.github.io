@@ -8,8 +8,22 @@
         <atom:link href="/categories/R/rss2.xml" rel="self" type="application/rss+xml"/>
         
         <description></description>
-        <pubDate>Fri, 19 Aug 2016 13:55:46 GMT</pubDate>
+        <pubDate>Tue, 30 Aug 2016 17:55:16 GMT</pubDate>
         <generator>http://hexo.io/</generator>
+        
+        <item>
+            <title>RStudio addin - extend RStudio in your way</title>
+            <link>http://dracodoc.github.io/2016/08/10/rstudio-addin/</link>
+            <guid>http://dracodoc.github.io/2016/08/10/rstudio-addin/</guid>
+            <pubDate>Wed, 10 Aug 2016 17:57:23 GMT</pubDate>
+            <description>
+                
+                &lt;h2 id=&quot;RStudio-addins-first-attempt&quot;&gt;&lt;a href=&quot;#RStudio-addins-first-attempt&quot; class=&quot;headerlink&quot; title=&quot;RStudio addins - first attempt&quot;&gt;&lt;/a&gt;RStudio addins - first attempt&lt;/h2&gt;&lt;p&gt;Recently I found RStudio began to provide addin mechanism. The examples looked simple, and the addin API easy to use. I immediately started to try writing one by myself. It will be a good practice project for writing R package, and I can implement some features I wanted but not in RStudio’s high priority list.&lt;/p&gt;
+                
+            </description>
+            
+            <comments>http://dracodoc.github.io/2016/08/10/rstudio-addin/#disqus_thread</comments>
+        </item>
         
         <item>
             <title>Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning</title>

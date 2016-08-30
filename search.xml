@@ -4,6 +4,61 @@
   
     
     <entry>
+      <title><![CDATA[RStudio addin - extend RStudio in your way]]></title>
+      <url>http://dracodoc.github.io/2016/08/10/rstudio-addin/</url>
+      <content type="html"><![CDATA[<h2 id="rstudio-addins-first-attempt"><a href="#RStudio-addins-first-attempt" class="headerlink" title="RStudio addins - first attempt"></a>RStudio addins - first attempt</h2><p>Recently I found RStudio began to provide addin mechanism. The examples looked simple, and the addin API easy to use. I immediately started to try writing one by myself. It will be a good practice project for writing R package, and I can implement some features I wanted but not in RStudio&#x2019;s high priority list.</p>
+<a id="more"></a>
+<p>My first idea came from a long time frustration of using <code>Ctrl+Enter</code> to run current statement in console. With ggplot code like this, <code>Ctrl+Enter</code> only send one line with your cursor.</p>
+<pre><code>ggplot(data = diamonds) +
+  geom_bar(mapping = aes(x = cut, fill = cut), width = 1) +
+  coord_polar() +
+  facet_wrap( ~ clarity)
+</code></pre><p>I submitted a feature request for this to RStudio support, though I didn&#x2019;t expect it to be implemented soon since they must have lots of stuff in list. </p>
+<p>After a little bit research on how R can recognize multiple line statement to be single statement, I felt the problem was not easy but doable. </p>
+<p>R know a statement is not finished yet even with newline if it found</p>
+<ul>
+<li>a string started with quotation mark</li>
+<li>an operator like <code>+</code>, <code>/</code>, <code>&lt;-</code> in the end of line</li>
+<li>a function call started with <code>(</code></li>
+</ul>
+<p>I started to write regular expressions and work on the addin mechanism. After some time I began to test on sample code, then I found RStudio can send multiple line statement with <code>Ctrl+Enter</code> correctly! </p>
+<p>Turned out I just upgraded RStudio to the latest preview beta version because of requirement of addin development, and the latest preview version implemented my feature suggestion already. I knew it could be easy from RStudio angle because RStudio has analyzed every line of code, and should have many information readily available.</p>
+<h2 id="mischelper"><a href="#mischelper" class="headerlink" title="mischelper"></a>mischelper</h2><p>With my initial target crossed off, I tried to find some other usages that could use an addin. </p>
+<ul>
+<li><p>First candidate came from my experience of copying some text from PDF as notes: I&#x2019;d like to <code>remove the hard line breaks</code> from PDF. To do this I need to separate the hard word wrap from the normal paragraphs. With some experimentations on regular expressions this was done in a short time. I also added option to insert empty line between paragraphs.</p>
+<p>  <img src="unwrap.gif" alt="unwrap"></p>
+</li>
+<li><p>I felt the <code>remove hard line break</code> feature is too trivial to be an independent addin, so I added yet another trivial feature: flip the windows path separator <code>\</code> into <code>/</code>. Thus I can copy a file or folder full path in Total Commander, paste it into R script with one click.</p>
+<p>  <img src="flip.gif" alt="flip"></p>
+</li>
+<li><p>Still not satisfied, I found a really useful function later: if you want to do a simple benchmark or measuring time spent on code, the primitive method is to use <code>proc.time()</code>. Or you could use the great <a href="https://cran.r-project.org/web/packages/microbenchmark/index.html" target="_blank" rel="external"><code>microbenchmark</code></a> package, which would run the code several times to get better statistics.<br>  To use <code>microbenchmark</code>, you need to wrap your code or function like this:</p>
+<pre><code>microbenchmark::microbenchmark({your code or function}, times = 100)
+</code></pre><p>  It&#x2019;s not hard if you are just measuring a function, but I found I wanted to measure a code chunk instead of function in most times. Because it&#x2019;s harder to interactively debug code once it was wrapped into a function, I always fully test code before it became a function. Sometimes I may also want to test different code chunks, thus the usage of <code>microbenchmark</code> became quite laborious.</p>
+<p>  I always want to automate everything as much as I can, and this case is a perfect usage. Just select the code I want to benchmark, one keyboard short cut or menu click will wrap them and microbenchmark in console. Since the code in source editor is not changed, I can continue coding or select different code chunk freely without any extra editing.</p>
+<p>  <img src="benchmark.gif" alt="microbenchmark"></p>
+</li>
+<li><p>In similar spirit, I wrote another function to use the profiler provided by RStudio. </p>
+</li>
+</ul>
+<p>Now my addin have enough features, and I named it as <a href="https://github.com/dracodoc/mischelper" target="_blank" rel="external"><code>mischelper</code></a> since the features are quite random. I&#x2019;m not sure if end user will need all of them. Installing the addin will add 5 menu items in addin menu, and the menu can become quite busy quickly. There is no menu organization mechanism like menu folder available yet, though you can edit the menu registration file manually to remove the feature you don&#x2019;t need from the list.</p>
+<h2 id="namebrowser"><a href="#namebrowser" class="headerlink" title="namebrowser"></a>namebrowser</h2><p>The features I developed above are very simple. Though another idea I had turned out to be much more complicated.</p>
+<p>The motivation came from my experience of learning R packages. There are thousands of R packages and you do need to use quite some of them. Sometimes I knew a method or dataset exist but not sure which package it is in, especially when there are several related candidates, like <code>plyr</code>, <code>dplyr</code>, <code>tidyr</code> etc. R help will suggest to use <code>??</code> when it cannot find the name, but <code>??</code> seemed to be a full text search, which are slow and return too many irrelevant results.</p>
+<p>I used to code Java in IntelliJ IDEA. One feature called <code>auto import</code> can:</p>
+<ol>
+<li>Automatically add import statements for all classes that are found in the pasted block of code and are not imported in the current class yet</li>
+<li>Automatically display import pop-up dialog box when typing the name of a symbol that lacks import statement.</li>
+</ol>
+<p>I made a <a href="https://support.rstudio.com/hc/en-us/community/posts/212206388-automatically-load-packages-like-the-auto-import-in-IntelliJ-IDEA" target="_blank" rel="external">feature request</a> to RStudio again. Though after some research I found this task is not a easy one. In java there are probably not much ambiguity about which class to load since the names are often unique, while in R we have many functions shared same names across packages. User have to check options and make decision, so it&#x2019;s impossible to load package automatically. The only solution is to provide a database browser to check and search names.</p>
+<p>It will need quite some tedious work to maintain a database of names in packages, especially since the packages installed can change, upgrade or be removed from time to time. The method I tested need to load and attach each package before scanning, then there will be the error <code>maximal number of DLLs reached</code> pretty soon. I made extra efforts to unload packages properly after scanning, but there would still be some packages cannot be unloaded because of dependency from other loaded packages. Finally I built up a work flow to scan hundreds of packages, then started to work on a browser to search the name table.</p>
+<p>With Shiny and DT it is relatively easy to get a working prototype running, though anything special customization that I wanted to do took lots of efforts to search, read and experiment on every little piece of information. After a lot of revisions I finally got <a href="https://github.com/dracodoc/namebrowser" target="_blank" rel="external">a satisfying version here</a>.</p>
+<p><img src="search_normal_prefix.gif" alt="search_normal_prefix"></p>
+<p><img src="search_regex_lib.gif" alt="search_regex_lib"></p>
+<p><img src="search_symbol.gif" alt="search_symbol"></p>
+<h2 id="addin-list"><a href="#addin-list" class="headerlink" title="addin list"></a>addin list</h2><p>I think RStudio addin is a great method to allow users to add features into RStudio based on their own needs. Although it&#x2019;s still in its infancy stage, there are many good addins popped up already. You can check out <a href="https://github.com/daattali/addinslist" target="_blank" rel="external">addinlist</a>, which listed most known addins. You can also install it as a RStudio addin to manage addin installation. Some addins look very promising, like the <a href="https://github.com/daattali/addinslist" target="_blank" rel="external">ggplot theme assist</a>, which let you customize ggplot2 themes interactively.</p>
+]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning]]></title>
       <url>http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</url>
       <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
