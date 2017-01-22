@@ -8,8 +8,26 @@
         <atom:link href="/categories/R/rss2.xml" rel="self" type="application/rss+xml"/>
         
         <description></description>
-        <pubDate>Tue, 30 Aug 2016 17:55:16 GMT</pubDate>
+        <pubDate>Sun, 22 Jan 2017 01:47:44 GMT</pubDate>
         <generator>http://hexo.io/</generator>
+        
+        <item>
+            <title>rCartoAPI - call Carto.com API with R</title>
+            <link>http://dracodoc.github.io/2017/01/21/rCarto/</link>
+            <guid>http://dracodoc.github.io/2017/01/21/rCarto/</guid>
+            <pubDate>Sat, 21 Jan 2017 22:04:26 GMT</pubDate>
+            <description>
+                
+                &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;My experience with Carto.com in creating web map for data analysis&lt;/li&gt;
+&lt;li&gt;I wrote a R package to wrap Carto.com API calls&lt;/li&gt;
+&lt;li&gt;Some notes on my experience of managing Gigabyte size data for mapping&lt;/li&gt;
+&lt;/ul&gt;
+                
+            </description>
+            
+            <comments>http://dracodoc.github.io/2017/01/21/rCarto/#disqus_thread</comments>
+        </item>
         
         <item>
             <title>RStudio addin - extend RStudio in your way</title>

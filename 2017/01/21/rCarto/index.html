@@ -1,0 +1,877 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Data Science,R,Map,Carto," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="From Learning and Evolution to Data Science" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="Summary
+My experience with Carto.com in creating web map for data analysis
+I wrote a R package to wrap Carto.com API calls
+Some notes on my experience of managing Gigabyte size data for mapping">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rCartoAPI - call Carto.com API with R">
+<meta property="og:url" content="http://dracodoc.github.io/2017/01/21/rCarto/index.html">
+<meta property="og:site_name" content="From Learning and Evolution to Data Science">
+<meta property="og:description" content="Summary
+My experience with Carto.com in creating web map for data analysis
+I wrote a R package to wrap Carto.com API calls
+Some notes on my experience of managing Gigabyte size data for mapping">
+<meta property="og:updated_time" content="2017-01-22T01:47:44.335Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="rCartoAPI - call Carto.com API with R">
+<meta name="twitter:description" content="Summary
+My experience with Carto.com in creating web map for data analysis
+I wrote a R package to wrap Carto.com API calls
+Some notes on my experience of managing Gigabyte size data for mapping">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: 'Author'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="http://dracodoc.github.io/2017/01/21/rCarto/"/>
+
+  <title> rCartoAPI - call Carto.com API with R | From Learning and Evolution to Data Science </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="en">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">From Learning and Evolution to Data Science</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            Categories
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            About
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            Tags
+          </a>
+        </li>
+      
+
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
+            
+            Search
+          </a>
+        </li>
+      
+    </ul>
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup">
+ <span class="search-icon fa fa-search"></span>
+ <input type="text" id="local-search-input">
+ <div id="local-search-result"></div>
+ <span class="popup-btn-close">close</span>
+</div>
+
+
+    </div>
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                rCartoAPI - call Carto.com API with R
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">Posted on</span>
+            <time itemprop="dateCreated" datetime="2017-01-21T17:04:26-05:00" content="2017-01-21">
+              2017-01-21
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/R/" itemprop="url" rel="index">
+                    <span itemprop="name">R</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2017/01/21/rCarto/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017/01/21/rCarto/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
+<li>My experience with Carto.com in creating web map for data analysis</li>
+<li>I wrote a R package to wrap Carto.com API calls</li>
+<li>Some notes on my experience of managing Gigabyte size data for mapping</li>
+</ul>
+<a id="more"></a>
+<h2 id="introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>Carto.com is a web map provider. I used Carto in my project because:</p>
+<ol>
+<li>With PostgreSQL, PostGIS as backend, you have all the power of SQL and PostGIS functions. With Mapbox you will need to do everything in JavaScript. Because you can run SQL inside the Carto website UI, it&#x2019;s much easier to experiment and update.</li>
+<li>The new Builder let user to create widgets for map, which let map viewers select range in date or histgram, value in categorical variable, and the map will update dynamically. </li>
+</ol>
+<p>Carto provide <a href="https://carto.com/docs/carto-engine/sql-api" target="_blank" rel="external">several types of API</a> for different tasks. It&#x2019;s simple to construct an API call with <code>curl</code> but also very cumbersome. You also often need to use some parts of the request response, which means a lot of copy/paste. I try to replace all repetitive manual labor with programs as much as possible, so it&#x2019;s only natural to do this with R.</p>
+<p>There are some R package or function available for Carto API but they are either too old and broken or too limited for my usage. I developed my own R functions for every API call I used gradually, then I made it into a R package - <a href="https://github.com/dracodoc/rCartoAPI" target="_blank" rel="external">RCartoAPI</a>.</p>
+<ul>
+<li>upload local file to Carto</li>
+<li>let Carto import a remote file by url </li>
+<li>let Carto sync with a remote file</li>
+<li>check sync status</li>
+<li>force sync</li>
+<li>remove sync connection</li>
+<li>list all sync tables</li>
+<li>run SQL inquiry</li>
+<li>run time consuming SQL inquiry in Batch mode, check status later</li>
+</ul>
+<p>So it&#x2019;s more focused on data import/sync and time consuming SQL inquiries. I have found it saved me a lot of time.</p>
+<h3 id="carto-user-name-and-api-key"><a href="#Carto-user-name-and-API-key" class="headerlink" title="Carto user name and API key"></a>Carto user name and API key</h3><p>All the functions in the package currently require an API key from Carto. Without API key you can only do some read only operations with public data. If there is more demand I can add the keyless versions, though I think it will be even better for Carto to just provide API key in free plan.</p>
+<p>It&#x2019;s not easy to save sensitive information securely and conveniently at the same time. After checking <a href="http://blog.revolutionanalytics.com/2015/11/how-to-store-and-use-authentication-details-with-r.html" target="_blank" rel="external">this summary</a> and <a href="https://cran.r-project.org/web/packages/httr/vignettes/api-packages.html" target="_blank" rel="external">the best practices vignette</a> from <code>httr</code>, I chose to save them in system environment and minimize the exposure of user name and API key. After reading from system environment, the user name and API key only exist inside the package functions, which are further wrapped in package environment, not visible from global environment.</p>
+<p>Most references I found in this usage used <code>.Rprofile</code>, while I think <code>.Renviron</code> is more suitable for this need. If you want to update variables and reload them, you don&#x2019;t need to touch the other part in <code>.Rprofile</code>. </p>
+<p>When package is loaded it will check system environment for the user name and API key and report status. If you modified the user name and API key in <code>.Renviron</code>, just run <code>update_env()</code>. </p>
+<h2 id="some-tips-from-my-experience"><a href="#Some-tips-from-my-experience" class="headerlink" title="Some tips from my experience"></a>Some tips from my experience</h2><h3 id="csv-column-type-guessing"><a href="#csv-column-type-guessing" class="headerlink" title="csv column type guessing"></a>csv column type guessing</h3><p>Carto by default will set csv column type according to column content. However sometimes column with numbers are actually categorical, and often there are leading 0s need to be kept. If Carto import these columns as number, the leading 0 information is lost and you cannot recover it by changing column type later in Carto. </p>
+<p>Thus I will add quote for the columns that I want to keep them as characters, and use parameter <code>quoted_fields_guessing</code> as FALSE by default. Then Carto will not guessing type for these columns. We still want the field guessing on for other columns, especially it&#x2019;s easier that Carto recognize lon/lat pair and build the geom automatically. <code>write.csv</code> will write non-numeric columns with quote by default, which is what we want. If you are using <code>fwrite</code> in <code>data.table</code>, you need to set <code>quote = TRUE</code> manually.</p>
+<h3 id="update-data-after-a-map-is-created"><a href="#update-data-after-a-map-is-created" class="headerlink" title="update data after a map is created"></a>update data after a map is created</h3><p>Sometimes I may want to update the data used in a map after the map has been created, for example there are more data cleaning needed. I didn&#x2019;t find a straightforward way to do this in Carto. </p>
+<ul>
+<li>One way is to upload the new data file with new name, then duplicate the map, change the SQL call for the data set to load the new data table. There are multiple manual steps involved, and there will be duplicated maps and data sets.</li>
+<li>Another way is to set map using a sync table to a remote url, for example dropbox shared file. Then you can update the file in dropbox, let Carto to update the data. If the default sync interval is too long, there is <code>force_sync</code> function in package to force immediate sync. Note there is a 15 mins wait from last sync before force sync can work. </li>
+</ul>
+<p>It also worth note that by copying new version of data file into the local dropbox folder to override the old version will update the file and keep the sharing link same.</p>
+<h3 id="upload-large-file-to-carto"><a href="#upload-large-file-to-Carto" class="headerlink" title="upload large file to Carto"></a>upload large file to Carto</h3><p>There is a limit of 1 million rows for single file upload to Carto. I have a data file with 4 million rows, so I have to split it into smaller chunks, upload each file, then combine them with SQL inquries. With the help of <code>rdrop2</code> package and my own package, I can do all of these automatically, which make it much easier to update the data and run the process again.</p>
+<p>Compare to upload huge local file directly to Carto, I think upload to cloud probably is more reliable. I chose dropbox because the direct file link can be inferred from the share link, while I didn&#x2019;t find a working method to get direct link of google drive file. </p>
+<p>To run the code below you need to provide a data set. Then the verification part may need some column adjustment to pass.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="keyword">library</span>(data.table)</span><br><span class="line"><span class="comment"># setup rdrop2</span></span><br><span class="line">devtools::install_github(<span class="string">&apos;karthik/rdrop2&apos;</span>)</span><br><span class="line"><span class="keyword">library</span>(rdrop2)</span><br><span class="line">drop_auth()</span><br><span class="line"><span class="comment"># provide your data set here</span></span><br><span class="line">target &lt;- data.table(dataset)</span><br><span class="line"><span class="comment"># use small size to test workflow first, change to full scale later</span></span><br><span class="line">chunk_size &lt;- <span class="number">200</span></span><br><span class="line">name_prefix &lt;- <span class="string">&quot;bfa_sample&quot;</span></span><br><span class="line">file_count &lt;- ceiling(target[, .N] / chunk_size)</span><br><span class="line"><span class="comment"># generate this to be used later. note no &quot;.csv&quot; part here</span></span><br><span class="line">file_name_list &lt;- paste0(name_prefix, <span class="string">&quot;_&quot;</span>, <span class="number">1</span>:file_count)</span><br><span class="line"><span class="keyword">for</span> (i <span class="keyword">in</span> <span class="number">1</span>:file_count) {</span><br><span class="line">  range_s &lt;- (i - <span class="number">1</span>) * chunk_size + <span class="number">1</span></span><br><span class="line">  <span class="comment"># the last chunk could be of different size. R will recycle rows if not specified</span></span><br><span class="line">  range_e &lt;- min(target[, .N], range_s + chunk_size - <span class="number">1</span>)</span><br><span class="line">  save_csv(target[range_s:range_e], file_name_list[i])</span><br><span class="line">}</span><br><span class="line"><span class="comment"># verify split data integrity</span></span><br><span class="line">file_list &lt;- paste0(csv_folder, file_name_list, <span class="string">&quot;.csv&quot;</span>)</span><br><span class="line">dt_list &lt;- vector(<span class="string">&quot;list&quot;</span>, length(file_list))</span><br><span class="line"><span class="keyword">for</span> (j <span class="keyword">in</span> seq_along(file_list)) {</span><br><span class="line">  dt_list[[j]] &lt;- fread(file_list[[j]])</span><br><span class="line">}</span><br><span class="line">dt &lt;- rbindlist(dt_list)</span><br><span class="line"><span class="comment"># in reality, some columns types need to be converted first after reading from csv directly</span></span><br><span class="line">all.equal(dt, target)</span><br><span class="line"><span class="comment"># setup dropbox, get url.</span></span><br><span class="line">file_urls &lt;- vector(mode = <span class="string">&quot;character&quot;</span>, length = length(file_list))</span><br><span class="line"><span class="keyword">for</span> (i <span class="keyword">in</span> seq_along(file_list)) {</span><br><span class="line">  drop_upload(file_list[i])</span><br><span class="line">  res &lt;- drop_share(drop_search(file_name_list[i])$path, short_url = <span class="literal">FALSE</span>)</span><br><span class="line">  file_urls[i] &lt;- res$url</span><br><span class="line">}</span><br><span class="line"><span class="comment"># setup dropbox sync, wait complete, get table id</span></span><br><span class="line"><span class="keyword">for</span> (i <span class="keyword">in</span> seq_along(file_urls)) {</span><br><span class="line">  res &lt;- url_sync(convert_dropbox_link(file_urls[i]))</span><br><span class="line">}</span><br><span class="line"><span class="comment"># check result</span></span><br><span class="line">tables_df &lt;- list_sync_tables_df()</span><br></pre></td></tr></table></figure>
+<p>My case need to upload 4 200M files. Any error in the network or Carto server may prevent it finish perfectly. Upon checking the sync table I found the last file sync is not successful. I tried force sync it but failed, so I just use this code to upload and sync that file again.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># need both file_path and file_name</span></span><br><span class="line">file_path &lt;- <span class="string">&quot;your file path&quot;</span></span><br><span class="line">file_name &lt;- <span class="string">&quot;your file name&quot;</span></span><br><span class="line">drop_upload(file_path)</span><br><span class="line">res &lt;- drop_share(drop_search(file_name)$path, short_url = <span class="literal">FALSE</span>)</span><br><span class="line">file_url &lt;- res$url</span><br><span class="line"><span class="comment"># setup dropbox sync, wait complete, get table id</span></span><br><span class="line">res &lt;- url_sync(convert_dropbox_link(file_url))</span><br><span class="line">dt &lt;- list_sync_tables_dt()</span><br></pre></td></tr></table></figure>
+<h3 id="merge-uploaded-chunks-with-batch-sql"><a href="#merge-uploaded-chunks-with-Batch-sql" class="headerlink" title="merge uploaded chunks with Batch sql"></a>merge uploaded chunks with Batch sql</h3><p>With all data files uploaded to Carto, now we need to merge them. Because I tested with small size sample first, I can test my sql inquiry in the web page directly (click a data set to open the data view, switch to sql view to run sql inquiry). After that I run the sql inquiry with my R package. With everything works I change the data set to the full scale data and run the whole process again.</p>
+<p>I used a template for sql inquiries because I need to apply them for small sample file first, then larger full scale file later. With a template I can change the table name easily.</p>
+<p>Carto expect a table <a href="https://github.com/CartoDB/cartodb-postgresql/blob/master/doc/cartodbfy-requirements.rst" target="_blank" rel="external">matching some special schema to work</a>, including a <code>cartodb_id</code> column. When you upload a file into Carto, Carto will convert the data automatically in the importing process. Since we are creating a new table by sql API directly, this new table didn&#x2019;t go through that process and is not ready for Carto mapping yet. We need to drop the <code>cartodb_id</code> column, <a href="https://github.com/CartoDB/cartodb/wiki/creating-tables-though-the-SQL-API" target="_blank" rel="external">run <code>cdb_cartodbfytable</code> function to make the table ready</a>. Only after this finished you can see the result table in the data set page of Carto.</p>
+<p>The sql inquiries we used here need some time to finish. With rCartoAPI you can run the inquiries and check the job status easily.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># pattern of uploaded file name</span></span><br><span class="line">file_name_pattern &lt;- <span class="string">&quot;data_set&quot;</span></span><br><span class="line">tables_dt &lt;- list_sync_tables_dt()</span><br><span class="line"><span class="comment"># get the full table name for uploaded files in Carto</span></span><br><span class="line">file_name_list &lt;- tables_dt[order(name)][str_detect(name, file_name_pattern), name]</span><br><span class="line">result_table &lt;- <span class="string">&quot;data_set_all&quot;</span></span><br><span class="line"><span class="comment"># inquiries in two parts</span></span><br><span class="line">inquiry_list &lt;- vector(mode = <span class="string">&quot;character&quot;</span>, length = <span class="number">2</span>)</span><br><span class="line"><span class="comment"># merge the table, cartodb_id column need to be dropped and generated again for merged dataset, because it is a row id column.</span></span><br><span class="line">inquiry_list[<span class="number">1</span>] &lt;- <span class="string">&quot;DROP TABLE IF EXISTS __result_table;</span><br><span class="line">CREATE TABLE __result_table AS </span><br><span class="line">  SELECT * FROM __table_1</span><br><span class="line">  union</span><br><span class="line">  SELECT * FROM __table_2</span><br><span class="line">  union</span><br><span class="line">  SELECT * FROM __table_3</span><br><span class="line">  union</span><br><span class="line">  SELECT * FROM __table_4</span><br><span class="line">  union</span><br><span class="line">  SELECT * FROM __table_5;</span><br><span class="line">ALTER TABLE __result_table</span><br><span class="line">  DROP COLUMN cartodb_id; &quot;</span></span><br><span class="line"><span class="comment"># make a plain table ready for Carto. need your Carto user name here</span></span><br><span class="line">inquiry_list[<span class="number">2</span>] &lt;- <span class="string">&quot;select cdb_cartodbfytable(&apos;your user name&apos;, &apos;__result_table&apos;)&quot;</span></span><br><span class="line"><span class="comment"># str_replace_all named pair of pattern:replacement.</span></span><br><span class="line">inq &lt;- lapply(inquiry_list, <span class="keyword">function</span>(x) str_replace_all(x, </span><br><span class="line">                c(<span class="string">&quot;__result_table&quot;</span> = result_table, </span><br><span class="line">                  <span class="string">&quot;__table_1&quot;</span> = file_name_list[<span class="number">1</span>], </span><br><span class="line">                  <span class="string">&quot;__table_2&quot;</span> = file_name_list[<span class="number">2</span>],</span><br><span class="line">                  <span class="string">&quot;__table_3&quot;</span> = file_name_list[<span class="number">3</span>], </span><br><span class="line">                  <span class="string">&quot;__table_4&quot;</span> = file_name_list[<span class="number">4</span>],</span><br><span class="line">                  <span class="string">&quot;__table_5&quot;</span> = file_name_list[<span class="number">5</span>])))</span><br><span class="line"><span class="comment"># run batch job 1, merge tables</span></span><br><span class="line">job &lt;- sql_batch_inquiry_id(inq[[<span class="number">1</span>]])</span><br><span class="line">sql_batch_check(job)</span><br><span class="line"><span class="comment"># check merging result</span></span><br><span class="line">sql_inquiry_dt(<span class="string">&quot;select * from data_set_all limit 2&quot;</span>)</span><br><span class="line">sql_inquiry_dt(<span class="string">&quot;select count(*) from data_set_all&quot;</span>)</span><br><span class="line"><span class="comment"># run batch job 2, cartodbfy</span></span><br><span class="line">job_2 &lt;- sql_batch_inquiry_id(inq[[<span class="number">2</span>]])</span><br><span class="line">sql_batch_check(job_2)</span><br><span class="line"><span class="comment"># check result</span></span><br><span class="line">sql_inquiry_dt(<span class="string">&quot;select * from data_set_all limit 2&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>After this I can create map with the merged data set. However the map performance is not ideal. I learned that you can <a href="https://carto.com/docs/tips-and-tricks/back-end-data-performance" target="_blank" rel="external">create overviews to improve performance</a> in this case.</p>
+<p>So I can drop the overviews for the uploaded chunks, which were created automatically in importing process but we don&#x2019;t need it. Then create overview for the merged table.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># optimization for big table</span></span><br><span class="line">sql_inquiry(<span class="string">&quot;select cdb_dropoverviews(&apos;table_1&apos;); &quot;</span>)</span><br><span class="line">sql_inquiry(<span class="string">&quot;select cdb_dropoverviews(&apos;table_2&apos;); &quot;</span>)</span><br><span class="line">sql_inquiry(<span class="string">&quot;select cdb_dropoverviews(&apos;table_3&apos;); &quot;</span>)</span><br><span class="line">sql_inquiry(<span class="string">&quot;select cdb_dropoverviews(&apos;table_4&apos;); &quot;</span>)</span><br><span class="line">sql_inquiry(<span class="string">&quot;select cdb_dropoverviews(&apos;table_5&apos;); &quot;</span>)</span><br><span class="line">job_4 &lt;- sql_batch_inquiry_id(<span class="string">&quot;select cdb_createoverviews(&apos;data_set_all&apos;); &quot;</span>)</span><br><span class="line">sql_batch_check(job_4)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>Later I found I want to add a year column that work as categorical instead of numerical. Even this simple process is very slow for table this large. I have to use Batch sql inquiry for this. I also need to update the overview for the table after this change to data.</p>
+<figure class="highlight r"><table><tr><td class="code"><pre><span class="line"><span class="comment"># add year categorical</span></span><br><span class="line">job_5 &lt;- sql_batch_inquiry_id(<span class="string">&quot;alter table data_set_all</span><br><span class="line">  add column by_year varchar(25)&quot;</span>)</span><br><span class="line">sql_batch_check(job_5)</span><br><span class="line">job_6 &lt;- sql_batch_inquiry_id(<span class="string">&quot;update data_set_all</span><br><span class="line">  set by_year = to_char(year, &apos;9999&apos;)&quot;</span>)</span><br><span class="line">sql_batch_check(job_6)</span><br><span class="line"><span class="comment"># run overview again</span></span><br><span class="line">sql_inquiry(<span class="string">&quot;select cdb_dropoverviews(&apos;data_set_all&apos;); &quot;</span>)</span><br><span class="line">job_7 &lt;- sql_batch_inquiry_id(<span class="string">&quot;select cdb_createoverviews(&apos;data_set_all&apos;); &quot;</span>)</span><br><span class="line">sql_batch_check(job_7)</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Data-Science/" rel="tag">#Data Science</a>
+          
+            <a href="/tags/R/" rel="tag">#R</a>
+          
+            <a href="/tags/Map/" rel="tag">#Map</a>
+          
+            <a href="/tags/Carto/" rel="tag">#Carto</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/10/rstudio-addin/" rel="next" title="RStudio addin - extend RStudio in your way">
+                <i class="fa fa-chevron-left"></i> RStudio addin - extend RStudio in your way
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="//disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="dracodoc" />
+          <p class="site-author-name" itemprop="name">dracodoc</p>
+          <p class="site-description motion-element" itemprop="description">This is about my exploration of Data Science, came from research background of AI, artificial learning and evolution.</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-name">posts</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">categories</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">tags</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+          <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+            <div class="links-of-blogroll-title">
+              <i class="fa  fa-fw fa-globe"></i>
+              Links
+            </div>
+            <ul class="links-of-blogroll-list">
+              
+                <li class="links-of-blogroll-item">
+                  <a href="http://www.R-bloggers.com" title="R-bloggers" target="_blank">R-bloggers</a>
+                </li>
+              
+            </ul>
+          </div>
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#summary"><span class="nav-number">1.</span> <span class="nav-text">Summary</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction"><span class="nav-number">2.</span> <span class="nav-text">Introduction</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#carto-user-name-and-api-key"><span class="nav-number">2.1.</span> <span class="nav-text">Carto user name and API key</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#some-tips-from-my-experience"><span class="nav-number">3.</span> <span class="nav-text">Some tips from my experience</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#csv-column-type-guessing"><span class="nav-number">3.1.</span> <span class="nav-text">csv column type guessing</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#update-data-after-a-map-is-created"><span class="nav-number">3.2.</span> <span class="nav-text">update data after a map is created</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#upload-large-file-to-carto"><span class="nav-number">3.3.</span> <span class="nav-text">upload large file to Carto</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#merge-uploaded-chunks-with-batch-sql"><span class="nav-number">3.4.</span> <span class="nav-text">merge uploaded chunks with Batch sql</span></a></li></ol></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy;  2015 - 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">dracodoc</span>
+</div>
+
+<div class="powered-by">
+  Powered by <a class="theme-link" href="https://hexo.io">Hexo</a>
+</div>
+
+<div class="theme-info">
+  Theme -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+    <script type="text/javascript">
+      var disqus_shortname = 'dracodocgithub';
+      var disqus_identifier = '2017/01/21/rCarto/';
+      var disqus_title = "rCartoAPI - call Carto.com API with R";
+      var disqus_url = 'http://dracodoc.github.io/2017/01/21/rCarto/';
+
+      function run_disqus_script(disqus_script){
+        var dsq = document.createElement('script');
+        dsq.type = 'text/javascript';
+        dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+      }
+
+      run_disqus_script('count.js');
+      
+        run_disqus_script('embed.js');
+      
+    </script>
+  
+
+
+
+
+  
+  
+  <script type="text/javascript">
+    // Popup Window;
+    var isfetched = false;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length == 0) {
+       search_path = "search.xml";
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    function proceedsearch() {
+      $("body").append('<div class="popoverlay">').css('overflow', 'hidden');
+      $('.popup').toggle();
+
+    }
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+    'use strict';
+    $.ajax({
+        url: path,
+        dataType: "xml",
+        async: true,
+        success: function( xmlResponse ) {
+            // get the contents from search data
+            isfetched = true;
+            $('.popup').detach().appendTo('.header-inner');
+            var datas = $( "entry", xmlResponse ).map(function() {
+                return {
+                    title: $( "title", this ).text(),
+                    content: $("content",this).text(),
+                    url: $( "url" , this).text()
+                };
+            }).get();
+            var $input = document.getElementById(search_id);
+            var $resultContent = document.getElementById(content_id);
+            $input.addEventListener('input', function(){
+                var matchcounts = 0;
+                var str='<ul class=\"search-result-list\">';
+                var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+                $resultContent.innerHTML = "";
+                if (this.value.trim().length > 1) {
+                // perform local searching
+                datas.forEach(function(data) {
+                    var isMatch = true;
+                    var content_index = [];
+                    var data_title = data.title.trim().toLowerCase();
+                    var data_content = data.content.trim().replace(/<[^>]+>/g,"").toLowerCase();
+                    var data_url = data.url;
+                    var index_title = -1;
+                    var index_content = -1;
+                    var first_occur = -1;
+                    // only match artiles with not empty titles and contents
+                    if(data_title != '' && data_content != '') {
+                        keywords.forEach(function(keyword, i) {
+                            index_title = data_title.indexOf(keyword);
+                            index_content = data_content.indexOf(keyword);
+                            if( index_title < 0 && index_content < 0 ){
+                                isMatch = false;
+                            } else {
+                                if (index_content < 0) {
+                                    index_content = 0;
+                                }
+                                if (i == 0) {
+                                    first_occur = index_content;
+                                }
+                            }
+                        });
+                    }
+                    // show search results
+                    if (isMatch) {
+                        matchcounts += 1;
+                        str += "<li><a href='"+ data_url +"' class='search-result-title'>"+ data_title +"</a>";
+                        var content = data.content.trim().replace(/<[^>]+>/g,"");
+                        if (first_occur >= 0) {
+                            // cut out 100 characters
+                            var start = first_occur - 20;
+                            var end = first_occur + 80;
+                            if(start < 0){
+                                start = 0;
+                            }
+                            if(start == 0){
+                                end = 50;
+                            }
+                            if(end > content.length){
+                                end = content.length;
+                            }
+                            var match_content = content.substring(start, end);
+                            // highlight all keywords
+                            keywords.forEach(function(keyword){
+                                var regS = new RegExp(keyword, "gi");
+                                match_content = match_content.replace(regS, "<b class=\"search-keyword\">"+keyword+"</b>");
+                            });
+
+                            str += "<p class=\"search-result\">" + match_content +"...</p>"
+                        }
+                        str += "</li>";
+                    }
+                })};
+                str += "</ul>";
+                if (matchcounts == 0) { str = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>' }
+                if (keywords == "") { str = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>' }
+                $resultContent.innerHTML = str;
+            });
+            proceedsearch();
+        }
+    });}
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched == false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+
+    });
+
+    $('.popup-btn-close').click(function(e){
+      $('.popup').hide();
+      $(".popoverlay").remove();
+      $('body').css('overflow', '');
+    });
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+  </script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
