@@ -89,9 +89,9 @@
       <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
     
     
-      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
-    
       <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
+    
+      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
     
       <category term="Map" scheme="http://dracodoc.github.io/tags/Map/"/>
     
@@ -166,9 +166,9 @@
       <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
     
     
-      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
-    
       <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
+    
+      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
     
       <category term="RStudio" scheme="http://dracodoc.github.io/tags/RStudio/"/>
     
@@ -397,13 +397,13 @@
       <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
     
     
-      <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
-    
-      <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
+      <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
     
       <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
     
-      <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
+      <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
+    
+      <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
     
   </entry>
   
@@ -495,11 +495,11 @@
       <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
     
     
-      <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
+      <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
     
       <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
     
-      <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
+      <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
     
       <category term="NYC taxi data" scheme="http://dracodoc.github.io/tags/NYC-taxi-data/"/>
     
@@ -777,6 +777,10 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
       <category term="Geocoding" scheme="http://dracodoc.github.io/categories/Geocoding/"/>
     
     
+      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
+    
+      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
+    
       <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
     
       <category term="Tiger Geocoder" scheme="http://dracodoc.github.io/tags/Tiger-Geocoder/"/>
@@ -784,10 +788,6 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
       <category term="PostGIS" scheme="http://dracodoc.github.io/tags/PostGIS/"/>
     
       <category term="postgresql" scheme="http://dracodoc.github.io/tags/postgresql/"/>
-    
-      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
-    
-      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
     
   </entry>
   
@@ -903,6 +903,10 @@ su ubuntu
       <category term="Geocoding" scheme="http://dracodoc.github.io/categories/Geocoding/"/>
     
     
+      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
+    
+      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
+    
       <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
     
       <category term="Tiger Geocoder" scheme="http://dracodoc.github.io/tags/Tiger-Geocoder/"/>
@@ -910,10 +914,6 @@ su ubuntu
       <category term="PostGIS" scheme="http://dracodoc.github.io/tags/PostGIS/"/>
     
       <category term="postgresql" scheme="http://dracodoc.github.io/tags/postgresql/"/>
-    
-      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
-    
-      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
     
   </entry>
   
@@ -997,15 +997,15 @@ su ubuntu
       <category term="Data Science" scheme="http://dracodoc.github.io/categories/Data-Science/"/>
     
     
-      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
-    
-      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
-    
       <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
     
       <category term="Red Cross" scheme="http://dracodoc.github.io/tags/Red-Cross/"/>
     
+      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
+    
       <category term="Smoke Alarm project" scheme="http://dracodoc.github.io/tags/Smoke-Alarm-project/"/>
+    
+      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
     
   </entry>
   

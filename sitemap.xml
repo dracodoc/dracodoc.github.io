@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://dracodoc.github.io/about/index.html</loc>
+    
+    <lastmod>2017-03-09T00:37:21.908Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://dracodoc.github.io/2017/01/21/rCarto/</loc>
     
     <lastmod>2017-01-22T01:47:44.335Z</lastmod>
@@ -61,13 +68,6 @@
     <loc>http://dracodoc.github.io/2015/11/17/Geocoding/</loc>
     
     <lastmod>2016-08-19T13:46:40.772Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://dracodoc.github.io/about/index.html</loc>
-    
-    <lastmod>2016-05-10T20:42:17.757Z</lastmod>
     
   </url>
   
