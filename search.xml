@@ -4,6 +4,15 @@
   
     
     <entry>
+      <title><![CDATA[Color Sync in multiple ggplots]]></title>
+      <url>http://dracodoc.github.io/2017/04/08/color-sync-gg/</url>
+      <content type="html"><![CDATA[<p>This is a summary about my experience on synchronize colors in multiple ggplots of same dataset. </p>
+<a id="more"></a>
+<p>RMarkdown is the better format for the content, so please see <a href="color_sync_ggplot/">the rendered RMarkdown document here</a>.</p>
+]]></content>
+    </entry>
+    
+    <entry>
       <title><![CDATA[rCartoAPI - call Carto.com API with R]]></title>
       <url>http://dracodoc.github.io/2017/01/21/rCarto/</url>
       <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>

@@ -5,7 +5,7 @@
   <link href="http://dracodoc.github.io/atom.xml" rel="self"/>
   
   <link href="http://dracodoc.github.io/"/>
-  <updated>2017-01-22T01:47:44.335Z</updated>
+  <updated>2017-04-08T17:45:59.768Z</updated>
   <id>http://dracodoc.github.io/</id>
   
   <author>
@@ -14,6 +14,33 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Color Sync in multiple ggplots</title>
+    <link href="http://dracodoc.github.io/2017/04/08/color-sync-gg/"/>
+    <id>http://dracodoc.github.io/2017/04/08/color-sync-gg/</id>
+    <published>2017-04-08T12:30:34.000Z</published>
+    <updated>2017-04-08T17:45:59.768Z</updated>
+    
+    <content type="html"><![CDATA[<p>This is a summary about my experience on synchronize colors in multiple ggplots of same dataset. </p>
+<a id="more"></a>
+<p>RMarkdown is the better format for the content, so please see <a href="color_sync_ggplot/">the rendered RMarkdown document here</a>.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;This is a summary about my experience on synchronize colors in multiple ggplots of same dataset. &lt;/p&gt;
+    
+    </summary>
+    
+      <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
+    
+    
+      <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
+    
+      <category term="ggplot" scheme="http://dracodoc.github.io/tags/ggplot/"/>
+    
+  </entry>
   
   <entry>
     <title>rCartoAPI - call Carto.com API with R</title>
@@ -399,9 +426,9 @@
     
       <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
     
-      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
-    
       <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
+    
+      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
     
       <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
     
@@ -777,10 +804,6 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
       <category term="Geocoding" scheme="http://dracodoc.github.io/categories/Geocoding/"/>
     
     
-      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
-    
-      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
-    
       <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
     
       <category term="Tiger Geocoder" scheme="http://dracodoc.github.io/tags/Tiger-Geocoder/"/>
@@ -788,6 +811,10 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
       <category term="PostGIS" scheme="http://dracodoc.github.io/tags/PostGIS/"/>
     
       <category term="postgresql" scheme="http://dracodoc.github.io/tags/postgresql/"/>
+    
+      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
+    
+      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
     
   </entry>
   
@@ -903,10 +930,6 @@ su ubuntu
       <category term="Geocoding" scheme="http://dracodoc.github.io/categories/Geocoding/"/>
     
     
-      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
-    
-      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
-    
       <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
     
       <category term="Tiger Geocoder" scheme="http://dracodoc.github.io/tags/Tiger-Geocoder/"/>
@@ -914,6 +937,10 @@ su ubuntu
       <category term="PostGIS" scheme="http://dracodoc.github.io/tags/PostGIS/"/>
     
       <category term="postgresql" scheme="http://dracodoc.github.io/tags/postgresql/"/>
+    
+      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
+    
+      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
     
   </entry>
   
@@ -997,15 +1024,15 @@ su ubuntu
       <category term="Data Science" scheme="http://dracodoc.github.io/categories/Data-Science/"/>
     
     
+      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
+    
+      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
+    
       <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
     
       <category term="Red Cross" scheme="http://dracodoc.github.io/tags/Red-Cross/"/>
     
-      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
-    
       <category term="Smoke Alarm project" scheme="http://dracodoc.github.io/tags/Smoke-Alarm-project/"/>
-    
-      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
     
   </entry>
   

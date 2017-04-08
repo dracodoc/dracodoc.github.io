@@ -8,8 +8,22 @@
         <atom:link href="/categories/R/rss2.xml" rel="self" type="application/rss+xml"/>
         
         <description></description>
-        <pubDate>Sun, 22 Jan 2017 01:47:44 GMT</pubDate>
+        <pubDate>Sat, 08 Apr 2017 17:45:59 GMT</pubDate>
         <generator>http://hexo.io/</generator>
+        
+        <item>
+            <title>Color Sync in multiple ggplots</title>
+            <link>http://dracodoc.github.io/2017/04/08/color-sync-gg/</link>
+            <guid>http://dracodoc.github.io/2017/04/08/color-sync-gg/</guid>
+            <pubDate>Sat, 08 Apr 2017 12:30:34 GMT</pubDate>
+            <description>
+                
+                &lt;p&gt;This is a summary about my experience on synchronize colors in multiple ggplots of same dataset. &lt;/p&gt;
+                
+            </description>
+            
+            <comments>http://dracodoc.github.io/2017/04/08/color-sync-gg/#disqus_thread</comments>
+        </item>
         
         <item>
             <title>rCartoAPI - call Carto.com API with R</title>
