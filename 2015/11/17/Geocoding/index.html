@@ -86,22 +86,17 @@
 
 
 
-<meta name="description" content="Summary
-This post discussed the background, approaches, windows and linux environment setup for my Geocoding task.
-See more details about the script and workflow in next post.">
+<meta name="description" content="Summary This post discussed the background, approaches, windows and linux environment setup for my Geocoding task. See more details about the script and workflow in next post.">
+<meta name="keywords" content="Geocoding,Tiger Geocoder,PostGIS,postgresql,DataKind,NFIRS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Geocoding 18 million addresses with PostGIS Tiger Geocoder">
 <meta property="og:url" content="http://dracodoc.github.io/2015/11/17/Geocoding/index.html">
 <meta property="og:site_name" content="From Learning and Evolution to Data Science">
-<meta property="og:description" content="Summary
-This post discussed the background, approaches, windows and linux environment setup for my Geocoding task.
-See more details about the script and workflow in next post.">
+<meta property="og:description" content="Summary This post discussed the background, approaches, windows and linux environment setup for my Geocoding task. See more details about the script and workflow in next post.">
 <meta property="og:updated_time" content="2016-08-19T13:46:40.772Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Geocoding 18 million addresses with PostGIS Tiger Geocoder">
-<meta name="twitter:description" content="Summary
-This post discussed the background, approaches, windows and linux environment setup for my Geocoding task.
-See more details about the script and workflow in next post.">
+<meta name="twitter:description" content="Summary This post discussed the background, approaches, windows and linux environment setup for my Geocoding task. See more details about the script and workflow in next post.">
 
 
 
@@ -408,7 +403,7 @@ set TMPDIR=e:\data\gisdata\temp\\
 <p>  Then I run this python script to split it by states.</p>
 </li>
 </ul>
-<figure class="highlight python"><figcaption><span>splitStates.py</span><a href="https://gist.github.com/dracodoc/f0eeeac91eb0d68c712c#file-splitstates-py" target="_blank" rel="external">Open in Github</a></figcaption><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">__author__ = <span class="string">&apos;draco&apos;</span></span><br><span class="line"><span class="comment"># split all states loader script into separate scripts by states.</span></span><br><span class="line"><span class="comment"># replace all the &quot;set TMPDIR=...&quot; line with &quot;:: ---- end state ----\nset TMPDIR=...&quot;</span></span><br><span class="line"><span class="comment"># then delete the first line of &quot;:: ---- end state ----\n&quot;</span></span><br><span class="line"><span class="comment"># modify the base file path and output file folder by your case.</span></span><br><span class="line"></span><br><span class="line">text_file = open(<span class="string">&quot;e:\\Data\\all_states.bat&quot;</span>,<span class="string">&quot;r&quot;</span>)</span><br><span class="line">lines = text_file.readlines()</span><br><span class="line">text_file.close()</span><br><span class="line"><span class="keyword">print</span> len(lines)</span><br><span class="line">sep = <span class="string">&quot;:: ---- end state ----\n&quot;</span></span><br><span class="line">file_no = <span class="number">1</span></span><br><span class="line">temp = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> line <span class="keyword">in</span> lines[<span class="number">0</span>:]:</span><br><span class="line">    <span class="keyword">if</span> line != sep:</span><br><span class="line">        temp += line</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        state_file = open(<span class="string">&quot;e:\\Data\\&quot;</span> + str(file_no).zfill(<span class="number">2</span>) + <span class="string">&quot;.bat&quot;</span>, <span class="string">&apos;w&apos;</span>)</span><br><span class="line">        state_file.write(temp)</span><br><span class="line">        state_file.close()</span><br><span class="line">        temp = line</span><br><span class="line">        file_no += <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><figcaption><span>splitStates.py</span><a href="https://gist.github.com/dracodoc/f0eeeac91eb0d68c712c#file-splitstates-py" target="_blank" rel="external">Open in Github</a></figcaption><table><tr><td class="code"><pre><div class="line"></div><div class="line">__author__ = <span class="string">&apos;draco&apos;</span></div><div class="line"><span class="comment"># split all states loader script into separate scripts by states.</span></div><div class="line"><span class="comment"># replace all the &quot;set TMPDIR=...&quot; line with &quot;:: ---- end state ----\nset TMPDIR=...&quot;</span></div><div class="line"><span class="comment"># then delete the first line of &quot;:: ---- end state ----\n&quot;</span></div><div class="line"><span class="comment"># modify the base file path and output file folder by your case.</span></div><div class="line"></div><div class="line">text_file = open(<span class="string">&quot;e:\\Data\\all_states.bat&quot;</span>,<span class="string">&quot;r&quot;</span>)</div><div class="line">lines = text_file.readlines()</div><div class="line">text_file.close()</div><div class="line"><span class="keyword">print</span> len(lines)</div><div class="line">sep = <span class="string">&quot;:: ---- end state ----\n&quot;</span></div><div class="line">file_no = <span class="number">1</span></div><div class="line">temp = <span class="string">&quot;&quot;</span></div><div class="line"><span class="keyword">for</span> line <span class="keyword">in</span> lines[<span class="number">0</span>:]:</div><div class="line">    <span class="keyword">if</span> line != sep:</div><div class="line">        temp += line</div><div class="line">    <span class="keyword">else</span>:</div><div class="line">        state_file = open(<span class="string">&quot;e:\\Data\\&quot;</span> + str(file_no).zfill(<span class="number">2</span>) + <span class="string">&quot;.bat&quot;</span>, <span class="string">&apos;w&apos;</span>)</div><div class="line">        state_file.write(temp)</div><div class="line">        state_file.close()</div><div class="line">        temp = line</div><div class="line">        file_no += <span class="number">1</span></div></pre></td></tr></table></figure>
 <h2 id="linux-setup"><a href="#Linux-Setup" class="headerlink" title="Linux Setup"></a>Linux Setup</h2><p>After I moved the postgresql database to regular hard drive because of storage limit, the geocoding performance was very low. Fortunately I got the generous support of DataKind on their AWS resources, so I can run the geocoding task in Amazon EC2 server. I want to test everything as comprehensive as possible before deploying an expensive EC2 instance, thus I decided to do everything with the Amazon EC2 free tier service first. The free tier only allow 30G storage, 1G RAM but I can test with 2 states first.</p>
 <p>I used the <a href="https://github.com/enigma-io/ansible-tiger-geocoder-playbook" target="_blank" rel="external">ansible playbook</a> from Enigma to setup the AWS EC2 instance. Here are some notes:</p>
 <ul>
@@ -570,7 +565,7 @@ su ubuntu
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-count">11</span>
               <span class="site-state-item-name">posts</span>
             </a>
           </div>

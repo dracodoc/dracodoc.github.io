@@ -21,7 +21,7 @@
                 &lt;h2 id=&quot;Summary&quot;&gt;&lt;a href=&quot;#Summary&quot; class=&quot;headerlink&quot; title=&quot;Summary&quot;&gt;&lt;/a&gt;Summary&lt;/h2&gt;&lt;ul&gt;
 &lt;li&gt;I discussed all the problem I met, approaches I tried, and improvement I achieved in the Geocoding task.&lt;/li&gt;
 &lt;li&gt;There are many subtle details, some open questions and areas can be improved.&lt;/li&gt;
-&lt;li&gt;The final working script and complete workflow are hosted in &lt;a href=&quot;https://github.com/dracodoc/Geocode&quot;&gt;github&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;The final working script and complete workflow are hosted in &lt;a href=&quot;https://github.com/dracodoc/Geocode&quot; target=&quot;_blank&quot; rel=&quot;external&quot;&gt;github&lt;/a&gt;.&lt;/li&gt;
 &lt;/ul&gt;
                 
             </description>
