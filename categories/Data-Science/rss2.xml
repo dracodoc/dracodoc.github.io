@@ -4,7 +4,7 @@
      xmlns:content="http://purl.org/rss/1.0/modules/content/">
     <channel>
         <title></title>
-        <link>http://dracodoc.github.io/</link>
+        <link>https://dracodoc.github.io/</link>
         <atom:link href="/categories/Data-Science/rss2.xml" rel="self" type="application/rss+xml"/>
         
         <description></description>
@@ -13,8 +13,8 @@
         
         <item>
             <title>Red Cross Smoke Alarm Project</title>
-            <link>http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/</link>
-            <guid>http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/</guid>
+            <link>https://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/</link>
+            <guid>https://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/</guid>
             <pubDate>Wed, 11 Nov 2015 14:02:10 GMT</pubDate>
             <description>
                 
@@ -31,13 +31,13 @@
                 
             </description>
             
-            <comments>http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/#disqus_thread</comments>
+            <comments>https://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/#disqus_thread</comments>
         </item>
         
         <item>
             <title>Exploring House Price Estimation And Imagining A Better Real Estate Website</title>
-            <link>http://dracodoc.github.io/2015/10/23/house-price/</link>
-            <guid>http://dracodoc.github.io/2015/10/23/house-price/</guid>
+            <link>https://dracodoc.github.io/2015/10/23/house-price/</link>
+            <guid>https://dracodoc.github.io/2015/10/23/house-price/</guid>
             <pubDate>Fri, 23 Oct 2015 18:23:53 GMT</pubDate>
             <description>
                 
@@ -50,7 +50,7 @@
                 
             </description>
             
-            <comments>http://dracodoc.github.io/2015/10/23/house-price/#disqus_thread</comments>
+            <comments>https://dracodoc.github.io/2015/10/23/house-price/#disqus_thread</comments>
         </item>
         
     </channel>

@@ -2,11 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
   <title>From Learning and Evolution to Data Science</title>
   
-  <link href="http://dracodoc.github.io/atom.xml" rel="self"/>
+  <link href="https://dracodoc.github.io/atom.xml" rel="self"/>
   
-  <link href="http://dracodoc.github.io/"/>
+  <link href="https://dracodoc.github.io/"/>
   <updated>2017-06-04T01:44:31.369Z</updated>
-  <id>http://dracodoc.github.io/</id>
+  <id>https://dracodoc.github.io/</id>
   
   <author>
     <name>dracodoc</name>
@@ -17,8 +17,8 @@
   
   <entry>
     <title>Color Sync in multiple ggplots</title>
-    <link href="http://dracodoc.github.io/2017/04/08/color-sync-gg/"/>
-    <id>http://dracodoc.github.io/2017/04/08/color-sync-gg/</id>
+    <link href="https://dracodoc.github.io/2017/04/08/color-sync-gg/"/>
+    <id>https://dracodoc.github.io/2017/04/08/color-sync-gg/</id>
     <published>2017-04-08T12:30:34.000Z</published>
     <updated>2017-06-04T01:44:31.369Z</updated>
     
@@ -33,19 +33,19 @@
     
     </summary>
     
-      <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
+      <category term="R" scheme="https://dracodoc.github.io/categories/R/"/>
     
     
-      <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
+      <category term="R" scheme="https://dracodoc.github.io/tags/R/"/>
     
-      <category term="ggplot" scheme="http://dracodoc.github.io/tags/ggplot/"/>
+      <category term="ggplot" scheme="https://dracodoc.github.io/tags/ggplot/"/>
     
   </entry>
   
   <entry>
     <title>rCartoAPI - call Carto.com API with R</title>
-    <link href="http://dracodoc.github.io/2017/01/21/rCarto/"/>
-    <id>http://dracodoc.github.io/2017/01/21/rCarto/</id>
+    <link href="https://dracodoc.github.io/2017/01/21/rCarto/"/>
+    <id>https://dracodoc.github.io/2017/01/21/rCarto/</id>
     <published>2017-01-21T22:04:26.000Z</published>
     <updated>2017-01-22T01:47:44.335Z</updated>
     
@@ -113,23 +113,23 @@
     
     </summary>
     
-      <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
+      <category term="R" scheme="https://dracodoc.github.io/categories/R/"/>
     
     
-      <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
+      <category term="Data Science" scheme="https://dracodoc.github.io/tags/Data-Science/"/>
     
-      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
+      <category term="R" scheme="https://dracodoc.github.io/tags/R/"/>
     
-      <category term="Map" scheme="http://dracodoc.github.io/tags/Map/"/>
+      <category term="Map" scheme="https://dracodoc.github.io/tags/Map/"/>
     
-      <category term="Carto" scheme="http://dracodoc.github.io/tags/Carto/"/>
+      <category term="Carto" scheme="https://dracodoc.github.io/tags/Carto/"/>
     
   </entry>
   
   <entry>
     <title>RStudio addin - extend RStudio in your way</title>
-    <link href="http://dracodoc.github.io/2016/08/10/rstudio-addin/"/>
-    <id>http://dracodoc.github.io/2016/08/10/rstudio-addin/</id>
+    <link href="https://dracodoc.github.io/2016/08/10/rstudio-addin/"/>
+    <id>https://dracodoc.github.io/2016/08/10/rstudio-addin/</id>
     <published>2016-08-10T17:57:23.000Z</published>
     <updated>2016-08-30T17:55:16.329Z</updated>
     
@@ -190,21 +190,21 @@
     
     </summary>
     
-      <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
+      <category term="R" scheme="https://dracodoc.github.io/categories/R/"/>
     
     
-      <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
+      <category term="Data Science" scheme="https://dracodoc.github.io/tags/Data-Science/"/>
     
-      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
+      <category term="R" scheme="https://dracodoc.github.io/tags/R/"/>
     
-      <category term="RStudio" scheme="http://dracodoc.github.io/tags/RStudio/"/>
+      <category term="RStudio" scheme="https://dracodoc.github.io/tags/RStudio/"/>
     
   </entry>
   
   <entry>
     <title>Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning</title>
-    <link href="http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/"/>
-    <id>http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</id>
+    <link href="https://dracodoc.github.io/2016/02/03/data-cleaning-geocode/"/>
+    <id>https://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</id>
     <published>2016-02-03T21:17:59.000Z</published>
     <updated>2016-08-19T13:55:46.098Z</updated>
     
@@ -421,23 +421,23 @@
     
     </summary>
     
-      <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
+      <category term="R" scheme="https://dracodoc.github.io/categories/R/"/>
     
     
-      <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
+      <category term="Geocoding" scheme="https://dracodoc.github.io/tags/Geocoding/"/>
     
-      <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
+      <category term="Data Science" scheme="https://dracodoc.github.io/tags/Data-Science/"/>
     
-      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
+      <category term="R" scheme="https://dracodoc.github.io/tags/R/"/>
     
-      <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
+      <category term="Data Cleaning" scheme="https://dracodoc.github.io/tags/Data-Cleaning/"/>
     
   </entry>
   
   <entry>
     <title>Data Cleaning Part 1 - NYC Taxi Trip Data, Looking For Stories Behind Errors</title>
-    <link href="http://dracodoc.github.io/2016/01/31/data-cleaning/"/>
-    <id>http://dracodoc.github.io/2016/01/31/data-cleaning/</id>
+    <link href="https://dracodoc.github.io/2016/01/31/data-cleaning/"/>
+    <id>https://dracodoc.github.io/2016/01/31/data-cleaning/</id>
     <published>2016-02-01T01:27:06.000Z</published>
     <updated>2016-08-19T13:47:21.585Z</updated>
     
@@ -519,23 +519,23 @@
     
     </summary>
     
-      <category term="R" scheme="http://dracodoc.github.io/categories/R/"/>
+      <category term="R" scheme="https://dracodoc.github.io/categories/R/"/>
     
     
-      <category term="R" scheme="http://dracodoc.github.io/tags/R/"/>
+      <category term="Data Science" scheme="https://dracodoc.github.io/tags/Data-Science/"/>
     
-      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
+      <category term="R" scheme="https://dracodoc.github.io/tags/R/"/>
     
-      <category term="Data Cleaning" scheme="http://dracodoc.github.io/tags/Data-Cleaning/"/>
+      <category term="Data Cleaning" scheme="https://dracodoc.github.io/tags/Data-Cleaning/"/>
     
-      <category term="NYC taxi data" scheme="http://dracodoc.github.io/tags/NYC-taxi-data/"/>
+      <category term="NYC taxi data" scheme="https://dracodoc.github.io/tags/NYC-taxi-data/"/>
     
   </entry>
   
   <entry>
     <title>Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder</title>
-    <link href="http://dracodoc.github.io/2015/11/19/Script-workflow/"/>
-    <id>http://dracodoc.github.io/2015/11/19/Script-workflow/</id>
+    <link href="https://dracodoc.github.io/2015/11/19/Script-workflow/"/>
+    <id>https://dracodoc.github.io/2015/11/19/Script-workflow/</id>
     <published>2015-11-19T20:05:00.000Z</published>
     <updated>2016-08-19T19:39:10.803Z</updated>
     
@@ -801,27 +801,27 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
     
     </summary>
     
-      <category term="Geocoding" scheme="http://dracodoc.github.io/categories/Geocoding/"/>
+      <category term="Geocoding" scheme="https://dracodoc.github.io/categories/Geocoding/"/>
     
     
-      <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
+      <category term="Geocoding" scheme="https://dracodoc.github.io/tags/Geocoding/"/>
     
-      <category term="Tiger Geocoder" scheme="http://dracodoc.github.io/tags/Tiger-Geocoder/"/>
+      <category term="Tiger Geocoder" scheme="https://dracodoc.github.io/tags/Tiger-Geocoder/"/>
     
-      <category term="PostGIS" scheme="http://dracodoc.github.io/tags/PostGIS/"/>
+      <category term="PostGIS" scheme="https://dracodoc.github.io/tags/PostGIS/"/>
     
-      <category term="postgresql" scheme="http://dracodoc.github.io/tags/postgresql/"/>
+      <category term="postgresql" scheme="https://dracodoc.github.io/tags/postgresql/"/>
     
-      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
+      <category term="DataKind" scheme="https://dracodoc.github.io/tags/DataKind/"/>
     
-      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
+      <category term="NFIRS" scheme="https://dracodoc.github.io/tags/NFIRS/"/>
     
   </entry>
   
   <entry>
     <title>Geocoding 18 million addresses with PostGIS Tiger Geocoder</title>
-    <link href="http://dracodoc.github.io/2015/11/17/Geocoding/"/>
-    <id>http://dracodoc.github.io/2015/11/17/Geocoding/</id>
+    <link href="https://dracodoc.github.io/2015/11/17/Geocoding/"/>
+    <id>https://dracodoc.github.io/2015/11/17/Geocoding/</id>
     <published>2015-11-17T16:36:10.000Z</published>
     <updated>2016-08-19T13:46:40.772Z</updated>
     
@@ -927,27 +927,27 @@ su ubuntu
     
     </summary>
     
-      <category term="Geocoding" scheme="http://dracodoc.github.io/categories/Geocoding/"/>
+      <category term="Geocoding" scheme="https://dracodoc.github.io/categories/Geocoding/"/>
     
     
-      <category term="Geocoding" scheme="http://dracodoc.github.io/tags/Geocoding/"/>
+      <category term="Geocoding" scheme="https://dracodoc.github.io/tags/Geocoding/"/>
     
-      <category term="Tiger Geocoder" scheme="http://dracodoc.github.io/tags/Tiger-Geocoder/"/>
+      <category term="Tiger Geocoder" scheme="https://dracodoc.github.io/tags/Tiger-Geocoder/"/>
     
-      <category term="PostGIS" scheme="http://dracodoc.github.io/tags/PostGIS/"/>
+      <category term="PostGIS" scheme="https://dracodoc.github.io/tags/PostGIS/"/>
     
-      <category term="postgresql" scheme="http://dracodoc.github.io/tags/postgresql/"/>
+      <category term="postgresql" scheme="https://dracodoc.github.io/tags/postgresql/"/>
     
-      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
+      <category term="DataKind" scheme="https://dracodoc.github.io/tags/DataKind/"/>
     
-      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
+      <category term="NFIRS" scheme="https://dracodoc.github.io/tags/NFIRS/"/>
     
   </entry>
   
   <entry>
     <title>Red Cross Smoke Alarm Project</title>
-    <link href="http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/"/>
-    <id>http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/</id>
+    <link href="https://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/"/>
+    <id>https://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/</id>
     <published>2015-11-11T14:02:10.000Z</published>
     <updated>2016-08-19T13:48:32.625Z</updated>
     
@@ -1021,25 +1021,25 @@ su ubuntu
     
     </summary>
     
-      <category term="Data Science" scheme="http://dracodoc.github.io/categories/Data-Science/"/>
+      <category term="Data Science" scheme="https://dracodoc.github.io/categories/Data-Science/"/>
     
     
-      <category term="DataKind" scheme="http://dracodoc.github.io/tags/DataKind/"/>
+      <category term="DataKind" scheme="https://dracodoc.github.io/tags/DataKind/"/>
     
-      <category term="NFIRS" scheme="http://dracodoc.github.io/tags/NFIRS/"/>
+      <category term="NFIRS" scheme="https://dracodoc.github.io/tags/NFIRS/"/>
     
-      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
+      <category term="Data Science" scheme="https://dracodoc.github.io/tags/Data-Science/"/>
     
-      <category term="Red Cross" scheme="http://dracodoc.github.io/tags/Red-Cross/"/>
+      <category term="Red Cross" scheme="https://dracodoc.github.io/tags/Red-Cross/"/>
     
-      <category term="Smoke Alarm project" scheme="http://dracodoc.github.io/tags/Smoke-Alarm-project/"/>
+      <category term="Smoke Alarm project" scheme="https://dracodoc.github.io/tags/Smoke-Alarm-project/"/>
     
   </entry>
   
   <entry>
     <title>Exploring House Price Estimation And Imagining A Better Real Estate Website</title>
-    <link href="http://dracodoc.github.io/2015/10/23/house-price/"/>
-    <id>http://dracodoc.github.io/2015/10/23/house-price/</id>
+    <link href="https://dracodoc.github.io/2015/10/23/house-price/"/>
+    <id>https://dracodoc.github.io/2015/10/23/house-price/</id>
     <published>2015-10-23T18:23:53.000Z</published>
     <updated>2016-08-19T13:53:27.004Z</updated>
     
@@ -1175,21 +1175,21 @@ su ubuntu
     
     </summary>
     
-      <category term="Data Science" scheme="http://dracodoc.github.io/categories/Data-Science/"/>
+      <category term="Data Science" scheme="https://dracodoc.github.io/categories/Data-Science/"/>
     
     
-      <category term="Data Science" scheme="http://dracodoc.github.io/tags/Data-Science/"/>
+      <category term="Data Science" scheme="https://dracodoc.github.io/tags/Data-Science/"/>
     
-      <category term="House Price" scheme="http://dracodoc.github.io/tags/House-Price/"/>
+      <category term="House Price" scheme="https://dracodoc.github.io/tags/House-Price/"/>
     
-      <category term="modeling" scheme="http://dracodoc.github.io/tags/modeling/"/>
+      <category term="modeling" scheme="https://dracodoc.github.io/tags/modeling/"/>
     
   </entry>
   
   <entry>
     <title>Simple Python performance timing by checkpoints</title>
-    <link href="http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/"/>
-    <id>http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/</id>
+    <link href="https://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/"/>
+    <id>https://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/</id>
     <published>2015-10-21T00:16:43.000Z</published>
     <updated>2016-08-19T19:09:47.192Z</updated>
     
@@ -1238,12 +1238,12 @@ su ubuntu
     
     </summary>
     
-      <category term="Python" scheme="http://dracodoc.github.io/categories/Python/"/>
+      <category term="Python" scheme="https://dracodoc.github.io/categories/Python/"/>
     
     
-      <category term="Python" scheme="http://dracodoc.github.io/tags/Python/"/>
+      <category term="Python" scheme="https://dracodoc.github.io/tags/Python/"/>
     
-      <category term="Programming" scheme="http://dracodoc.github.io/tags/Programming/"/>
+      <category term="Programming" scheme="https://dracodoc.github.io/tags/Programming/"/>
     
   </entry>
   

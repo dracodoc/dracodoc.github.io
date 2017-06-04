@@ -4,7 +4,7 @@
      xmlns:content="http://purl.org/rss/1.0/modules/content/">
     <channel>
         <title></title>
-        <link>http://dracodoc.github.io/</link>
+        <link>https://dracodoc.github.io/</link>
         <atom:link href="/categories/Geocoding/rss2.xml" rel="self" type="application/rss+xml"/>
         
         <description></description>
@@ -13,8 +13,8 @@
         
         <item>
             <title>Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder</title>
-            <link>http://dracodoc.github.io/2015/11/19/Script-workflow/</link>
-            <guid>http://dracodoc.github.io/2015/11/19/Script-workflow/</guid>
+            <link>https://dracodoc.github.io/2015/11/19/Script-workflow/</link>
+            <guid>https://dracodoc.github.io/2015/11/19/Script-workflow/</guid>
             <pubDate>Thu, 19 Nov 2015 20:05:00 GMT</pubDate>
             <description>
                 
@@ -26,13 +26,13 @@
                 
             </description>
             
-            <comments>http://dracodoc.github.io/2015/11/19/Script-workflow/#disqus_thread</comments>
+            <comments>https://dracodoc.github.io/2015/11/19/Script-workflow/#disqus_thread</comments>
         </item>
         
         <item>
             <title>Geocoding 18 million addresses with PostGIS Tiger Geocoder</title>
-            <link>http://dracodoc.github.io/2015/11/17/Geocoding/</link>
-            <guid>http://dracodoc.github.io/2015/11/17/Geocoding/</guid>
+            <link>https://dracodoc.github.io/2015/11/17/Geocoding/</link>
+            <guid>https://dracodoc.github.io/2015/11/17/Geocoding/</guid>
             <pubDate>Tue, 17 Nov 2015 16:36:10 GMT</pubDate>
             <description>
                 
@@ -43,7 +43,7 @@
                 
             </description>
             
-            <comments>http://dracodoc.github.io/2015/11/17/Geocoding/#disqus_thread</comments>
+            <comments>https://dracodoc.github.io/2015/11/17/Geocoding/#disqus_thread</comments>
         </item>
         
     </channel>

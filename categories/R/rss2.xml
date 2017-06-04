@@ -4,7 +4,7 @@
      xmlns:content="http://purl.org/rss/1.0/modules/content/">
     <channel>
         <title></title>
-        <link>http://dracodoc.github.io/</link>
+        <link>https://dracodoc.github.io/</link>
         <atom:link href="/categories/R/rss2.xml" rel="self" type="application/rss+xml"/>
         
         <description></description>
@@ -13,8 +13,8 @@
         
         <item>
             <title>Color Sync in multiple ggplots</title>
-            <link>http://dracodoc.github.io/2017/04/08/color-sync-gg/</link>
-            <guid>http://dracodoc.github.io/2017/04/08/color-sync-gg/</guid>
+            <link>https://dracodoc.github.io/2017/04/08/color-sync-gg/</link>
+            <guid>https://dracodoc.github.io/2017/04/08/color-sync-gg/</guid>
             <pubDate>Sat, 08 Apr 2017 12:30:34 GMT</pubDate>
             <description>
                 
@@ -22,13 +22,13 @@
                 
             </description>
             
-            <comments>http://dracodoc.github.io/2017/04/08/color-sync-gg/#disqus_thread</comments>
+            <comments>https://dracodoc.github.io/2017/04/08/color-sync-gg/#disqus_thread</comments>
         </item>
         
         <item>
             <title>rCartoAPI - call Carto.com API with R</title>
-            <link>http://dracodoc.github.io/2017/01/21/rCarto/</link>
-            <guid>http://dracodoc.github.io/2017/01/21/rCarto/</guid>
+            <link>https://dracodoc.github.io/2017/01/21/rCarto/</link>
+            <guid>https://dracodoc.github.io/2017/01/21/rCarto/</guid>
             <pubDate>Sat, 21 Jan 2017 22:04:26 GMT</pubDate>
             <description>
                 
@@ -40,13 +40,13 @@
                 
             </description>
             
-            <comments>http://dracodoc.github.io/2017/01/21/rCarto/#disqus_thread</comments>
+            <comments>https://dracodoc.github.io/2017/01/21/rCarto/#disqus_thread</comments>
         </item>
         
         <item>
             <title>RStudio addin - extend RStudio in your way</title>
-            <link>http://dracodoc.github.io/2016/08/10/rstudio-addin/</link>
-            <guid>http://dracodoc.github.io/2016/08/10/rstudio-addin/</guid>
+            <link>https://dracodoc.github.io/2016/08/10/rstudio-addin/</link>
+            <guid>https://dracodoc.github.io/2016/08/10/rstudio-addin/</guid>
             <pubDate>Wed, 10 Aug 2016 17:57:23 GMT</pubDate>
             <description>
                 
@@ -54,13 +54,13 @@
                 
             </description>
             
-            <comments>http://dracodoc.github.io/2016/08/10/rstudio-addin/#disqus_thread</comments>
+            <comments>https://dracodoc.github.io/2016/08/10/rstudio-addin/#disqus_thread</comments>
         </item>
         
         <item>
             <title>Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning</title>
-            <link>http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</link>
-            <guid>http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</guid>
+            <link>https://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</link>
+            <guid>https://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</guid>
             <pubDate>Wed, 03 Feb 2016 21:17:59 GMT</pubDate>
             <description>
                 
@@ -72,13 +72,13 @@
                 
             </description>
             
-            <comments>http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/#disqus_thread</comments>
+            <comments>https://dracodoc.github.io/2016/02/03/data-cleaning-geocode/#disqus_thread</comments>
         </item>
         
         <item>
             <title>Data Cleaning Part 1 - NYC Taxi Trip Data, Looking For Stories Behind Errors</title>
-            <link>http://dracodoc.github.io/2016/01/31/data-cleaning/</link>
-            <guid>http://dracodoc.github.io/2016/01/31/data-cleaning/</guid>
+            <link>https://dracodoc.github.io/2016/01/31/data-cleaning/</link>
+            <guid>https://dracodoc.github.io/2016/01/31/data-cleaning/</guid>
             <pubDate>Mon, 01 Feb 2016 01:27:06 GMT</pubDate>
             <description>
                 
@@ -90,7 +90,7 @@
                 
             </description>
             
-            <comments>http://dracodoc.github.io/2016/01/31/data-cleaning/#disqus_thread</comments>
+            <comments>https://dracodoc.github.io/2016/01/31/data-cleaning/#disqus_thread</comments>
         </item>
         
     </channel>

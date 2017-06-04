@@ -5,7 +5,7 @@
     
     <entry>
       <title><![CDATA[Color Sync in multiple ggplots]]></title>
-      <url>http://dracodoc.github.io/2017/04/08/color-sync-gg/</url>
+      <url>https://dracodoc.github.io/2017/04/08/color-sync-gg/</url>
       <content type="html"><![CDATA[<p>This is a summary about my experience on synchronize colors in multiple ggplots of same dataset. </p>
 <a id="more"></a>
 <p>RMarkdown is the better format for the content, so please see <a href="color_sync_ggplot/">the rendered RMarkdown document here</a>.</p>
@@ -30,7 +30,7 @@
     
     <entry>
       <title><![CDATA[rCartoAPI - call Carto.com API with R]]></title>
-      <url>http://dracodoc.github.io/2017/01/21/rCarto/</url>
+      <url>https://dracodoc.github.io/2017/01/21/rCarto/</url>
       <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>My experience with Carto.com in creating web map for data analysis</li>
 <li>I wrote a R package to wrap Carto.com API calls</li>
@@ -94,9 +94,9 @@
         
         <tags>
             
-            <tag> R </tag>
-            
             <tag> Data Science </tag>
+            
+            <tag> R </tag>
             
             <tag> Map </tag>
             
@@ -108,7 +108,7 @@
     
     <entry>
       <title><![CDATA[RStudio addin - extend RStudio in your way]]></title>
-      <url>http://dracodoc.github.io/2016/08/10/rstudio-addin/</url>
+      <url>https://dracodoc.github.io/2016/08/10/rstudio-addin/</url>
       <content type="html"><![CDATA[<h2 id="rstudio-addins-first-attempt"><a href="#RStudio-addins-first-attempt" class="headerlink" title="RStudio addins - first attempt"></a>RStudio addins - first attempt</h2><p>Recently I found RStudio began to provide addin mechanism. The examples looked simple, and the addin API easy to use. I immediately started to try writing one by myself. It will be a good practice project for writing R package, and I can implement some features I wanted but not in RStudio&#x2019;s high priority list.</p>
 <a id="more"></a>
 <p>My first idea came from a long time frustration of using <code>Ctrl+Enter</code> to run current statement in console. With ggplot code like this, <code>Ctrl+Enter</code> only send one line with your cursor.</p>
@@ -169,9 +169,9 @@
         
         <tags>
             
-            <tag> R </tag>
-            
             <tag> Data Science </tag>
+            
+            <tag> R </tag>
             
             <tag> RStudio </tag>
             
@@ -181,7 +181,7 @@
     
     <entry>
       <title><![CDATA[Data Cleaning Part 2 - Geocoding Addresses, Double The Performance By Cleaning]]></title>
-      <url>http://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</url>
+      <url>https://dracodoc.github.io/2016/02/03/data-cleaning-geocode/</url>
       <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>This is my second post on topic of Data Cleaning. </li>
 <li>Cleaning addresses format turned out to have a substantial positive impact on Geocoding performance.</li>
@@ -394,11 +394,11 @@
         
         <tags>
             
-            <tag> R </tag>
-            
             <tag> Geocoding </tag>
             
             <tag> Data Science </tag>
+            
+            <tag> R </tag>
             
             <tag> Data Cleaning </tag>
             
@@ -408,7 +408,7 @@
     
     <entry>
       <title><![CDATA[Data Cleaning Part 1 - NYC Taxi Trip Data, Looking For Stories Behind Errors]]></title>
-      <url>http://dracodoc.github.io/2016/01/31/data-cleaning/</url>
+      <url>https://dracodoc.github.io/2016/01/31/data-cleaning/</url>
       <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>Data cleaning is a cumbersome but important task for Data Science project in reality.</li>
 <li>This is a discussion on my practice of data cleaning for NYC Taxi Trip data.</li>
@@ -486,9 +486,9 @@
         
         <tags>
             
-            <tag> R </tag>
-            
             <tag> Data Science </tag>
+            
+            <tag> R </tag>
             
             <tag> Data Cleaning </tag>
             
@@ -500,7 +500,7 @@
     
     <entry>
       <title><![CDATA[Script And Workflow For Batch Geocoding Millions Of Address With PostGIS Tiger Geocoder]]></title>
-      <url>http://dracodoc.github.io/2015/11/19/Script-workflow/</url>
+      <url>https://dracodoc.github.io/2015/11/19/Script-workflow/</url>
       <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>I discussed all the problem I met, approaches I tried, and improvement I achieved in the Geocoding task.</li>
 <li>There are many subtle details, some open questions and areas can be improved.</li>
@@ -780,7 +780,7 @@ psql:geocode_batch.sql:178: NOTICE:  # 00:00:03.4  |    2000    &lt;&lt;&lt;&lt;
     
     <entry>
       <title><![CDATA[Geocoding 18 million addresses with PostGIS Tiger Geocoder]]></title>
-      <url>http://dracodoc.github.io/2015/11/17/Geocoding/</url>
+      <url>https://dracodoc.github.io/2015/11/17/Geocoding/</url>
       <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>This post discussed the background, approaches, windows and linux environment setup for my Geocoding task.</li>
 <li>See more details about the script and workflow in next post.</li>
@@ -901,7 +901,7 @@ su ubuntu
     
     <entry>
       <title><![CDATA[Red Cross Smoke Alarm Project]]></title>
-      <url>http://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/</url>
+      <url>https://dracodoc.github.io/2015/11/11/Red-Cross-Smoke-Alarm-Project/</url>
       <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>This is a write-up for my volunteer Data Science project for the American Red Cross.</li>
 <li>The project used public data to help Red Cross directing limited resources to homes that more vulnerable to fire risk and loss.</li>
@@ -982,7 +982,7 @@ su ubuntu
     
     <entry>
       <title><![CDATA[Exploring House Price Estimation And Imagining A Better Real Estate Website]]></title>
-      <url>http://dracodoc.github.io/2015/10/23/house-price/</url>
+      <url>https://dracodoc.github.io/2015/10/23/house-price/</url>
       <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>This personal project was inspired by my own experience in housing market. I was wondering what I can achieve with public data and Data Science methods.</li>
 <li>Built upon extensive research of domain knowledge, my model is very simple yet powerful. It used the data with most information, followed the trends in space and time.</li>
@@ -1125,7 +1125,7 @@ su ubuntu
     
     <entry>
       <title><![CDATA[Simple Python performance timing by checkpoints]]></title>
-      <url>http://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/</url>
+      <url>https://dracodoc.github.io/2015/10/20/simple-python-performance-timing-by-checkpoints/</url>
       <content type="html"><![CDATA[<h2 id="summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><ul>
 <li>This is a simple python script that can measure python program running time in fine levels. </li>
 <li>It&#x2019;s simpler than a full profiler, easier to use than other currently available similar scripts.</li>
