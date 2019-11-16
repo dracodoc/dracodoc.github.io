@@ -8,8 +8,36 @@
         <atom:link href="/categories/R/rss2.xml" rel="self" type="application/rss+xml"/>
         
         <description></description>
-        <pubDate>Sun, 04 Jun 2017 01:44:31 GMT</pubDate>
+        <pubDate>Sat, 16 Nov 2019 00:56:50 GMT</pubDate>
         <generator>http://hexo.io/</generator>
+        
+        <item>
+            <title>Reactive in Shiny</title>
+            <link>https://dracodoc.github.io/2019/11/15/shiny-reactive/</link>
+            <guid>https://dracodoc.github.io/2019/11/15/shiny-reactive/</guid>
+            <pubDate>Sat, 16 Nov 2019 00:42:58 GMT</pubDate>
+            <description>
+                
+                &lt;h2 id=&quot;Intro&quot;&gt;&lt;a href=&quot;#Intro&quot; class=&quot;headerlink&quot; title=&quot;Intro&quot;&gt;&lt;/a&gt;Intro&lt;/h2&gt;&lt;p&gt;  In preparing an invited talk on Shiny, I organized my experience and notes on reactive programming, and found the storyline I developed may actually be a good alternative compare to the usual tutorials on this topic. Thus I’m expanding the talk slides into a blog post and sharing it here.&lt;/p&gt;
+                
+            </description>
+            
+            <comments>https://dracodoc.github.io/2019/11/15/shiny-reactive/#disqus_thread</comments>
+        </item>
+        
+        <item>
+            <title>Make link button with Shiny functions</title>
+            <link>https://dracodoc.github.io/2017/06/03/shiny-link-button/</link>
+            <guid>https://dracodoc.github.io/2017/06/03/shiny-link-button/</guid>
+            <pubDate>Sun, 04 Jun 2017 02:25:27 GMT</pubDate>
+            <description>
+                
+                &lt;p&gt;You can customize Shiny to a much greater extent if you knew Shiny UI functions just generate html codes. You can make a link button with creative use of Shiny functions.&lt;br&gt;
+                
+            </description>
+            
+            <comments>https://dracodoc.github.io/2017/06/03/shiny-link-button/#disqus_thread</comments>
+        </item>
         
         <item>
             <title>Color Sync in multiple ggplots</title>

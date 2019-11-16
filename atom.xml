@@ -5,7 +5,7 @@
   <link href="https://dracodoc.github.io/atom.xml" rel="self"/>
   
   <link href="https://dracodoc.github.io/"/>
-  <updated>2017-06-04T01:44:31.369Z</updated>
+  <updated>2019-11-16T00:56:50.778Z</updated>
   <id>https://dracodoc.github.io/</id>
   
   <author>
@@ -14,6 +14,125 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Reactive in Shiny</title>
+    <link href="https://dracodoc.github.io/2019/11/15/shiny-reactive/"/>
+    <id>https://dracodoc.github.io/2019/11/15/shiny-reactive/</id>
+    <published>2019-11-16T00:42:58.000Z</published>
+    <updated>2019-11-16T00:56:50.778Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h2><p>  In preparing an invited talk on Shiny, I organized my experience and notes on reactive programming, and found the storyline I developed may actually be a good alternative compare to the usual tutorials on this topic. Thus I&#x2019;m expanding the talk slides into a blog post and sharing it here.</p>
+<a id="more"></a>
+<h2 id="programming-for-user-interface-event-driving-programming"><a href="#Programming-for-User-Interface-Event-Driving-programming" class="headerlink" title="Programming for User Interface: Event Driving programming"></a>Programming for User Interface: Event Driving programming</h2><p>  Programming user interface is different from some other domains, because user interface need to respond to user input and you don&#x2019;t know when that will happen. Usually this means you write some logic for some possible situations, and there will be a maintained loop watching for user input, and trigger the appropriate logic when the input happens.</p>
+<p>  In desktop application development, the common pattern is Event Driven programming. User input will generate some event, and the event object have information about the input. You can write code for specific event and conditions, &#x201C;register&#x201D; the event to the system (the programming framework), and the system will trigger the code. Here the framework handle the details about event, registering, triggering, and developer only need to write code for event handling.</p>
+<p>  This pattern is straightforward and not hard to understand. Shiny support this pattern too (<a href="https://shiny.rstudio.com/reference/shiny/1.4.0/observeEvent.html" target="_blank" rel="external">observeEvent</a>, note sometimes you may see code examples using <code>observe</code>, which is a low level API and I believe usually there is no real reason for you to use <code>observe</code> instead of more friendly <code>observeEvent</code>.) since it&#x2019;s a good approach for certain use cases.</p>
+<p>  There is a slight difference in Shiny <code>observeEvent</code> though. You can think it is observing data changes in the target, not really some event object (it&#x2019;s possible in the underlying level implementation of Shiny framework something can be called as event object, but I think this way of understanding will help to recognize the difference and connection to the reactive programming topic later). For example, an <code>actionButton</code> click actually just increase its return value by 1, and that value change can trigger some observeEvent code. You can even write something like <code>observeEvent(1, {...})</code>, just the code will only execute once and not again.</p>
+<p>  If we think <code>observeEvent</code> observe data changes, it can be triggered by any kind of change, including user input (which will change the value input$widget_id), reactive expressions(we will discuss it next).</p>
+<p>  Summary: <strong><code>observeEvent</code> observe data changes in target expression, run the code once anything changed</strong> (there are more options control the fine details, like whether to run in initialization, if to ignore NULL etc, see help page of <code>observeEvent</code>). </p>
+<pre><code>observeEvent: data changes ---trigger---&gt; event handling code
+</code></pre><p>  Note the official tutorials differentiate event observer and reactive expressions mainly by side effect/calculated values. In my experience this difference is less useful than the difference of source/target of changes, the latter often determined which one you need to use, and you can have side effect in reactive expression in some valid user cases. After all, anything interacting with outside world is side effect, and we need to interact with outside world a lot in user interface programming.</p>
+<p>  If your reactive expression only returned some changed values and that didn&#x2019;t reflect to GUI, why were the changes needed? if it did reflect to GUI, that&#x2019;s still side effect, just shiny framework did the plumbing work and made the changes so the reactive expression didn&#x2019;t look like did anything imperative.</p>
+<p>  More relevantly, should use the design principle of cohererant and loose coupling. let related event update together. if you have multiple control for one final value, better use a reactive expression instead of multiple observer.</p>
+<h2 id="another-pattern-reactive-programming"><a href="#Another-pattern-Reactive-programming" class="headerlink" title="Another pattern: Reactive programming"></a>Another pattern: Reactive programming</h2><p>  For more complete and detailed tutorial on reactive programming, check <a href="https://mastering-shiny.org/why-reactivity.html" target="_blank" rel="external">Hadley&#x2019;s new book on Shiny</a>.</p>
+<p>  In this post my perspective is to introduce reactive pattern by comparing with event driving programming.</p>
+<p>  <strong>A reactive expression/value will automatically update itself triggered by data changes in source of changes.</strong> This automatical update is handled by Shiny framework, thus require less manual work and appears to be more magical to developers.</p>
+<h3 id="reactive-expression-all-reactive-values-inside-become-source-of-changes"><a href="#Reactive-Expression-all-reactive-values-inside-become-source-of-changes" class="headerlink" title="Reactive Expression: all reactive values inside become source of changes"></a>Reactive Expression: all reactive values inside become source of changes</h3><p>  observeEvent is triggered by data changes in the target expression, while a <a href="https://shiny.rstudio.com/reference/shiny/1.4.0/reactive.html" target="_blank" rel="external">reactive expression</a> update is triggered by all data changes in all reactive values inside the expression, and you don&#x2019;t need to register them explicitly. </p>
+<pre><code>reactive({
+    ...
+    Shiny UI reactive values like input$checkbox
+    reactive values defined by reactiveValue()
+    other reactive expression()
+})
+dynamic data 1
+dynamic data 2  ==&gt; expression reevaluate
+dynamic data 3
+</code></pre><p>  Note:</p>
+<ul>
+<li>Reactive expression look like a function, use like a function. Thus you reference it with () for the updated value, transfer it without () in some other scenarios (like Shiny module) when you are using the expression itself but not going to use the updating value immediately.</li>
+</ul>
+<h2 id="reactive-expression-vs-observeevent"><a href="#Reactive-Expression-Vs-observeEvent" class="headerlink" title="Reactive Expression Vs observeEvent"></a>Reactive Expression Vs observeEvent</h2><p>  Compare to observeEvent, you can establish multiple -&gt; one data update relationship in reactive expression without explicit registering, thus this is a prefered way if it met all your needs. </p>
+<p>  In <a href="(https://shiny.rstudio.com/reference/shiny/1.4.0/observe.html"><code>observe</code></a>) help page, there are some official comparison for these two, mainly focused on:</p>
+<blockquote>
+<p>it doesn&#x2019;t yield a result and can&#x2019;t be used as an input to other reactive expressions. Thus, observers are only useful for their side effects (for example, performing I/O).<br>  Another contrast between reactive expressions and observers is their execution strategy. Reactive expressions use lazy evaluation; that is, when their dependencies change, they don&#x2019;t re-execute right away but rather wait until they are called by someone else. Indeed, if they are not called then they will never re-execute. In contrast, observers use eager evaluation; as soon as their dependencies change, they schedule themselves to re-execute.</p>
+</blockquote>
+<p>  All these are definitely valid points, but I think the deciding factor for choosing one of them should be just how you want to arrange the source of changes and eager vs lazy evaluation. With observeEvent you need to be more explicit and have more control, with reactive expression you &#x201C;let it go&#x201D; and everything will work smoothly if it fit the pattern.</p>
+<h2 id="reactive-values"><a href="#Reactive-Values" class="headerlink" title="Reactive Values"></a>Reactive Values</h2><p>  One real limit with reactive expression is that you cannot modify its value arbitrarily. It can update when source of changes changed, but always change with same expression. When you need to modify the dynamic data from another source/place/time, you need <a href="https://shiny.rstudio.com/reference/shiny/1.4.0/reactiveValues.html" target="_blank" rel="external">reactive values</a>.</p>
+<p>  Thus you have more control and more responsibilities with reactive values</p>
+<pre><code>- read reactive value inside reactive expression
+  - value change ==&gt; expression reevaluate
+- write reactive value inside reactive expression
+  - expression reevaluate ==&gt; value updated
+- read/write same reactive value inside reactive expression?
+  - that will cause an infinite loop
+</code></pre><h2 id="shiny-inputoutput-as-reactive-special-cases"><a href="#Shiny-input-output-as-reactive-special-cases" class="headerlink" title="Shiny input/output as reactive special cases"></a>Shiny input/output as reactive special cases</h2><ul>
+<li>input value (input$slider_value) are reactive values driven by user input<ul>
+<li>cannot modify it directly by assignment</li>
+<li>use <a href="https://shiny.rstudio.com/reference/shiny/1.4.0/" target="_blank" rel="external">update* methods</a> to change UI status</li>
+</ul>
+</li>
+<li>output code (renderPlot) create reactive scopes like reactive expression<ul>
+<li>return value used immediately</li>
+<li>if you need to reuse the value, just create a reactive expression and reference it </li>
+</ul>
+</li>
+<li>Error: Operation not allowed without an active reactive context<ul>
+<li>Every reactive value inside a reactive domain (like inside a reactive expression, output code which is reactive domain implicitly) get registered by Shiny framework behind the scene so their changes can be monitored. Thus using a reactive value outside of reactive domain will raise this error.</li>
+<li>If you do need to inspect the value in debugging, or you want to read the value but don&#x2019;t want the value update trigger reactive expression reevaluation, you can use <a href="https://shiny.rstudio.com/reference/shiny/1.4.0/isolate.html" target="_blank" rel="external">isolate</a>.</li>
+</ul>
+</li>
+</ul>
+<h2 id="when-more-controls-are-needed"><a href="#When-more-controls-are-needed" class="headerlink" title="When more controls are needed"></a>When more controls are needed</h2><p>  The components above can be used to create sophisticated dynamic systems. However sometimes the order of changes may not be ideal with these rules.</p>
+<ul>
+<li>One simple case is that your downstream reactive expression/value may not have valid upstream value yet when the app UI is initialized. You can use <a href="https://shiny.rstudio.com/reference/shiny/1.4.0/req.html" target="_blank" rel="external">req</a> to hold off the related UI widget rendering before the upstream value is ready. </li>
+<li><p>Sometimes you have multiple widgets updating at the same time driven by some changes, and some widget always update slower, this may cause problems. </p>
+<p>For example, <code>DT</code> is one of my favorite package and I used it extensively in my app, often using the table selection to control other parts of app. When a <code>DT</code> table was updated, the row information will update after the whole table render finish, which is often the slowest one if other widgets are updating at the same time. I may have a plot is depending on some row selection value, so there will be a short time period when the row selection value are not valid and plot will render with the invalid value. Once the table finished update it will be corrected.</p>
+<p>In the beginning I tried to use <a href="https://shiny.rstudio.com/reference/shiny/1.4.0/outputOptions.html" target="_blank" rel="external">priority levels</a> to adjust the order, but that seemed never work.</p>
+<p>Instead you can use <a href="https://shiny.rstudio.com/reference/shiny/1.4.0/freezeReactiveValue.html" target="_blank" rel="external">freezeReactiveValue</a>, which will hold off downstream changes until the last second, so the plot will not render with the invalid value.</p>
+</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;Intro&quot;&gt;&lt;a href=&quot;#Intro&quot; class=&quot;headerlink&quot; title=&quot;Intro&quot;&gt;&lt;/a&gt;Intro&lt;/h2&gt;&lt;p&gt;  In preparing an invited talk on Shiny, I organized my experience and notes on reactive programming, and found the storyline I developed may actually be a good alternative compare to the usual tutorials on this topic. Thus I’m expanding the talk slides into a blog post and sharing it here.&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="R" scheme="https://dracodoc.github.io/categories/R/"/>
+    
+    
+      <category term="R" scheme="https://dracodoc.github.io/tags/R/"/>
+    
+      <category term="Shiny" scheme="https://dracodoc.github.io/tags/Shiny/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Make link button with Shiny functions</title>
+    <link href="https://dracodoc.github.io/2017/06/03/shiny-link-button/"/>
+    <id>https://dracodoc.github.io/2017/06/03/shiny-link-button/</id>
+    <published>2017-06-04T02:25:27.000Z</published>
+    <updated>2017-06-04T02:33:09.772Z</updated>
+    
+    <content type="html"><![CDATA[<p>You can customize Shiny to a much greater extent if you knew Shiny UI functions just generate html codes. You can make a link button with creative use of Shiny functions.<br><a id="more"></a></p>
+<p>RMarkdown is the better format for the content, so please see <a href="link-button/">the rendered RMarkdown document here</a>.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;You can customize Shiny to a much greater extent if you knew Shiny UI functions just generate html codes. You can make a link button with creative use of Shiny functions.&lt;br&gt;
+    
+    </summary>
+    
+      <category term="R" scheme="https://dracodoc.github.io/categories/R/"/>
+    
+    
+      <category term="R" scheme="https://dracodoc.github.io/tags/R/"/>
+    
+      <category term="Shiny" scheme="https://dracodoc.github.io/tags/Shiny/"/>
+    
+  </entry>
   
   <entry>
     <title>Color Sync in multiple ggplots</title>
